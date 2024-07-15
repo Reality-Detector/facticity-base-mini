@@ -1,5 +1,5 @@
 
-## Dev Practices for Facticity
+# Dev Practices for Facticity
 
 Create 'temp' branches while working on new features/bugs and merge into the primary branch
 
