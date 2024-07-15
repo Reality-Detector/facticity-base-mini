@@ -7,7 +7,14 @@ Wherever possible, create new components in order to prevent App.js from becomin
 
 Add short comment lines to explain code flow and code blocks, so that it's easier for other devs who might work on the same code block in the future.
 
-For using backend or API URLs, displaying long hardcoded texts -> create an entry in the config file, and import the key of the entry in code and use. This would facilitate easier reusability and if a text that we are displaying, say 'Enter a Fact about someone or something and I will fact check it' needs to be updated, it can be easily changed just in the config file, instead of having to go through the code and find the div and make changes.
+For using backend or API URLs, displaying long hardcoded texts -> create an entry in the config file, and import the key of the entry in code and use. This would facilitate easier reusability.
+
+Eg: if a text that we are displaying, say 'Enter a Fact about someone or something and I will fact check it' needs to be updated, it can be easily changed just in the config file, instead of having to go through the code and find the div and make changes.
+
+Usage of Feature Flags: It is recommended to have modular features, certain app behaviors (both frontend and backend) that can be toggled, under a Feature Flag. If the feature flag for a particular feature is set to True in the config file, then this feature would be displayed/used in the UI.  
+
+Eg: Let's say that one feature/behavior of the application is referring to Knowledge Base. If the 'USE_KNOWLEDGE_BASE' flag is set to true in the config file, then in the code flow, knowlegde will be used. If set to false, then those code blocks should be skipped.
+
 
 # Getting Started with Create React App
 
