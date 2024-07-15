@@ -13,7 +13,8 @@ Eg: if a text that we are displaying, say 'Enter a Fact about someone or somethi
 
 Usage of Feature Flags: It is recommended to have modular features, certain app behaviors (both frontend and backend) that can be toggled, under a Feature Flag. If the feature flag for a particular feature is set to True in the config file, then this feature would be displayed/used in the UI.  
 
-Eg: Let's say that one feature/behavior of the application is referring to Knowledge Base. If the 'USE_KNOWLEDGE_BASE' flag is set to true in the config file, then in the code flow, knowlegde will be used. If set to false, then those code blocks should be skipped.
+Eg: Let's say that one feature/behavior of the application is referring to Knowledge Base. If the 'USE_KNOWLEDGE_BASE' flag is set to true in the config file, then in the code flow, knowledge base will be used. If set to false, then those code blocks should be skipped (which will be enforced by the boolean variable USE_KNOWLEDGE_BASE). 
+If we want to turn off knowledge base, then instead of having to comment out all of the code blocks related to knowledge base, just changing the flag from true to false in the config file would be enough. This will automatically reflect in the entire code flow.
 
 
 # Getting Started with Create React App
