@@ -12,7 +12,7 @@ const Sidebar = ({ isOpen }) => {
     width: `${sidebarWidth}px`,
     height: '100%',
     backgroundColor: '#FFF',
-    boxShadow: '2px 0px 5px rgba(0,0,0,0.5)',
+    boxShadow: '1px 0px 1px rgba(0,0,0,0.5)',
     transition: 'left 0.3s ease',
     zIndex: 900,
     borderRadius: '20px',

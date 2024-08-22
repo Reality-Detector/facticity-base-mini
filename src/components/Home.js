@@ -26,7 +26,7 @@ const Home = () => {
                 style={{
                     width: '98%',
                     height: '98%',
-                    border: '0.5px solid #0066FF',
+                    border: '1.5px solid #0066FF',
                     borderRadius: '20px',
                     display: 'flex',
                     position: 'relative',
@@ -37,7 +37,7 @@ const Home = () => {
                 {/* First Column - Sidebar */}
                 <div style={{ ...columnStyle, position: 'relative' }}>
                     <IconButton onClick={toggleSidebar} style={{ position: 'absolute', top: 15, left: 0, zIndex: 1000 }}>
-                        <MenuIcon />
+                        <MenuIcon style = {{color : '#0066FF'}}/>
                     </IconButton>
                     <Sidebar isOpen={isSidebarOpen} style={{ marginTop: '20px' }} />
                 </div>
