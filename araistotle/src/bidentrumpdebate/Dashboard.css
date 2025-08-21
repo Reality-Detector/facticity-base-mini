@@ -1,0 +1,137 @@
+/* Navbar */
+.navbar {
+    background-color: #333;
+    color: #fff;
+    padding: 10px 20px;
+    margin-bottom: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  
+  .navbar h1 {
+    margin: 0;
+  }
+  
+  .navbar h5 {
+    margin: 5px 0;
+  }
+  
+  .about-button {
+    margin-top: 10px;
+  }
+  
+  .about-button button {
+    background-color: #555;
+    color: #fff;
+    border: none;
+    padding: 10px 10px;
+    cursor: pointer;
+    border-radius: 20%;
+  }
+  
+  .note {
+    color: darkgray;
+    padding-left: 20px;
+  }
+  
+  .content {
+    display: flex;
+    flex-direction: column;
+    padding: 20px;
+  }
+  
+  .candidate-section {
+    width: 100%;
+    background-color: #ADD8E6;
+    padding: 10px;
+    border-radius: 10px;
+    margin-bottom: 20px;
+  }
+  
+  .candidate-section.trump {
+    background-color: #FFA07A;
+  }
+  
+  .candidate-header {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+  }
+  
+  .candidate-header h2 {
+    margin-right: 10px;
+    
+  }
+  
+  .candidate-header img {
+    max-width: 100px;
+    max-height: 100px;
+    margin-top: 10px;
+    border: 2px solid black;
+    border-radius: 50%;
+    object-fit: cover; /* Ensures the image covers the area */
+  }
+  
+  .stats {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+  
+  .facts-list {
+    max-height: 600px;
+    overflow-y: scroll;
+  }
+  
+  /* Media Queries for Responsiveness */
+  @media (min-width: 768px) {
+    .navbar {
+      flex-direction: row;
+      align-items: center;
+    }
+  
+    .content {
+      flex-direction: row;
+      justify-content: space-around;
+    }
+  
+    .candidate-section {
+      width: 45%;
+    }
+  }
+
+  /* Dashboard.css */
+.custom-toast {
+    background-color: #ffcccb; /* Light red background */
+    color: #000; /* Black text */
+    font-weight: bold; /* Bold text */
+    padding: 16px; /* Padding for better spacing */
+}
+
+.custom-toast-body {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.filter-checkboxes {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.filter-checkbox {
+  display: flex;
+  align-items: center;
+}
+
+.filter-checkbox p {
+  margin: 0 10px;
+}
+
+.filter-checkbox input {
+  margin-right: 2px
+}
+
+  

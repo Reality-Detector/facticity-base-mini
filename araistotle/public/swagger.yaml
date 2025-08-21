@@ -1,0 +1,450 @@
+# openapi: 3.0.0
+# info:
+#   version: v0.1
+#   title: Facticity
+#   description: The Facticity API enables developers to integrate advanced fact-checking capabilities into their applications, providing real-time verification of text, audio, and video content. It empowers users to build apps that automatically assess the accuracy of information, enhancing content credibility and trustworthiness. This API is ideal for news platforms, research tools, and content moderation systems.
+# servers:
+#   - description: API
+#     url: https://api.facticity.ai
+# components:
+#   securitySchemes:
+#     ApiKeyAuth:
+#       type: apiKey
+#       in: header
+#       name: X-API-KEY
+# paths:
+#   /fact-check:
+#     post:
+#       summary: Initiate a fact-checking request
+#       description: >
+#         The /fact-check endpoint is used to initiate a fact-checking request. Depending on the mode specified (sync or async), the endpoint either processes the request immediately or queues it for later processing.
+#       security:
+#         - ApiKeyAuth: []  # API key required only for this endpoint
+#       requestBody:
+#         required: true
+#         content:
+#           application/json:
+#             schema:
+#               type: object
+#               properties:
+#                 query:
+#                   type: string
+#                   description: The main input for the fact-check request. This is the statement or claim you want to verify.
+#                 timeout:
+#                   type: integer
+#                   default: 60
+#                   description: The maximum amount of time (in seconds) the server will wait for a task to complete when in synchronous (sync) mode.
+#                 mode:
+#                   type: string
+#                   enum: [sync, async]
+#                   default: sync
+#                   description: |
+#                     The mode of processing the request.
+#                     - sync: The server will wait for the task to complete and return the result.
+#                     - async: The request will be added to the processing queue, and the server will return immediately with a task ID for status checks.
+#               required:
+#                 - query
+#       responses:
+#         '200':
+#           description: Successful response
+#           content:
+#             application/json:
+#               schema:
+#                 type: object
+#                 properties:
+#                   input:
+#                     type: string
+#                     example: "Is the earth flat?"
+#                   Classification:
+#                     type: string
+#                     example: "False"
+#                   overall_assessment:
+#                     type: string
+#                     example: "The earth is round."
+#                   evidence:
+#                     type: string
+#                     example: "NASA and various scientific studies confirm the earth's round shape."
+#                   disambiguation:
+#                     type: string
+#                     example: "None"
+#                   sources:
+#                     type: array
+#                     items:
+#                       type: string
+#                       example: "NASA"
+#                   task_id:
+#                     type: string
+#                     example: "123456"
+#         '400':
+#           description: Bad Request - Missing required parameters such as query or task ID.
+#         '404':
+#           description: Task Not Found - The task with the provided task ID was not found.
+#         '408':
+#           description: Request Timeout - The task did not complete within the specified timeout period in sync mode.
+#         '500':
+#           description: Internal Server Error - An error occurred while checking the task status or processing the request.
+#       examples:
+#         sync_request:
+#           summary: Example Request (Sync Mode)
+#           value:
+#             query: "Is the earth flat?"
+#             timeout: 60
+#             mode: "sync"
+#         async_request:
+#           summary: Example Request (Async Mode)
+#           value:
+#             query: "Albert Einstein won a Nobel Prize"
+#             timeout: 30
+#             mode: "async"
+#         sync_response:
+#           summary: Example Response (Sync Mode)
+#           value:
+#             input: "Is the earth flat?"
+#             Classification: "False"
+#             overall_assessment: "The earth is round."
+#             evidence: "NASA and various scientific studies confirm the earth's round shape."
+#             disambiguation: "None"
+#             sources: ["NASA", "Scientific Journals"]
+#             task_id: "123456"
+#         async_response:
+#           summary: Example Response (Async Mode)
+#           value:
+#             message: "Request received and added to the processing queue"
+#             task_id: "123456"
+
+#   /check-task-status:
+#     get:
+#       summary: Check the status of a task
+#       description: >
+#         The /check-task-status endpoint allows you to check the status of an asynchronous (async) task or re-access the output of a previously completed query.
+#       parameters:
+#         - name: task_id
+#           in: query
+#           required: true
+#           schema:
+#             type: string
+#           description: The unique ID associated with the fact-check request. This ID is provided when the request is submitted in async mode.
+#       responses:
+#         '200':
+#           description: Task status retrieved successfully
+#           content:
+#             application/json:
+#               schema:
+#                 type: object
+#                 properties:
+#                   input:
+#                     type: string
+#                     example: "Did Albert Einstein win a Nobel Prize?"
+#                   Classification:
+#                     type: string
+#                     example: "True"
+#                   overall_assessment:
+#                     type: string
+#                     example: "Albert Einstein won the Nobel Prize in Physics in 1921."
+#                   evidence:
+#                     type: string
+#                     example: "Nobel Prize records and historical documents."
+#                   disambiguation:
+#                     type: string
+#                     example: "None"
+#                   sources:
+#                     type: array
+#                     items:
+#                       type: string
+#                       example: "Nobel Prize Official Website"
+#                   task_id:
+#                     type: string
+#                     example: "123456"
+#                   status:
+#                     type: string
+#                     example: "completed"
+#                   step:
+#                     type: array
+#                     items:
+#                       type: string
+#                       example: "Analyzing sources"
+#         '400':
+#           description: Bad Request - Missing required task ID parameter.
+#         '404':
+#           description: Task Not Found - The task with the provided task ID was not found.
+#         '500':
+#           description: Internal Server Error - An error occurred while checking the task status.
+#       examples:
+#         task_completed:
+#           summary: Example Response (Task Completed)
+#           value:
+#             input: "Did Albert Einstein win a Nobel Prize?"
+#             Classification: "True"
+#             overall_assessment: "Albert Einstein won the Nobel Prize in Physics in 1921."
+#             evidence: "Nobel Prize records and historical documents."
+#             disambiguation: "None"
+#             sources: ["Nobel Prize Official Website", "Historical Archives"]
+#             task_id: "123456"
+#             status: "completed"
+#         task_in_progress:
+#           summary: Example Response (Task Not Completed)
+#           value:
+#             status: "in_progress"
+#             step: ["Checking historical records", "Analyzing sources"]
+
+
+openapi: 3.0.0
+info:
+  version: v0.1
+  title: Facticity
+  description: The Facticity API enables developers to integrate advanced fact-checking capabilities into their applications, providing real-time verification of text, audio, and video content. It empowers users to build apps that automatically assess the accuracy of information, enhancing content credibility and trustworthiness. This API is ideal for news platforms, research tools, and content moderation systems.
+servers:
+  - description: API
+    url: https://api.facticity.ai
+components:
+  securitySchemes:
+    ApiKeyAuth:
+      type: apiKey
+      in: header
+      name: X-API-KEY
+paths:
+  /fact-check:
+    post:
+      summary: Initiate a fact-checking request
+      description: >
+        The /fact-check endpoint is used to initiate a fact-checking request. Depending on the mode specified (sync or async), the endpoint either processes the request immediately or queues it for later processing.
+      security:
+        - ApiKeyAuth: []  # API key required only for this endpoint
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                query:
+                  type: string
+                  description: The main input for the fact-check request. This is the statement or claim you want to verify.
+                timeout:
+                  type: integer
+                  default: 60
+                  description: The maximum amount of time (in seconds) the server will wait for a task to complete when in synchronous (sync) mode.
+                mode:
+                  type: string
+                  enum: [sync, async]
+                  default: sync
+                  description: |
+                    The mode of processing the request.
+                    - sync: The server will wait for the task to complete and return the result.
+                    - async: The request will be added to the processing queue, and the server will return immediately with a task ID for status checks.
+                version:
+                  type: string
+                  enum: [v2, v3]
+                  default: v3
+                  description: |
+                    The version of the fact checking backend to be used.
+                    - v2: More afforable version of Facticity.
+                    - v3: Premium version of Facticity with higher accuracy.
+                            
+              required:
+                - query
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  input:
+                    type: string
+                    example: "The earth is flat"
+                  Classification:
+                    type: string
+                    example: "False"
+                  overall_assessment:
+                    type: string
+                    example: "This source is reliable as it is an educational platform associated with a reputable university, providing scientifically backed explanations."
+                  evidence:
+                    type: string
+                    example: {}
+                  disambiguation:
+                    type: string
+                    example: ""
+                  sources:
+                    type: array
+                    items:
+                      type: string
+                      example: []
+                  task_id:
+                    type: string
+                    example: "123456"
+        '400':
+          description: Bad Request - Missing required parameters such as query or task ID.
+        '404':
+          description: Task Not Found - The task with the provided task ID was not found.
+        '408':
+          description: Request Timeout - The task did not complete within the specified timeout period in sync mode.
+        '500':
+          description: Internal Server Error - An error occurred while checking the task status or processing the request.
+      examples:
+        sync_request:
+          summary: Example Request (Sync Mode)
+          value:
+            query: "Is the earth flat?"
+            timeout: 60
+            mode: "sync"
+        async_request:
+          summary: Example Request (Async Mode)
+          value:
+            query: "Albert Einstein won a Nobel Prize"
+            timeout: 30
+            mode: "async"
+        sync_response:
+          summary: Example Response (Sync Mode)
+          value:
+            input: "Is the earth flat?"
+            Classification: "False"
+            overall_assessment: "The earth is round."
+            evidence: "NASA and various scientific studies confirm the earth's round shape."
+            disambiguation: "None"
+            sources: ["NASA", "Scientific Journals"]
+            task_id: "123456"
+        async_response:
+          summary: Example Response (Async Mode)
+          value:
+            message: "Request received and added to the processing queue"
+            task_id: "123456"
+
+  /check-task-status:
+    get:
+      summary: Check the status of a task
+      description: >
+        The /check-task-status endpoint allows you to check the status of an asynchronous (async) task or re-access the output of a previously completed query.
+      parameters:
+        - name: task_id
+          in: query
+          required: true
+          schema:
+            type: string
+          description: The unique ID associated with the fact-check request. This ID is provided when the request is submitted in async mode.
+      responses:
+        '200':
+          description: Task status retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  input:
+                    type: string
+                    example: "Did Albert Einstein win a Nobel Prize?"
+                  Classification:
+                    type: string
+                    example: "True"
+                  overall_assessment:
+                    type: string
+                    example: "Albert Einstein won the Nobel Prize in Physics in 1921."
+                  evidence:
+                    type: string
+                    example: "Nobel Prize records and historical documents."
+                  disambiguation:
+                    type: string
+                    example: "None"
+                  sources:
+                    type: array
+                    items:
+                      type: string
+                      example: "Nobel Prize Official Website"
+                  task_id:
+                    type: string
+                    example: "123456"
+                  status:
+                    type: string
+                    example: "completed"
+                  step:
+                    type: array
+                    items:
+                      type: string
+                      example: "Analyzing sources"
+        '400':
+          description: Bad Request - Missing required task ID parameter.
+        '404':
+          description: Task Not Found - The task with the provided task ID was not found.
+        '500':
+          description: Internal Server Error - An error occurred while checking the task status.
+      examples:
+        task_completed:
+          summary: Example Response (Task Completed)
+          value:
+            input: "Did Albert Einstein win a Nobel Prize?"
+            Classification: "True"
+            overall_assessment: "Albert Einstein won the Nobel Prize in Physics in 1921."
+            evidence: "Nobel Prize records and historical documents."
+            disambiguation: "None"
+            sources: ["Nobel Prize Official Website", "Historical Archives"]
+            task_id: "123456"
+            status: "completed"
+        task_in_progress:
+          summary: Example Response (Task Not Completed)
+          value:
+            status: "in_progress"
+            step: ["Checking historical records", "Analyzing sources"]
+
+  /extract-claim:
+    post:
+      summary: Extract claims from text or YouTube content
+      description: >
+        The /extract-claim endpoint extracts claims from the provided text input or YouTube content. It uses advanced claim extraction methods for identifying statements or claims that can be fact-checked.
+      security:
+        - ApiKeyAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                input:
+                  type: string
+                  description: The input content, either a YouTube URL or a text string.
+                content_type:
+                  type: string
+                  enum: [youtube, text]
+                  description: Specifies the type of input content. Must be either "youtube" for YouTube URLs or "text" for plain text input.
+              required:
+                - input
+                - content_type
+      responses:
+        '200':
+          description: Claims extracted successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  claims:
+                    type: array
+                    items:
+                      type: string
+                      example: "The earth is flat."
+        '400':
+          description: Bad Request - Missing required parameters such as input or content_type, or invalid content_type.
+        '404':
+          description: Not Found - No available transcripts found for the YouTube video.
+        '500':
+          description: Internal Server Error - An error occurred while processing the request or retrieving transcripts.
+      examples:
+        youtube_request:
+          summary: Example Request (YouTube Content)
+          value:
+            input: "https://www.youtube.com/watch?v=example"
+            content_type: "youtube"
+        text_request:
+          summary: Example Request (Text Content)
+          value:
+            input: "Albert Einstein was awarded the Nobel Prize."
+            content_type: "text"
+        youtube_response:
+          summary: Example Response (YouTube Content)
+          value:
+            claims: ["Albert Einstein was a theoretical physicist.", "He won the Nobel Prize in 1921."]
+        text_response:
+          summary: Example Response (Text Content)
+          value:
+            claims: ["Albert Einstein was awarded the Nobel Prize."]

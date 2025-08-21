@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Health Check</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            padding: 50px;
+            background-color: #f5f5f5;
+        }
+        .health-status {
+            background-color: #4CAF50;
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px auto;
+            max-width: 400px;
+        }
+        .env-info {
+            background-color: #2196F3;
+            color: white;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px auto;
+            max-width: 400px;
+        }
+        .timestamp {
+            color: #666;
+            font-size: 14px;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="health-status">
+        <h1>✅ Healthy</h1>
+        <p>Frontend service is running successfully</p>
+    </div>
+    
+    <div class="env-info">
+        <h3>Environment Information</h3>
+        <p><strong>Service:</strong> facticity-new-fe</p>
+        <p><strong>Environment:</strong> <span id="environment">Detecting...</span></p>
+        <p><strong>URL Pattern:</strong> <span id="urlPattern">Detecting...</span></p>
+        <p><strong>Server:</strong> <span id="server">Detecting...</span></p>
+    </div>
+    
+    <div class="timestamp">
+        <p>Status: Operational</p>
+        <p id="timestamp"></p>
+    </div>
+    
+    <script>
+        // Detect environment and server type
+        function detectEnvironment() {
+            const url = window.location.href;
+            const pathname = window.location.pathname;
+            
+            // Detect environment based on URL pattern
+            let environment = 'Unknown';
+            let urlPattern = 'Unknown';
+            let server = 'Unknown';
+            
+            if (pathname === '/health.html') {
+                environment = 'Development';
+                urlPattern = '/health.html (React Dev Server)';
+                server = 'React Development Server';
+            } else if (pathname === '/health') {
+                environment = 'Production';
+                urlPattern = '/health (Nginx Mapped)';
+                server = 'Nginx';
+            }
+            
+            // Additional environment detection
+            if (url.includes('localhost') || url.includes('127.0.0.1')) {
+                environment += ' (Local)';
+            } else if (url.includes('dev.') || url.includes('staging.')) {
+                environment += ' (Staging)';
+            } else {
+                environment += ' (Production)';
+            }
+            
+            document.getElementById('environment').textContent = environment;
+            document.getElementById('urlPattern').textContent = urlPattern;
+            document.getElementById('server').textContent = server;
+        }
+        
+        // Update timestamp
+        function updateTimestamp() {
+            const now = new Date();
+            document.getElementById('timestamp').textContent = 
+                'Last checked: ' + now.toISOString();
+        }
+        
+        // Initialize
+        detectEnvironment();
+        updateTimestamp();
+        setInterval(updateTimestamp, 1000);
+    </script>
+</body>
+</html> 

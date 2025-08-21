@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <!-- Required Meta Tags -->
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <!-- Title & Favicon -->
+    <title>Facticity AI – Best Internet and Social Media AI Fact-Checker</title>
+    <link rel="icon" type="image/x-icon" href="/favicon2.ico" />
+
+    <!-- Primary Meta Tags -->
+    <meta name="description" content="Facticity AI is an advanced, Multilingual internet and social media AI fact-checking tool by AI Seer. We provide real-time claim verification to combat misinformation. AI fact checker, fact checker, Facticity AI, auto citation, ai foot-noting, fact checking, misinformation detection, automatic fact checking, generative AI, large language models, real-time claim verification, Time's Best Inventions 2024, Tim Draper, Microsoft Word Add-in, RAG (Retrieval-Augmented Generation), cross-media validation, automated verification technology, AI for trust and safety, live debate fact-checking, misinformation combat tools, advanced AI algorithms, scalable AI solutions, B2B and B2C fact-checking tools, credibility verification, automated claim analysis, AI safety solutions, multilingual fact-checking, multimedia content analysis, text verification, audio verification, video verification, ethical AI development, misinformation prevention, enterprise AI tools, government AI partnerships, scalable AI infrastructure." />
+    <meta name="keywords" content="AI fact checker, fact checker, Facticity AI, fact checking, misinformation detection, automatic fact checking, generative AI, large language models, real-time claim verification, Time's Best Inventions 2024, Tim Draper, Microsoft Word Add-in, RAG (Retrieval-Augmented Generation), cross-media validation, automated verification technology, AI for trust and safety, live debate fact-checking, misinformation combat tools, advanced AI algorithms, scalable AI solutions, B2B and B2C fact-checking tools, credibility verification, automated claim analysis, AI safety solutions, multilingual fact-checking, multimedia content analysis, text verification, audio verification, video verification, ethical AI development, misinformation prevention, enterprise AI tools, government AI partnerships, scalable AI infrastructure" />
+    <meta name="robots" content="index, follow" />
+    <meta name="theme-color" content="#000000" />
+
+    <!-- Open Graph Meta Tags -->
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://www.facticity.ai/" />
+    <meta property="og:title" content="Facticity AI – Best Multilingual Internet and Social Media AI Fact-Checker" />
+    <meta property="og:description" content="Facticity AI by AI Seer. Real-time verification of text, audio, and video content, achieving 92% accuracy to combat misinformation." />
+    <meta property="og:image" content="/logo192.png" />
+
+    <!-- Twitter Card Meta Tags -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:url" content="https://x.com/facticityai" />
+    <meta name="twitter:title" content="Facticity AI – Best Multilingual Internet and Social Media AI Fact-Checker" />
+    <meta name="twitter:description" content="Facticity AI by AI Seer. Real-time verification of text, audio, and video content, achieving 92% accuracy to combat misinformation." />
+    <meta name="twitter:image" content="/logo192.png" />
+    <meta name="twitter:site" content="@facticityai" />
+
+    <!-- Apple Touch Icon & Manifest -->
+    <link rel="apple-touch-icon" href="/logo192.png" />
+    <link rel="manifest" href="/manifest.json" />
+
+    <!-- CSS Animation -->
+    <style>
+      @keyframes pulse {
+        0% { opacity: 1; }
+        50% { opacity: 0.3; }
+        100% { opacity: 1; }
+      }
+    </style>
+  </head>
+
+  <body style="background-color: #F1F3FE; margin: 0; padding: 0;">
+    <noscript>You need to enable JavaScript to run this app.</noscript>
+    
+    <div id="root"></div>
+
+    <!-- Centered Loading Logo -->
+    <div id="loading-logo" style="
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      z-index: 1000;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      width: 100vw;
+      height: 100vh;
+      background-color: #F1F3FE;
+      pointer-events: none;">
+      <img src="/facticity-ai.svg" alt="Facticity AI Logo" style="
+        width: 300px;
+        height: 300px;
+        max-width: 80vw;
+        max-height: 80vh;
+        object-fit: contain;
+        animation: pulse 1.5s ease-in-out infinite;">
+    </div>
+
+    <!-- <footer style="background-color: #F1F3FE;">
+      <a href="/blog/times-best-inventions" style="color: #F1F3FE;">
+        Facticity.AI Named to TIME's Best Inventions of 2024</a>
+    </footer> -->
+
+    <!-- Main React Entry -->
+    <script type="module" src="/src/main.jsx"></script>
+
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-JV42MFK2X0"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag() { dataLayer.push(arguments); }
+      gtag('js', new Date());
+      gtag('config', 'G-JV42MFK2X0');
+    </script>
+
+    <!-- Hide loading screen -->
+    <script>
+      window.addEventListener('load', function () {
+        setTimeout(function () {
+          const logo = document.getElementById('loading-logo');
+          if (logo) logo.style.display = 'none';
+        }, 100);
+      });
+
+      document.addEventListener('DOMContentLoaded', function () {
+        setTimeout(function () {
+          const root = document.getElementById('root');
+          if (root && root.children.length > 0) {
+            const logo = document.getElementById('loading-logo');
+            if (logo) logo.style.display = 'none';
+          }
+        }, 500);
+      });
+    </script>
+  </body>
+</html>

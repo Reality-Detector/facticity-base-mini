@@ -1,0 +1,23 @@
+.facti-tut-step-6 {
+    transition: all 0.3s ease;
+  }
+  
+  .facti-tut-step-6.highlight {
+    animation: highlightEffect 3s ease-in-out; /* Trigger the animation */
+  }
+  
+  @keyframes highlightEffect {
+    0% {
+      transform: scale(1);
+      box-shadow: 0 0 5px rgb(0, 102, 255), 0 0 10px rgb(0, 102, 255);
+    }
+    50% {
+      transform: scale(1.2);
+      box-shadow: 0 0 15px rgb(0, 102, 255), 0 0 20px rgb(0, 102, 255);
+    }
+    100% {
+      transform: scale(1);
+      box-shadow: 0 0 5px rgb(0, 102, 255), 0 0 10px rgb(0, 102, 255);
+    }
+  }
+  

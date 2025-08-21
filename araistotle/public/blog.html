@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Facticity AI Blog</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+            color: #333;
+        }
+        .blog-container {
+            text-align: center;
+            padding: 60px 20px;
+            background-color: #f9f9f9;
+        }
+        .blog-container h1 {
+            font-size: 2.8em;
+            margin-bottom: 20px;
+            color: #222;
+        }
+        .blog-wrapper {
+            max-width: 900px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+        .blog-post {
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 5px 10px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            cursor: pointer;
+        }
+        .blog-post:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.15);
+        }
+        .blog-post h2 {
+            color: #0073e6;
+            font-size: 1.5em;
+        }
+        .blog-post p {
+            color: #555;
+            font-size: 1em;
+            line-height: 1.6;
+        }
+        .blog-post a {
+            display: inline-block;
+            margin-top: 15px;
+            padding: 12px 20px;
+            background-color: #0073e6;
+            color: white;
+            text-decoration: none;
+            border-radius: 6px;
+            font-weight: bold;
+            transition: background 0.3s ease;
+        }
+        .blog-post a:hover {
+            background-color: #005bb5;
+        }
+        .full-article {
+            display: none;
+            padding: 50px;
+            background: white;
+            max-width: 900px;
+            margin: 50px auto;
+            border-radius: 12px;
+            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2);
+            text-align: left;
+        }
+        .full-article img {
+            max-width: 100%;
+            border-radius: 10px;
+        }
+        .full-article video {
+            width: 100%;
+            border-radius: 10px;
+            margin-top: 20px;
+        }
+    </style>
+    <script>
+        function showArticle(id) {
+            document.querySelector('.blog-container').style.display = 'none';
+            document.getElementById(id).style.display = 'block';
+        }
+    </script>
+</head>
+<body>
+    <section class="blog-container">
+        <h1>Facticity AI Blog</h1>
+        <div class="blog-wrapper">
+            <article class="blog-post" onclick="showArticle('article1')">
+                <h2>How AI is Revolutionizing Fact-Checking</h2>
+                <p>Artificial Intelligence is transforming the way we verify information. With tools like Facticity AI, real-time claim verification is now possible...</p>
+                <a>Read more</a>
+            </article>
+            <article class="blog-post" onclick="showArticle('article2')">
+                <h2>The Role of Large Language Models in Detecting Misinformation</h2>
+                <p>LLMs are playing a critical role in filtering out false information and generating reliable summaries...</p>
+                <a>Read more</a>
+            </article>
+            <article class="blog-post" onclick="showArticle('article3')">
+                <h2>Why Real-Time Verification Matters in 2025</h2>
+                <p>As misinformation spreads faster than ever, real-time verification has become essential for journalists, researchers, and the public...</p>
+                <a>Read more</a>
+            </article>
+        </div>
+    </section>
+    
+    <section class="full-article" id="article1">
+        <h1>How AI is Revolutionizing Fact-Checking</h1>
+        <img src="ai-fact-checking.jpg" alt="AI in Fact-Checking">
+        <p>AI-powered fact-checking leverages machine learning models to analyze vast amounts of data and verify claims instantly...</p>
+        <video controls><source src="ai-fact-checking.mp4" type="video/mp4">Your browser does not support video playback.</video>
+    </section>
+    
+    <section class="full-article" id="article2">
+        <h1>The Role of Large Language Models in Detecting Misinformation</h1>
+        <img src="llms-misinformation.jpg" alt="LLMs for Misinformation Detection">
+        <p>Large Language Models process billions of parameters to analyze content credibility...</p>
+    </section>
+    
+    <section class="full-article" id="article3">
+        <h1>Why Real-Time Verification Matters in 2025</h1>
+        <img src="real-time-verification.jpg" alt="Real-Time Fact-Checking">
+        <p>Real-time verification helps combat misinformation by providing instant fact-checking...</p>
+    </section>
+</body>
+</html>
