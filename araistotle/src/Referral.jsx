@@ -156,7 +156,7 @@ const Referral = () => {
   // Sidebar sections
   const sections = [
     { id: "credits", label: "Credits Breakdown", icon: AccountBalanceWalletIcon },
-    { id: "referrals", label: "Referral & Rewards", icon: CardGiftcardIcon },
+    // { id: "referrals", label: "Referral & Rewards", icon: CardGiftcardIcon },
   ];
 
   // Fetch config on mount
@@ -563,7 +563,7 @@ const Referral = () => {
             </Box>
 
             {/* Referral & Rewards Section */}
-            <Box id="referrals" sx={{ scrollMarginTop: 4 }}>
+            {/* <Box id="referrals" sx={{ scrollMarginTop: 4 }}>
               <Box sx={{ mb: 3 }}>
                 <Typography variant="h4" sx={{ fontWeight: 'bold', mb: 1, color: 'black' }}>
                   Referral & Rewards
@@ -578,7 +578,7 @@ const Referral = () => {
                 <CardContent>
                   <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
                     {/* Generate Code Section */}
-                    <Box>
+                    {/* <Box>
                       <Button
                         variant="contained"
                         onClick={handleGenerateReferral}
@@ -700,7 +700,7 @@ const Referral = () => {
                     <Divider />
 
                     {/* Redeem Code Section */}
-                    <Box>
+                    {/* <Box>
                       <Typography variant="h6" gutterBottom sx={{ color: '#1a73e8' }}>
                         Redeem a Code
                       </Typography>
@@ -742,7 +742,7 @@ const Referral = () => {
                     <Divider />
 
                     {/* Reward History Section */}
-                    <Box>
+                    {/* <Box>
                       <Typography variant="h6" gutterBottom sx={{ color: '#1a73e8' }}>
                         Reward History
                       </Typography>
@@ -795,7 +795,7 @@ const Referral = () => {
                   </Box>
                 </CardContent>
               </Card>
-            </Box>
+            </Box> */}
           </Box>
         </Box>
       </Container>

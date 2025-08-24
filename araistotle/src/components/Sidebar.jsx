@@ -156,8 +156,11 @@ const Sidebar = ({
               background: accent,
               borderRadius: "12px",
               boxShadow: "none",
+              transition: "all 0.2s ease",
               "&:hover": {
                 background: "#d2e3fa",
+                transform: "scale(1.05)",
+                boxShadow: "0 2px 8px rgba(20,81,242,0.2)",
               }
             }}
           >
@@ -172,15 +175,33 @@ const Sidebar = ({
         {!showHistory ? (
           <>
             <List disablePadding>
-              <Tooltip title="Return to the main Facticity landing page" placement="right" arrow>
+              <Box 
+                sx={{ 
+                  mb: 0.5,
+                  "&:hover .description-text": {
+                    opacity: 1,
+                    maxHeight: '20px',
+                    marginTop: '4px'
+                  },
+                  "&:hover .menu-button": {
+                    transform: "translateY(-2px)"
+                  }
+                }}
+              >
                 <ListItemButton 
+                  className="menu-button"
                   component={Link} 
                   to="https://facticity.ai" 
                   target="_blank"
                   sx={{
                     borderRadius: 2, 
-                    my: 0.5,
-                    "&:hover": { background: accent }
+                    my: 0,
+                    transition: "all 0.2s ease",
+                    "&:hover": { 
+                      background: accent,
+                      transform: "translateX(2px) translateY(-2px)",
+                      boxShadow: "0 2px 8px rgba(56,121,240,0.1)",
+                    }
                   }}
                 >
                   <ListItemIcon sx={{ minWidth: 36 }}>
@@ -194,15 +215,51 @@ const Sidebar = ({
                     }}
                   />
                 </ListItemButton>
-              </Tooltip>
-              <Tooltip title="See what our community is talking about." placement="right" arrow>
+                <Typography 
+                  className="description-text"
+                  sx={{ 
+                    fontSize: '11px', 
+                    color: 'grey.600', 
+                    pl: 6, 
+                    opacity: 0,
+                    maxHeight: 0,
+                    overflow: 'hidden',
+                    transition: 'all 0.2s ease',
+                    pointerEvents: 'none',
+                    fontStyle: 'italic',
+                    marginTop: 0
+                  }}
+                >
+                  Return to the main Facticity landing page
+                </Typography>
+              </Box>
+
+              <Box 
+                sx={{ 
+                  mb: 0.5,
+                  "&:hover .description-text": {
+                    opacity: 1,
+                    maxHeight: '20px',
+                    marginTop: '4px'
+                  },
+                  "&:hover .menu-button": {
+                    transform: "translateY(-2px)"
+                  }
+                }}
+              >
                 <ListItemButton 
-                  component={Link} 
-                  to="/discover"
+                  className="menu-button"
+                  disabled
                   sx={{
                     borderRadius: 2, 
-                    my: 0.5,
-                    "&:hover": { background: accent }
+                    my: 0,
+                    opacity: 0.5,
+                    cursor: 'not-allowed',
+                    transition: "all 0.2s ease",
+                    "&:hover": { 
+                      background: 'transparent',
+                      transform: "translateY(-2px)",
+                    }
                   }}
                 >
                   <ListItemIcon sx={{ minWidth: 36 }}>
@@ -210,15 +267,51 @@ const Sidebar = ({
                   </ListItemIcon>
                   <ListItemText primary="Discover" primaryTypographyProps={{ fontWeight: 500, fontSize: menuFontSize }} />
                 </ListItemButton>
-              </Tooltip>
-              <Tooltip title="Try it out now!" placement="right" arrow>
+                <Typography 
+                  className="description-text"
+                  sx={{ 
+                    fontSize: '11px', 
+                    color: 'grey.600', 
+                    pl: 6, 
+                    opacity: 0,
+                    maxHeight: 0,
+                    overflow: 'hidden',
+                    transition: 'all 0.2s ease',
+                    pointerEvents: 'none',
+                    fontStyle: 'italic',
+                    marginTop: 0
+                  }}
+                >
+                  Coming Soon - Stay tuned for new features!
+                </Typography>
+              </Box>
+
+              <Box 
+                sx={{ 
+                  mb: 0.5,
+                  "&:hover .description-text": {
+                    opacity: 1,
+                    maxHeight: '20px',
+                    marginTop: '4px'
+                  },
+                  "&:hover .menu-button": {
+                    transform: "translateY(-2px)"
+                  }
+                }}
+              >
                 <ListItemButton 
+                  className="menu-button"
                   component={Link} 
                   to="/writer"
                   sx={{
                     borderRadius: 2, 
-                    my: 0.5,
-                    "&:hover": { background: accent }
+                    my: 0,
+                    transition: "all 0.2s ease",
+                    "&:hover": { 
+                      background: accent,
+                      transform: "translateX(2px) translateY(-2px)",
+                      boxShadow: "0 2px 8px rgba(56,121,240,0.1)",
+                    }
                   }}
                 >
                   <ListItemIcon sx={{ minWidth: 36 }}>
@@ -226,47 +319,178 @@ const Sidebar = ({
                   </ListItemIcon>
                   <ListItemText primary="Writer" primaryTypographyProps={{ fontWeight: 500, fontSize: menuFontSize }} />
                 </ListItemButton>
-              </Tooltip>
-              <ListItemButton 
-                component={Link}
-                to="/rewards"
-                sx={{
-                  borderRadius: 2, 
-                  my: 0.5,
-                  "&:hover": { background: accent }
+                <Typography 
+                  className="description-text"
+                  sx={{ 
+                    fontSize: '11px', 
+                    color: 'grey.600', 
+                    pl: 6, 
+                    opacity: 0,
+                    maxHeight: 0,
+                    overflow: 'hidden',
+                    transition: 'all 0.2s ease',
+                    pointerEvents: 'none',
+                    fontStyle: 'italic',
+                    marginTop: 0
+                  }}
+                >
+                  Try our AI-powered writing assistant now!
+                </Typography>
+              </Box>
+
+              <Box 
+                sx={{ 
+                  mb: 0.5,
+                  "&:hover .description-text": {
+                    opacity: 1,
+                    maxHeight: '20px',
+                    marginTop: '4px'
+                  },
+                  "&:hover .menu-button": {
+                    transform: "translateY(-2px)"
+                  }
                 }}
               >
-                <ListItemIcon sx={{ minWidth: 36 }}>
-                  <Redeem fontSize="small" />
-                </ListItemIcon>
-                <ListItemText primary="Referrals & Redeem" primaryTypographyProps={{ fontWeight: 500, fontSize: menuFontSize }} />
-              </ListItemButton>
-              <ListItemButton 
-                onClick={(e) => { e.stopPropagation(); createConversation(); }}
-                sx={{
-                  borderRadius: 2, 
-                  my: 0.5,
-                  "&:hover": { background: accent }
+                <ListItemButton 
+                  className="menu-button"
+                  component={Link}
+                  to="/rewards"
+                  sx={{
+                    borderRadius: 2, 
+                    my: 0,
+                    transition: "all 0.2s ease",
+                    "&:hover": { 
+                      background: accent,
+                      transform: "translateX(2px) translateY(-2px)",
+                      boxShadow: "0 2px 8px rgba(56,121,240,0.1)",
+                    }
+                  }}
+                >
+                  <ListItemIcon sx={{ minWidth: 36 }}>
+                    <Redeem fontSize="small" />
+                  </ListItemIcon>
+                  <ListItemText primary="Points Breakdown" primaryTypographyProps={{ fontWeight: 500, fontSize: menuFontSize }} />
+                </ListItemButton>
+                <Typography 
+                  className="description-text"
+                  sx={{ 
+                    fontSize: '11px', 
+                    color: 'grey.600', 
+                    pl: 6, 
+                    opacity: 0,
+                    maxHeight: 0,
+                    overflow: 'hidden',
+                    transition: 'all 0.2s ease',
+                    pointerEvents: 'none',
+                    fontStyle: 'italic',
+                    marginTop: 0
+                  }}
+                >
+                  View your points and rewards breakdown
+                </Typography>
+              </Box>
+
+              <Box 
+                sx={{ 
+                  mb: 0.5,
+                  "&:hover .description-text": {
+                    opacity: 1,
+                    maxHeight: '20px',
+                    marginTop: '4px'
+                  },
+                  "&:hover .menu-button": {
+                    transform: "translateY(-2px)"
+                  }
                 }}
               >
-                <ListItemIcon sx={{ minWidth: 36 }}>
-                  <EditNoteIcon fontSize="small" />
-                </ListItemIcon>
-                <ListItemText primary="New Chat" primaryTypographyProps={{ fontWeight: 500, fontSize: menuFontSize }} />
-              </ListItemButton>
-              <ListItemButton
-                onClick={() => setShowHistory(true)}
-                sx={{
-                  borderRadius: 2, 
-                  my: 0.5,
-                  "&:hover": { background: accent }
+                <ListItemButton 
+                  className="menu-button"
+                  onClick={(e) => { e.stopPropagation(); createConversation(); }}
+                  sx={{
+                    borderRadius: 2, 
+                    my: 0,
+                    transition: "all 0.2s ease",
+                    "&:hover": { 
+                      background: accent,
+                      transform: "translateX(2px) translateY(-2px)",
+                      boxShadow: "0 2px 8px rgba(56,121,240,0.1)",
+                    }
+                  }}
+                >
+                  <ListItemIcon sx={{ minWidth: 36 }}>
+                    <EditNoteIcon fontSize="small" />
+                  </ListItemIcon>
+                  <ListItemText primary="New Chat" primaryTypographyProps={{ fontWeight: 500, fontSize: menuFontSize }} />
+                </ListItemButton>
+                <Typography 
+                  className="description-text"
+                  sx={{ 
+                    fontSize: '11px', 
+                    color: 'grey.600', 
+                    pl: 6, 
+                    opacity: 0,
+                    maxHeight: 0,
+                    overflow: 'hidden',
+                    transition: 'all 0.2s ease',
+                    pointerEvents: 'none',
+                    fontStyle: 'italic',
+                    marginTop: 0
+                  }}
+                >
+                  Start a new conversation
+                </Typography>
+              </Box>
+
+              <Box 
+                sx={{ 
+                  mb: 0.5,
+                  "&:hover .description-text": {
+                    opacity: 1,
+                    maxHeight: '20px',
+                    marginTop: '4px'
+                  },
+                  "&:hover .menu-button": {
+                    transform: "translateY(-2px)"
+                  }
                 }}
               >
-                <ListItemIcon sx={{ minWidth: 36 }}>
-                  <HistoryIcon fontSize="small" />
-                </ListItemIcon>
-                <ListItemText primary="View History" primaryTypographyProps={{ fontWeight: 500, fontSize: menuFontSize }} />
-              </ListItemButton>
+                <ListItemButton
+                  className="menu-button"
+                  onClick={() => setShowHistory(true)}
+                  sx={{
+                    borderRadius: 2, 
+                    my: 0,
+                    transition: "all 0.2s ease",
+                    "&:hover": { 
+                      background: accent,
+                      transform: "translateX(2px) translateY(-2px)",
+                      boxShadow: "0 2px 8px rgba(56,121,240,0.1)",
+                    }
+                  }}
+                >
+                  <ListItemIcon sx={{ minWidth: 36 }}>
+                    <HistoryIcon fontSize="small" />
+                  </ListItemIcon>
+                  <ListItemText primary="View History" primaryTypographyProps={{ fontWeight: 500, fontSize: menuFontSize }} />
+                </ListItemButton>
+                <Typography 
+                  className="description-text"
+                  sx={{ 
+                    fontSize: '11px', 
+                    color: 'grey.600', 
+                    pl: 6, 
+                    opacity: 0,
+                    maxHeight: 0,
+                    overflow: 'hidden',
+                    transition: 'all 0.2s ease',
+                    pointerEvents: 'none',
+                    fontStyle: 'italic',
+                    marginTop: 0
+                  }}
+                >
+                  Browse your conversation history
+                </Typography>
+              </Box>
             </List>
           </>
         ) : (
@@ -284,7 +508,12 @@ const Sidebar = ({
                   background: accent,
                   borderRadius: 2,
                   mb: 1,
-                  "&:hover": { background: "#c9daf9" },
+                  transition: "all 0.2s ease",
+                  "&:hover": { 
+                    background: "#c9daf9",
+                    transform: "translateX(-2px)",
+                    boxShadow: "0 2px 8px rgba(56,121,240,0.15)",
+                  },
                   pl: 2
                 }}
               >
@@ -312,11 +541,16 @@ const Sidebar = ({
                     margin: '4px 0',
                     padding: '6px 12px',
                     borderRadius: '8px',
+                    transition: "all 0.2s ease",
                     '&.Mui-selected': {
                       backgroundColor: '#F1F3FE',
                       '&:hover': {
                         backgroundColor: '#F1F3FE',
                       },
+                    },
+                    '&:hover': {
+                      transform: "translateX(2px)",
+                      boxShadow: "0 2px 8px rgba(56,121,240,0.1)",
                     },
                   }}
                 />
@@ -344,29 +578,66 @@ const Sidebar = ({
             boxShadow: "0 0.5px 0 0 #e7eaf5",
           }}
         >
-          <ListItemButton
-            component={Link}
-            to="/settings"
-            sx={{
-              borderRadius: 2,
-              background: "rgba(20,81,242,0.04)",
-              my: 0,
-              "&:hover": { background: accent },
-              minHeight: 48,
-              px: 2,
+          <Box 
+            sx={{ 
+              mb: 0.5,
+              "&:hover .description-text": {
+                opacity: 1,
+                maxHeight: '20px',
+                marginTop: '4px'
+              },
+              "&:hover .menu-button": {
+                transform: "translateY(-2px)"
+              }
             }}
           >
-            <ListItemIcon sx={{ minWidth: 36 }}>
-              <SettingsIcon sx={{ fontSize: 22, color: "#2059d1" }} />
-            </ListItemIcon>
-            <ListItemText 
-              primary="Settings" 
-              primaryTypographyProps={{
-                fontWeight: 500,
-                fontSize: "1rem",
-              }} 
-            />
-          </ListItemButton>
+            <ListItemButton
+              className="menu-button"
+              component={Link}
+              to="/settings"
+              sx={{
+                borderRadius: 2,
+                background: "rgba(20,81,242,0.04)",
+                my: 0,
+                transition: "all 0.2s ease",
+                "&:hover": { 
+                  background: accent,
+                  transform: "translateX(2px) translateY(-2px)",
+                  boxShadow: "0 2px 8px rgba(56,121,240,0.1)",
+                },
+                minHeight: 48,
+                px: 2,
+              }}
+            >
+              <ListItemIcon sx={{ minWidth: 36 }}>
+                <SettingsIcon sx={{ fontSize: 22, color: "#2059d1" }} />
+              </ListItemIcon>
+              <ListItemText 
+                primary="Settings" 
+                primaryTypographyProps={{
+                  fontWeight: 500,
+                  fontSize: "1rem",
+                }} 
+              />
+            </ListItemButton>
+            <Typography 
+              className="description-text"
+              sx={{ 
+                fontSize: '11px', 
+                color: 'grey.600', 
+                pl: 6, 
+                opacity: 0,
+                maxHeight: 0,
+                overflow: 'hidden',
+                transition: 'all 0.2s ease',
+                pointerEvents: 'none',
+                fontStyle: 'italic',
+                marginTop: 0
+              }}
+            >
+              Manage your account settings and preferences
+            </Typography>
+          </Box>
           <Divider sx={{ my: 1, opacity: 0.18 }} />
           <Box sx={{
             textAlign: "center",
@@ -388,11 +659,61 @@ const Sidebar = ({
                 [theme.breakpoints.down("sm")]: { gap: 1 },
               }}
             >
-              <a href="https://www.aiseer.co" target="_blank" rel="noopener noreferrer"><WebsiteIcon sx={{ color: "grey.600", fontSize: 20 }} /></a>
-              <a href="https://www.linkedin.com/company/aiseer" target="_blank" rel="noopener noreferrer"><LinkedInIcon sx={{ color: "grey.600", fontSize: 20 }} /></a>
-              <a href="https://x.com/facticityai" target="_blank" rel="noopener noreferrer"><XIcon sx={{ color: "grey.600", fontSize: 20 }} /></a>
-              <a href="https://www.instagram.com/facticity.ai/" target="_blank" rel="noopener noreferrer"><InstagramIcon sx={{ color: "grey.600", fontSize: 20 }} /></a>
-              <a href="https://www.youtube.com/@facticityai" target="_blank" rel="noopener noreferrer"><YouTubeIcon sx={{ color: "grey.600", fontSize: 20 }} /></a>
+              <a href="https://www.aiseer.co" target="_blank" rel="noopener noreferrer">
+                <WebsiteIcon sx={{ 
+                  color: "grey.600", 
+                  fontSize: 20,
+                  transition: "all 0.2s ease",
+                  "&:hover": {
+                    color: activeColor,
+                    transform: "scale(1.1)",
+                  }
+                }} />
+              </a>
+              <a href="https://www.linkedin.com/company/aiseer" target="_blank" rel="noopener noreferrer">
+                <LinkedInIcon sx={{ 
+                  color: "grey.600", 
+                  fontSize: 20,
+                  transition: "all 0.2s ease",
+                  "&:hover": {
+                    color: activeColor,
+                    transform: "scale(1.1)",
+                  }
+                }} />
+              </a>
+              <a href="https://x.com/facticityai" target="_blank" rel="noopener noreferrer">
+                <XIcon sx={{ 
+                  color: "grey.600", 
+                  fontSize: 20,
+                  transition: "all 0.2s ease",
+                  "&:hover": {
+                    color: activeColor,
+                    transform: "scale(1.1)",
+                  }
+                }} />
+              </a>
+              <a href="https://www.instagram.com/facticity.ai/" target="_blank" rel="noopener noreferrer">
+                <InstagramIcon sx={{ 
+                  color: "grey.600", 
+                  fontSize: 20,
+                  transition: "all 0.2s ease",
+                  "&:hover": {
+                    color: activeColor,
+                    transform: "scale(1.1)",
+                  }
+                }} />
+              </a>
+              <a href="https://www.youtube.com/@facticityai" target="_blank" rel="noopener noreferrer">
+                <YouTubeIcon sx={{ 
+                  color: "grey.600", 
+                  fontSize: 20,
+                  transition: "all 0.2s ease",
+                  "&:hover": {
+                    color: activeColor,
+                    transform: "scale(1.1)",
+                  }
+                }} />
+              </a>
             </Box>
           </Box>
         </Box>

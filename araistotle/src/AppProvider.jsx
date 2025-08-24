@@ -564,11 +564,13 @@ export const AppProvider = ({ children }) => {
       // const response = await fetch('https://backend-word-testing-934923488639.us-central1.run.app/check-multiple-task-status'
       const headers = {
         'Content-Type': 'application/json',
+        'Validator' : 'privy',
+        'Frontend' : 'web3'
       };
       
       if (accessToken) {
         headers['Authorization'] = `Bearer ${accessToken}`;
-        headers['Validator'] = 'privy';
+        
       }
       
       const response = await fetch(backendUrl+'/check-multiple-task-status', {
@@ -748,7 +750,6 @@ export const AppProvider = ({ children }) => {
         totalUserCredits, setTotalUserCredits,
         dailyUserCredits, setDailyUserCredits,
         temporaryUserCreditsList, setTemporaryUserCreditsList,
-        lifetimeUserCredits, setLifetimeUserCredits,
         temporaryExpiries, setTemporaryExpiries,
         totalTemporaryUserCredits, setTotalTemporaryUserCredits,
         fetchSubscriptionStatus,

@@ -26,7 +26,6 @@ import {
   ListItem,
   ListItemText,
   Collapse,
-  Button,
 } from "@mui/material";
 import FactCheckDisplay from '../FactCheckDisplay';
 import './animation.css'; // Ensure .search-container styles are removed/commented out
@@ -37,6 +36,8 @@ import SearchBar from './searchBar';
 import ErrorComponent from './ErrorComponent';
 import VideoParagraphComponent from '../videoExpand';
 import useAuth from '../useAuthHook';
+import { Button, setDarkModeActivation } from "nes-ui-react";
+
 
 import Snackbar from '@mui/material/Snackbar';
 import Alert from '@mui/material/Alert';
@@ -78,26 +79,7 @@ const BuyFACYButton = ({ variant = "contained", size = "medium", sx = {} }) => {
 
   return (
     <Button
-      variant={variant}
-      size={size}
-      onClick={handleBuyFACY}
-      sx={{
-        bgcolor: variant === "contained" ? '#FF6B35' : 'transparent',
-        color: variant === "contained" ? 'white' : '#FF6B35',
-        borderColor: variant === "outlined" ? '#FF6B35' : 'transparent',
-        textTransform: 'none',
-        fontWeight: 600,
-        borderRadius: '20px',
-        px: 2,
-        py: 1,
-        boxShadow: 'none',
-        '&:hover': {
-          bgcolor: variant === "contained" ? '#E55A2B' : 'rgba(255, 107, 53, 0.08)',
-          borderColor: variant === "outlined" ? '#E55A2B' : '#E55A2B',
-          boxShadow: 'none',
-        },
-        ...sx
-      }}
+    color="warning" borderInverted onClick={handleBuyFACY}
     >
       Buy $FACY
     </Button>
@@ -436,315 +418,315 @@ const CompactLeaderboardDisplay = () => {
 };
 
 // Enhanced Carousel component for discover posts
-const DiscoverPostCarousel = ({ posts = [] }) => {
-  const [activeIndex, setActiveIndex] = useState(0);
-  const [imgError, setImgError] = useState({});
-  const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
-  const carouselRef = useRef(null);
-  const navigate = useNavigate();
+// const DiscoverPostCarousel = ({ posts = [] }) => {
+//   const [activeIndex, setActiveIndex] = useState(0);
+//   const [imgError, setImgError] = useState({});
+//   const theme = useTheme();
+//   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
+//   const carouselRef = useRef(null);
+//   const navigate = useNavigate();
 
-  useEffect(() => {
-    if (posts.length > 1) {
-      const interval = setInterval(() => {
-        setActiveIndex((prevIndex) => (prevIndex + 1) % posts.length);
-      }, 5000); // Change post every 5 seconds
-      return () => clearInterval(interval);
-    }
-  }, [posts.length]);
+//   useEffect(() => {
+//     if (posts.length > 1) {
+//       const interval = setInterval(() => {
+//         setActiveIndex((prevIndex) => (prevIndex + 1) % posts.length);
+//       }, 5000); // Change post every 5 seconds
+//       return () => clearInterval(interval);
+//     }
+//   }, [posts.length]);
 
-  if (posts.length === 0) {
-    return (
-      <Box sx={{ textAlign: 'center' }}>
-        <Skeleton variant="rectangular" height={200} sx={{ borderRadius: 1 }} />
-      </Box>
-    );
-  }
+//   if (posts.length === 0) {
+//     return (
+//       <Box sx={{ textAlign: 'center' }}>
+//         <Skeleton variant="rectangular" height={200} sx={{ borderRadius: 1 }} />
+//       </Box>
+//     );
+//   }
 
-  const handlePrev = (e) => {
-    e.stopPropagation();
-    setActiveIndex((prevIndex) => (prevIndex - 1 + posts.length) % posts.length);
-  };
+//   const handlePrev = (e) => {
+//     e.stopPropagation();
+//     setActiveIndex((prevIndex) => (prevIndex - 1 + posts.length) % posts.length);
+//   };
 
-  const handleNext = (e) => {
-    e.stopPropagation();
-    setActiveIndex((prevIndex) => (prevIndex + 1) % posts.length);
-  };
+//   const handleNext = (e) => {
+//     e.stopPropagation();
+//     setActiveIndex((prevIndex) => (prevIndex + 1) % posts.length);
+//   };
 
-  const handlePostClick = (postId) => {
-    navigate(`/discover/feed?scrollTo=${postId}`);
-  };
+//   const handlePostClick = (postId) => {
+//     navigate(`/discover/feed?scrollTo=${postId}`);
+//   };
 
-  const handleImageError = (postId) => {
-    setImgError(prev => ({ ...prev, [postId]: true }));
-  };
+//   const handleImageError = (postId) => {
+//     setImgError(prev => ({ ...prev, [postId]: true }));
+//   };
 
-  const currentPost = posts[activeIndex];
+//   const currentPost = posts[activeIndex];
 
-  return (
-    <Box sx={{ position: 'relative', width: '100%', maxWidth: '100%', overflow: 'hidden' }}>
-      {/* Single post card */}
-      <Card 
-        sx={{ 
-          borderRadius: 2, 
-          boxShadow: '0 2px 8px rgba(0, 0, 0, 0.08)',
-          transition: 'all 0.3s ease',
-          width: '100%',
-          maxWidth: '100%', // Prevent expansion beyond container
-          height: 200,
-          display: 'flex',
-          overflow: 'hidden', // Prevent content overflow
-          '&:hover': {
-            boxShadow: '0 4px 12px rgba(0, 102, 255, 0.15)',
-            transform: 'translateY(-2px)'
-          }
-        }}
-      >
-        <CardActionArea 
-          onClick={() => handlePostClick(currentPost.id)}
-          sx={{ 
-            width: '100%', 
-            maxWidth: '100%', // Prevent expansion beyond container
-            height: '100%', 
-            display: 'flex', 
-            alignItems: 'stretch',
-            overflow: 'hidden' // Prevent content overflow
-          }}
-        >
-          {/* Thumbnail Image */}
-          <Box
-            sx={{
-              width: 120,
-              minWidth: 120,
-              maxWidth: 120, // Ensure thumbnail doesn't expand
-              height: '100%',
-              overflow: 'hidden',
-              background: '#e3edfc',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              borderRadius: '8px 0 0 8px',
-              flexShrink: 0 // Prevent shrinking
-            }}
-          >
-            {currentPost.thumbnail && !imgError[currentPost.id] ? (
-              <Box
-                component="img"
-                src={currentPost.thumbnail}
-                alt="Post thumbnail"
-                onError={() => handleImageError(currentPost.id)}
-                sx={{
-                  width: '100%',
-                  height: '100%',
-                  objectFit: 'cover',
-                  display: 'block',
-                }}
-              />
-            ) : (
-              <Box
-                component="img"
-                src="/facticityailogo-03.png"
-                alt="Facticity.AI logo"
-                sx={{
-                  width: '80%',
-                  height: 'auto',
-                  maxHeight: '60%',
-                  objectFit: 'contain',
-                }}
-              />
-            )}
-          </Box>
+//   return (
+//     <Box sx={{ position: 'relative', width: '100%', maxWidth: '100%', overflow: 'hidden' }}>
+//       {/* Single post card */}
+//       <Card 
+//         sx={{ 
+//           borderRadius: 2, 
+//           boxShadow: '0 2px 8px rgba(0, 0, 0, 0.08)',
+//           transition: 'all 0.3s ease',
+//           width: '100%',
+//           maxWidth: '100%', // Prevent expansion beyond container
+//           height: 200,
+//           display: 'flex',
+//           overflow: 'hidden', // Prevent content overflow
+//           '&:hover': {
+//             boxShadow: '0 4px 12px rgba(0, 102, 255, 0.15)',
+//             transform: 'translateY(-2px)'
+//           }
+//         }}
+//       >
+//         <CardActionArea 
+//           onClick={() => handlePostClick(currentPost.id)}
+//           sx={{ 
+//             width: '100%', 
+//             maxWidth: '100%', // Prevent expansion beyond container
+//             height: '100%', 
+//             display: 'flex', 
+//             alignItems: 'stretch',
+//             overflow: 'hidden' // Prevent content overflow
+//           }}
+//         >
+//           {/* Thumbnail Image */}
+//           <Box
+//             sx={{
+//               width: 120,
+//               minWidth: 120,
+//               maxWidth: 120, // Ensure thumbnail doesn't expand
+//               height: '100%',
+//               overflow: 'hidden',
+//               background: '#e3edfc',
+//               display: 'flex',
+//               alignItems: 'center',
+//               justifyContent: 'center',
+//               borderRadius: '8px 0 0 8px',
+//               flexShrink: 0 // Prevent shrinking
+//             }}
+//           >
+//             {currentPost.thumbnail && !imgError[currentPost.id] ? (
+//               <Box
+//                 component="img"
+//                 src={currentPost.thumbnail}
+//                 alt="Post thumbnail"
+//                 onError={() => handleImageError(currentPost.id)}
+//                 sx={{
+//                   width: '100%',
+//                   height: '100%',
+//                   objectFit: 'cover',
+//                   display: 'block',
+//                 }}
+//               />
+//             ) : (
+//               <Box
+//                 component="img"
+//                 src="/facticityailogo-03.png"
+//                 alt="Facticity.AI logo"
+//                 sx={{
+//                   width: '80%',
+//                   height: 'auto',
+//                   maxHeight: '60%',
+//                   objectFit: 'contain',
+//                 }}
+//               />
+//             )}
+//           </Box>
 
-          {/* Content */}
-          <CardContent sx={{ 
-            flex: 1, 
-            minWidth: 0, // Allow flex child to shrink
-            p: 1.5, 
-            display: 'flex', 
-            flexDirection: 'column', 
-            justifyContent: 'space-between',
-            height: '100%',
-            overflow: 'hidden' // Prevent content overflow
-          }}>
-            {/* Main content area */}
-            <Box sx={{ flex: 1 }}>
-              {/* Fact Check Query - Primary content */}
-              <Typography 
-                variant="caption" 
-                sx={{ 
-                  color: 'rgba(0, 102, 255, 0.7)', 
-                  fontWeight: 500, 
-                  fontSize: '0.7rem',
-                  display: 'block',
-                  mb: 0.5,
-                  textAlign: 'left'
-                }}
-              >
-                Fact Check:
-              </Typography>
-              <Typography 
-                variant="subtitle2" 
-                sx={{ 
-                  fontWeight: 'bold', 
-                  fontSize: '0.85rem',
-                  lineHeight: 1.3,
-                  mb: 1.5,
-                  color: '#0066FF',
-                  overflow: 'hidden',
-                  textOverflow: 'ellipsis',
-                  display: '-webkit-box',
-                  WebkitLineClamp: 2,
-                  WebkitBoxOrient: 'vertical',
-                  textAlign: 'left'
-                }}
-              >
-                {currentPost.query || "Fact check query not available"}
-              </Typography>
+//           {/* Content */}
+//           <CardContent sx={{ 
+//             flex: 1, 
+//             minWidth: 0, // Allow flex child to shrink
+//             p: 1.5, 
+//             display: 'flex', 
+//             flexDirection: 'column', 
+//             justifyContent: 'space-between',
+//             height: '100%',
+//             overflow: 'hidden' // Prevent content overflow
+//           }}>
+//             {/* Main content area */}
+//             <Box sx={{ flex: 1 }}>
+//               {/* Fact Check Query - Primary content */}
+//               <Typography 
+//                 variant="caption" 
+//                 sx={{ 
+//                   color: 'rgba(0, 102, 255, 0.7)', 
+//                   fontWeight: 500, 
+//                   fontSize: '0.7rem',
+//                   display: 'block',
+//                   mb: 0.5,
+//                   textAlign: 'left'
+//                 }}
+//               >
+//                 Fact Check:
+//               </Typography>
+//               <Typography 
+//                 variant="subtitle2" 
+//                 sx={{ 
+//                   fontWeight: 'bold', 
+//                   fontSize: '0.85rem',
+//                   lineHeight: 1.3,
+//                   mb: 1.5,
+//                   color: '#0066FF',
+//                   overflow: 'hidden',
+//                   textOverflow: 'ellipsis',
+//                   display: '-webkit-box',
+//                   WebkitLineClamp: 2,
+//                   WebkitBoxOrient: 'vertical',
+//                   textAlign: 'left'
+//                 }}
+//               >
+//                 {currentPost.query || "Fact check query not available"}
+//               </Typography>
               
-              {/* Username with @ prefix */}
-              <Typography 
-                variant="caption" 
-                sx={{ 
-                  fontSize: '0.75rem',
-                  color: '#0066FF',
-                  fontWeight: 600,
-                  mb: 1,
-                  display: 'block',
-                  textAlign: 'left'
-                }}
-              >
-                @{currentPost.publish_name || "anonymous"}
-              </Typography>
+//               {/* Username with @ prefix */}
+//               <Typography 
+//                 variant="caption" 
+//                 sx={{ 
+//                   fontSize: '0.75rem',
+//                   color: '#0066FF',
+//                   fontWeight: 600,
+//                   mb: 1,
+//                   display: 'block',
+//                   textAlign: 'left'
+//                 }}
+//               >
+//                 @{currentPost.publish_name || "anonymous"}
+//               </Typography>
 
-              {/* User Title */}
-              <Typography 
-                variant="body2" 
-                sx={{ 
-                  fontWeight: 'bold',
-                  fontSize: '0.8rem',
-                  lineHeight: 1.2,
-                  mb: 0.5,
-                  color: 'text.primary',
-                  overflow: 'hidden',
-                  textOverflow: 'ellipsis',
-                  display: '-webkit-box',
-                  WebkitLineClamp: 1,
-                  WebkitBoxOrient: 'vertical',
-                  textAlign: 'left'
-                }}
-              >
-                {currentPost.publish_title || "Untitled Post"}
-              </Typography>
+//               {/* User Title */}
+//               <Typography 
+//                 variant="body2" 
+//                 sx={{ 
+//                   fontWeight: 'bold',
+//                   fontSize: '0.8rem',
+//                   lineHeight: 1.2,
+//                   mb: 0.5,
+//                   color: 'text.primary',
+//                   overflow: 'hidden',
+//                   textOverflow: 'ellipsis',
+//                   display: '-webkit-box',
+//                   WebkitLineClamp: 1,
+//                   WebkitBoxOrient: 'vertical',
+//                   textAlign: 'left'
+//                 }}
+//               >
+//                 {currentPost.publish_title || "Untitled Post"}
+//               </Typography>
 
-              {/* Description */}
-              <Typography 
-                variant="body2" 
-                sx={{ 
-                  fontSize: '0.75rem',
-                  color: 'text.secondary',
-                  lineHeight: 1.3,
-                  overflow: 'hidden',
-                  textOverflow: 'ellipsis',
-                  display: '-webkit-box',
-                  WebkitLineClamp: 2,
-                  WebkitBoxOrient: 'vertical',
-                  textAlign: 'left'
-                }}
-              >
-                {(currentPost.description || currentPost.publish_description || currentPost.result_text)?.substring(0, 120) || "No description available"}
-                {(currentPost.description || currentPost.publish_description || currentPost.result_text)?.length > 120 ? '...' : ''}
-              </Typography>
-            </Box>
+//               {/* Description */}
+//               <Typography 
+//                 variant="body2" 
+//                 sx={{ 
+//                   fontSize: '0.75rem',
+//                   color: 'text.secondary',
+//                   lineHeight: 1.3,
+//                   overflow: 'hidden',
+//                   textOverflow: 'ellipsis',
+//                   display: '-webkit-box',
+//                   WebkitLineClamp: 2,
+//                   WebkitBoxOrient: 'vertical',
+//                   textAlign: 'left'
+//                 }}
+//               >
+//                 {(currentPost.description || currentPost.publish_description || currentPost.result_text)?.substring(0, 120) || "No description available"}
+//                 {(currentPost.description || currentPost.publish_description || currentPost.result_text)?.length > 120 ? '...' : ''}
+//               </Typography>
+//             </Box>
 
-            {/* Bottom action button */}
-            <Box sx={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center', mt: 1 }}>
-              <Chip 
-                label="View" 
-                size="small" 
-                sx={{ 
-                  fontSize: '0.65rem', 
-                  bgcolor: '#0066FF', 
-                  color: 'white',
-                  height: '20px',
-                  '&:hover': {
-                    bgcolor: '#004FCC'
-                  }
-                }}
-              />
-            </Box>
-          </CardContent>
-        </CardActionArea>
-      </Card>
+//             {/* Bottom action button */}
+//             <Box sx={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center', mt: 1 }}>
+//               <Chip 
+//                 label="View" 
+//                 size="small" 
+//                 sx={{ 
+//                   fontSize: '0.65rem', 
+//                   bgcolor: '#0066FF', 
+//                   color: 'white',
+//                   height: '20px',
+//                   '&:hover': {
+//                     bgcolor: '#004FCC'
+//                   }
+//                 }}
+//               />
+//             </Box>
+//           </CardContent>
+//         </CardActionArea>
+//       </Card>
 
-      {/* Navigation arrows (only show if more than 1 post) */}
-      {posts.length > 1 && (
-        <>
-          <IconButton 
-            size="small" 
-            sx={{ 
-              position: 'absolute', 
-              left: 4, 
-              top: '50%', 
-              transform: 'translateY(-50%)', 
-              bgcolor: 'rgba(255,255,255,0.9)',
-              boxShadow: '0 2px 5px rgba(0,0,0,0.2)',
-              width: 28,
-              height: 28,
-              zIndex: 2,
-              '&:hover': {
-                bgcolor: 'rgba(255,255,255,1)'
-              }
-            }}
-            onClick={handlePrev}
-          >
-            <ArrowBackIosNewIcon fontSize="small" />
-          </IconButton>
-          <IconButton 
-            size="small" 
-            sx={{ 
-              position: 'absolute', 
-              right: 4, 
-              top: '50%', 
-              transform: 'translateY(-50%)', 
-              bgcolor: 'rgba(255,255,255,0.9)',
-              boxShadow: '0 2px 5px rgba(0,0,0,0.2)',
-              width: 28,
-              height: 28,
-              zIndex: 2,
-              '&:hover': {
-                bgcolor: 'rgba(255,255,255,1)'
-              }
-            }}
-            onClick={handleNext}
-          >
-            <ArrowForwardIosIcon fontSize="small" />
-          </IconButton>
-        </>
-      )}
+//       {/* Navigation arrows (only show if more than 1 post) */}
+//       {posts.length > 1 && (
+//         <>
+//           <IconButton 
+//             size="small" 
+//             sx={{ 
+//               position: 'absolute', 
+//               left: 4, 
+//               top: '50%', 
+//               transform: 'translateY(-50%)', 
+//               bgcolor: 'rgba(255,255,255,0.9)',
+//               boxShadow: '0 2px 5px rgba(0,0,0,0.2)',
+//               width: 28,
+//               height: 28,
+//               zIndex: 2,
+//               '&:hover': {
+//                 bgcolor: 'rgba(255,255,255,1)'
+//               }
+//             }}
+//             onClick={handlePrev}
+//           >
+//             <ArrowBackIosNewIcon fontSize="small" />
+//           </IconButton>
+//           <IconButton 
+//             size="small" 
+//             sx={{ 
+//               position: 'absolute', 
+//               right: 4, 
+//               top: '50%', 
+//               transform: 'translateY(-50%)', 
+//               bgcolor: 'rgba(255,255,255,0.9)',
+//               boxShadow: '0 2px 5px rgba(0,0,0,0.2)',
+//               width: 28,
+//               height: 28,
+//               zIndex: 2,
+//               '&:hover': {
+//                 bgcolor: 'rgba(255,255,255,1)'
+//               }
+//             }}
+//             onClick={handleNext}
+//           >
+//             <ArrowForwardIosIcon fontSize="small" />
+//           </IconButton>
+//         </>
+//       )}
 
-      {/* Navigation dots */}
-      {posts.length > 1 && (
-        <Box sx={{ display: 'flex', justifyContent: 'center', mt: 1.5 }}>
-          {posts.map((_, index) => (
-            <Box
-              key={index}
-              sx={{
-                width: 6,
-                height: 6,
-                mx: 0.5,
-                borderRadius: '50%',
-                backgroundColor: index === activeIndex ? '#0066FF' : '#C4C4C4',
-                cursor: 'pointer',
-                transition: 'all 0.2s ease'
-              }}
-              onClick={() => setActiveIndex(index)}
-            />
-          ))}
-        </Box>
-      )}
-    </Box>
-  );
-};
+//       {/* Navigation dots */}
+//       {posts.length > 1 && (
+//         <Box sx={{ display: 'flex', justifyContent: 'center', mt: 1.5 }}>
+//           {posts.map((_, index) => (
+//             <Box
+//               key={index}
+//               sx={{
+//                 width: 6,
+//                 height: 6,
+//                 mx: 0.5,
+//                 borderRadius: '50%',
+//                 backgroundColor: index === activeIndex ? '#0066FF' : '#C4C4C4',
+//                 cursor: 'pointer',
+//                 transition: 'all 0.2s ease'
+//               }}
+//               onClick={() => setActiveIndex(index)}
+//             />
+//           ))}
+//         </Box>
+//       )}
+//     </Box>
+//   );
+// };
 
 const InitialStatePanel = ({
   scrollableDivRef,
@@ -811,20 +793,6 @@ const InitialStatePanel = ({
                   "&:hover": { bgcolor: "#004FCC" },
                 }}
               />
-              {/* <Chip
-                label="Chrome Extension"
-                clickable
-                component="a"
-                href="https://chromewebstore.google.com/detail/facticity-ai-fact-checker/mlackneplpmmomaobipjjpebhgcgmocp"
-                sx={{
-                  bgcolor: "#0066FF",
-                  color: "white",
-                  fontSize: { xs: "12px", sm: "14px" },
-                  px: { xs: 0.75, sm: 1 },
-                  py: { xs: 0.2, sm: 0.25 },
-                  "&:hover": { bgcolor: "#004FCC" },
-                }}
-              /> */}
               <Chip
                 label="Tutorial"
                 clickable
@@ -874,243 +842,38 @@ const InitialStatePanel = ({
             <Box sx={{ 
               display: 'flex',
               flexDirection: { xs: 'column', md: 'row' },
-              gap: 2,
-              mt: 2,
+              gap: 3,
+              mt: 3,
               pb: { xs: 2, md: 0 },
-              alignItems: { xs: 'stretch', md: 'stretch' }, // Ensure equal height
+              alignItems: { xs: 'stretch', md: 'flex-start' },
             }}>
-              {/* Left Column: Discover + Leaderboard */}
+              {/* Left Column: About + Examples */}
               <Box sx={{ 
-                flex: { xs: 1, md: 0.4 }, // Keep 40% width for left column
+                flex: { xs: 1, md: 0.5 },
                 display: 'flex',
                 flexDirection: 'column',
-                gap: 3, // Increased gap between the two main components
-                height: { xs: 'auto', md: '800px' }, // Fixed total height for equal columns
-                minHeight: { xs: 'auto', md: '800px' }, // Ensure minimum height
+                gap: 3,
               }}>
-                {/* Discover - Made bigger and more prominent */}
+                {/* About Facticity.AI */}
                 <Box sx={{ 
                   border: '2px solid rgba(0, 102, 255, 0.2)',
                   borderRadius: 2,
-                  p: 2.5,
+                  p: 2,
                   bgcolor: '#F1F3FE',
                   display: 'flex',
                   flexDirection: 'column',
-                  flex: 1, // Take up available space
+                  flexShrink: 0,
+                  height: aboutExpanded ? 'auto' : { xs: 'auto', md: '180px' },
+                  transition: 'height 0.3s ease-in-out',
                   boxShadow: '0 4px 12px rgba(0, 102, 255, 0.15)',
-                  width: '100%', // Fixed width
-                  maxWidth: '100%', // Prevent expansion beyond container
-                  minWidth: 0, // Allow flex shrinking
-                  overflow: 'hidden', // Prevent content from overflowing
-                }}
-                className='facti-tut-step-discover'>
-                  <Typography 
-                    variant="h5"
-                    sx={{ 
-                      fontSize: { xs: '1.3rem', md: '1.4rem' },
-                      fontWeight: 'bold', 
-                      color: '#0066FF',
-                      mb: 1,
-                      flexShrink: 0
-                    }}
-                  >
-                    🎯 Discover
-                  </Typography>
-                  <Typography
-                    variant="body1"
-                    sx={{
-                      color: 'text.secondary',
-                      fontSize: { xs: '0.85rem', md: '0.9rem' },
-                      lineHeight: 1.5,
-                      mb: 2,
-                      flexShrink: 0,
-                      fontWeight: 500,
-                      textAlign: 'left'
-                    }}
-                  >
-                    Earn Facticity credits by posting your fact-checks to discover (go to 'History' tab), liking and interacting with posts from other users in Discover
-                  </Typography>
-                  <Box sx={{ 
-                    flex: 1, 
-                    overflow: 'hidden', // Ensure content stays within bounds
-                    display: 'flex',
-                    alignItems: 'center', // Center content vertically
-                    justifyContent: 'center', // Center content horizontally
-                    width: '100%',
-                    maxWidth: '100%', // Prevent expansion beyond container
-                    minWidth: 0, // Allow flex shrinking
-                    minHeight: 0, // Allow flex child to shrink
-                  }}>
-                    {discoverPosts.length > 0 ? (
-                      <Box sx={{ 
-                        width: '100%',
-                        maxWidth: '100%', // Prevent expansion beyond container
-                        height: '100%',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        overflow: 'hidden', // Prevent content overflow
-                      }}>
-                        <DiscoverPostCarousel posts={discoverPosts} />
-                      </Box>
-                    ) : (
-                      <Box sx={{ 
-                        display: 'flex', 
-                        flexDirection: 'column', 
-                        gap: 2,
-                        width: '100%',
-                        maxWidth: '100%', // Prevent expansion beyond container
-                        height: '100%',
-                        alignItems: 'center',
-                        justifyContent: 'center'
-                      }}>
-                        <Skeleton variant="rectangular" height={120} sx={{ borderRadius: 1, width: '100%' }} />
-                      </Box>
-                    )}
-                  </Box>
-                </Box>
-
-                {/* Game Leaderboard - Made bigger and more prominent */}
-                <Box sx={{ 
-                  border: '2px solid rgba(0, 102, 255, 0.2)',
-                  borderRadius: 2,
-                  p: 2.5,
-                  bgcolor: '#F1F3FE',
-                  display: 'flex',
-                  flexDirection: 'column',
-                  flex: 1, // Take up available space
-                  boxShadow: '0 4px 12px rgba(0, 102, 255, 0.15)',
-                }}>
-                  {/* Header with title and buttons */}
-                  <Box sx={{ 
-                    display: 'flex', 
-                    justifyContent: 'space-between', 
-                    alignItems: 'center', 
-                    mb: 1,
-                    flexShrink: 0
-                  }}>
-                    <Typography 
-                      variant="h5"
-                      sx={{ 
-                        fontSize: { xs: '1.3rem', md: '1.4rem' },
-                        fontWeight: 'bold', 
-                        color: '#0066FF',
-                        mb: 0 // Reset margin since we're using flex layout
-                      }}
-                    >
-                      🏆 Game Leaderboard
-                    </Typography>
-                    <Box sx={{ display: 'flex', gap: 1 }}>
-                      <Button
-                        size="small"
-                        variant="outlined"
-                        onClick={() => navigate('/discover/leaderboard')}
-                        sx={{
-                          fontSize: '0.75rem',
-                          padding: '4px 8px',
-                          borderColor: '#0066FF',
-                          color: '#0066FF',
-                          textTransform: 'none',
-                          fontWeight: 600,
-                          '&:hover': {
-                            borderColor: '#0052CC',
-                            backgroundColor: 'rgba(0, 102, 255, 0.04)'
-                          }
-                        }}
-                      >
-                        View All
-                      </Button>
-                      <Button
-                        size="small"
-                        variant="contained"
-                        startIcon={<EmojiEventsIcon sx={{ fontSize: '0.9rem' }} />}
-                        onClick={() => navigate('/game')}
-                        sx={{
-                          fontSize: '0.75rem',
-                          padding: '4px 12px',
-                          bgcolor: '#0066FF',
-                          borderRadius: '8px',
-                          textTransform: 'none',
-                          fontWeight: 600,
-                          '&:hover': {
-                            bgcolor: '#0052CC',
-                            transform: 'translateY(-1px)',
-                            transition: 'all 0.2s ease-in-out'
-                          }
-                        }}
-                      >
-                        Play
-                      </Button>
-                    </Box>
-                  </Box>
-                  <Typography
-                    variant="body1"
-                    sx={{
-                      color: 'text.secondary',
-                      fontSize: { xs: '0.85rem', md: '0.9rem' },
-                      lineHeight: 1.5,
-                      mb: 2,
-                      flexShrink: 0,
-                      fontWeight: 500,
-                      textAlign: 'left'
-                    }}
-                  >
-                    Play our fact-checking game and compete with other users!
-                  </Typography>
-                  <Box sx={{ 
-                    flex: 1,
-                    overflow: { xs: 'visible', md: 'auto' }, // Changed from 'hidden' to 'auto' for scrolling
-                    display: 'flex',
-                    flexDirection: 'column',
-                    '&::-webkit-scrollbar': {
-                      width: '6px',
-                    },
-                    '&::-webkit-scrollbar-track': {
-                      background: '#f1f1f1',
-                      borderRadius: '3px',
-                    },
-                    '&::-webkit-scrollbar-thumb': {
-                      background: '#c1c1c1',
-                      borderRadius: '3px',
-                      '&:hover': {
-                        background: '#a8a8a8',
-                      },
-                    },
-                  }}>
-                    <CompactLeaderboardDisplay />
-                  </Box>
-                </Box>
-              </Box>
-
-              {/* Right Column: About + Examples + Headlines */}
-              <Box sx={{ 
-                flex: { xs: 1, md: 0.6 }, // Keep 60% width for right column
-                display: 'flex',
-                flexDirection: 'column',
-                gap: 2,
-                height: { xs: 'auto', md: '800px' }, // Fixed total height for equal columns
-                minHeight: { xs: 'auto', md: '800px' }, // Ensure minimum height
-              }}>
-                {/* About Facticity.AI - Made smaller */}
-                <Box sx={{ 
-                  border: '2px solid rgba(0, 102, 255, 0.2)', // Thicker border for prominence
-                  borderRadius: 2,
-                  p: 1.5,
-                  bgcolor: '#F1F3FE',
-                  display: 'flex',
-                  flexDirection: 'column',
-                  flexShrink: 0, // Don't shrink
-                  height: aboutExpanded ? 'auto' : { xs: 'auto', md: '160px' }, // Keep fixed height
-                  transition: 'height 0.3s ease-in-out', // Smooth height transition
-                  boxShadow: '0 4px 12px rgba(0, 102, 255, 0.15)', // Added shadow for prominence
                 }}>
                   <Typography 
                     variant="h6" 
                     sx={{ 
-                      fontSize: { xs: '1.1rem', md: '1.15rem' },
+                      fontSize: { xs: '1.1rem', md: '1.2rem' },
                       fontWeight: 'bold', 
                       color: '#0066FF',
-                      mb: 1,
+                      mb: 1.5,
                       flexShrink: 0
                     }}
                   >
@@ -1128,15 +891,15 @@ const InitialStatePanel = ({
                       sx={{
                         fontWeight: 400,
                         letterSpacing: "0.2px",
-                        fontSize: { xs: '0.8rem', sm: '0.85rem', md: '0.9rem' },
+                        fontSize: { xs: '0.85rem', sm: '0.9rem', md: '0.95rem' },
                         color: '#121212',
-                        lineHeight: 1.4,
+                        lineHeight: 1.5,
                         overflow: 'hidden',
                         display: aboutExpanded ? 'block' : '-webkit-box',
-                        WebkitLineClamp: aboutExpanded ? 'none' : { xs: 'none', md: 5 }, // Show all lines when expanded
+                        WebkitLineClamp: aboutExpanded ? 'none' : { xs: 'none', md: 6 },
                         WebkitBoxOrient: 'vertical',
                         textAlign: 'left',
-                        mb: 1
+                        mb: 1.5
                       }}
                     >
                       Our multi-modal and multi-lingual fact-checker can fact-check text claims, video URLs from social media platforms - try it out using the search bar below!
@@ -1155,24 +918,23 @@ const InitialStatePanel = ({
                       {' '}to assist you in essays, assignments, and research.
                     </Typography>
                     
-                    
-                    {/* Show More/Less Button - Only show on desktop when needed */}
+                    {/* Show More/Less Button */}
                     <Box sx={{ 
-                      display: { xs: 'none', md: 'flex' }, 
+                      display: 'flex', 
                       justifyContent: 'center',
                       mt: 'auto',
-                      pt: 0.5
+                      pt: 1
                     }}>
                       <Button
                         size="small"
                         onClick={() => setAboutExpanded(!aboutExpanded)}
                         sx={{
-                          fontSize: '0.7rem',
+                          fontSize: '0.75rem',
                           fontWeight: 600,
                           color: '#0066FF',
                           textTransform: 'none',
                           minHeight: 'auto',
-                          padding: '2px 8px',
+                          padding: '4px 12px',
                           '&:hover': {
                             backgroundColor: 'rgba(0, 102, 255, 0.08)',
                           }
@@ -1187,21 +949,21 @@ const InitialStatePanel = ({
 
                 {/* Fact Check Examples */}
                 <Box sx={{ 
-                  border: '2px solid rgba(0, 102, 255, 0.2)', // Thicker border for prominence
+                  border: '2px solid rgba(0, 102, 255, 0.2)',
                   borderRadius: 2,
-                  p: 1.5,
+                  p: 2,
                   bgcolor: '#F1F3FE',
                   display: 'flex',
                   flexDirection: 'column',
-                  flexShrink: 0, // Don't shrink
-                  height: { xs: 'auto', md: '280px' }, // Fixed height for examples
-                  boxShadow: '0 4px 12px rgba(0, 102, 255, 0.15)', // Added shadow for prominence
-                  overflow: 'auto', // Allow scrolling if content is too tall
+                  flexShrink: 0,
+                  height: { xs: 'auto', md: '320px' },
+                  boxShadow: '0 4px 12px rgba(0, 102, 255, 0.15)',
+                  overflow: 'auto',
                 }}>
                   <Typography 
                     variant="h6" 
                     sx={{ 
-                      fontSize: { xs: '1.1rem', md: '1.15rem' },
+                      fontSize: { xs: '1.1rem', md: '1.2rem' },
                       fontWeight: 'bold', 
                       color: '#0066FF',
                       mb: 1,
@@ -1214,9 +976,9 @@ const InitialStatePanel = ({
                     variant="body2"
                     sx={{
                       color: 'text.secondary',
-                      fontSize: '0.75rem',
-                      lineHeight: 1.3,
-                      mb: 1,
+                      fontSize: '0.8rem',
+                      lineHeight: 1.4,
+                      mb: 1.5,
                       flexShrink: 0,
                       textAlign: 'left'
                     }}
@@ -1224,7 +986,7 @@ const InitialStatePanel = ({
                     Explore the examples below to see how Facticity works and discover the types of fact-check insights it provides.
                   </Typography>
                   <Box sx={{ 
-                    // Allow content to expand naturally without any height or overflow constraints
+                    flex: 1,
                     width: '100%'
                   }}>
                     <div className='facti-tut-step-2'>
@@ -1232,26 +994,35 @@ const InitialStatePanel = ({
                     </div>
                   </Box>
                 </Box>
+              </Box>
 
-                {/* Headlines - Moved from right side to left side */}
+              {/* Right Column: Headlines + Leaderboard */}
+              <Box sx={{ 
+                flex: { xs: 1, md: 0.5 },
+                display: 'flex',
+                flexDirection: 'column',
+                gap: 3,
+              }}>
+                {/* Headlines */}
                 {headlines.length > 0 && (
                   <Box sx={{ 
-                    border: '2px solid rgba(0, 102, 255, 0.2)', // Thicker border for prominence
+                    border: '2px solid rgba(0, 102, 255, 0.2)',
                     borderRadius: 2,
-                    p: 1.5,
+                    p: 2,
                     bgcolor: '#F1F3FE',
                     display: 'flex',
                     flexDirection: 'column',
-                    flex: 1, // Take up most of the remaining space
-                    boxShadow: '0 4px 12px rgba(0, 102, 255, 0.15)', // Added shadow for prominence
+                    flexShrink: 0,
+                    height: { xs: 'auto', md: '280px' },
+                    boxShadow: '0 4px 12px rgba(0, 102, 255, 0.15)',
                   }}>
                     <Typography 
                       variant="h6" 
                       sx={{ 
-                        fontSize: { xs: '1.1rem', md: '1.15rem' },
+                        fontSize: { xs: '1.1rem', md: '1.2rem' },
                         fontWeight: 'bold', 
                         color: '#0066FF',
-                        mb: '2px',
+                        mb: 1,
                         flexShrink: 0
                       }}
                     >
@@ -1281,6 +1052,8 @@ const InitialStatePanel = ({
                     </Box>
                   </Box>
                 )}
+
+
               </Box>
             </Box>
           </Box>
@@ -1970,9 +1743,17 @@ const SearchComponent = ({ isSearchMoved, setIsSearchMoved, isMdUp, initialUrlPa
           flexShrink: 0, // Prevent shrinking
           width: '100%',
           backgroundColor: 'transparent',
-          p: 2,
+          p: { xs: 1, sm: 2 },
+          pb: { xs: 'calc(env(safe-area-inset-bottom) + 16px)', sm: 2 }, // Account for iPhone safe area
           zIndex: 1000,
-          // Remove sticky positioning that might interfere with parent scroll
+          position: 'sticky',
+          bottom: 0,
+          left: 0,
+          right: 0,
+          // Add backdrop blur and background for better visibility on mobile
+          backdropFilter: 'blur(10px)',
+          backgroundColor: 'rgba(241, 243, 254, 0.95)',
+          borderTop: '1px solid rgba(0, 102, 255, 0.1)',
         }}
       >
         <Box 
@@ -2013,12 +1794,16 @@ const SearchComponent = ({ isSearchMoved, setIsSearchMoved, isMdUp, initialUrlPa
             isSearchMoved={isSearchMoved}
             externalTrigger={externalTrigger}
             sx={{
-              padding: { xs: '12px', sm: '12px 16px' },
-              boxShadow: '0 2px 8px rgba(0, 0, 0, 0.15)',
+              padding: { xs: '16px', sm: '12px 16px' }, // Increased padding on mobile
+              boxShadow: '0 4px 16px rgba(0, 0, 0, 0.2)', // Stronger shadow for better visibility
               boxSizing: 'border-box',
               width: '100%',
               maxWidth: '1200px',
-              borderRadius: '24px'
+              borderRadius: '24px',
+              // Ensure proper touch target size on mobile
+              minHeight: { xs: '56px', sm: 'auto' },
+              // Add subtle border for better definition
+              border: '1px solid rgba(0, 102, 255, 0.1)',
             }}
           />
         </Box>

@@ -573,7 +573,7 @@ function SearchBar({
         </MenuItem>
       </Menu> */}
       <Menu anchorEl={anchorEl} open={open} onClose={handleMenuClose} PaperProps={{ sx: { borderRadius: '10px', padding: '8px', boxShadow: 3 } }}>
-        <MenuItem>
+        {/* <MenuItem>
           <ListItemIcon>
             <FormatQuoteIcon color="primary" />
           </ListItemIcon>
@@ -582,7 +582,7 @@ function SearchBar({
             secondary="Helps you get exact quotes from sources." 
           />
           <Switch checked={sourceFindMode} onChange={handleToggleSource} />
-        </MenuItem>
+        </MenuItem> */}
         <MenuItem>
           <ListItemIcon>
             <Business color="action" />

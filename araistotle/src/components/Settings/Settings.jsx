@@ -128,10 +128,6 @@ const Settings = ({ onClose }) => {
     // { id: "advanced", label: "Advanced", icon: SettingsIcon },
   ];
 
-
-
-
-
   // Validate handle
   const validateHandle = (handle) => {
     // Basic validation: 3-20 chars, alphanumeric and underscores only

@@ -51,8 +51,8 @@ const App = () => {
           <Route path = "/subscription" element = {<Subscription />} />
           <Route path = "/blog/harrisvtrump" element = {<Debate2 />} />
           <Route path = "/blog/bidenvtrump" element = {<Debate1 />} />
-          <Route path="/discover/:tab" element={<Discover />} />
-          <Route path="/discover" element={<Navigate to="/discover/feed" replace />} />
+          {/* <Route path="/discover/:tab" element={<Discover />} /> */}
+          {/* <Route path="/discover" element={<Navigate to="/discover/feed" replace />} /> */}
           <Route path = "/rewards" element = {<Referral />} />
           <Route path="/success" element={<Success />} />
           <Route path="/cancel" element={<Cancel />} />

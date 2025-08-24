@@ -473,27 +473,9 @@ const TaskActions = ({ conversation_id, task_id, userEmail, showRatingButtons = 
 };
 
   const handleDiscoverPostReward = async () => {
-    const canAwardPoints = await rewardBonusPoint('post_on_discover', 4);
-    
-    if (canAwardPoints) {
-        // Show credit animation with +4 credits
-        setShowCreditAnimation(true);
-        setCreditAmount(4);
-        
-        // Hide the animation after 2.5 seconds
-        setTimeout(() => {
-            setShowCreditAnimation(false);
-        }, 2500);
-    } else {
-        // Show "already awarded" animation
-        setShowAlreadyAwardedAnimation(true);
-        
-        // Hide the animation after 2.5 seconds
-        setTimeout(() => {
-            setShowAlreadyAwardedAnimation(false);
-        }, 2500);
-    }
-};
+    // This feature is currently disabled - will be available soon
+    console.log("Post to Discover feature coming soon!");
+  };
 
   const handleSubmitFeedback = async () => {
     const feedbackData = {
@@ -884,8 +866,8 @@ const TaskActions = ({ conversation_id, task_id, userEmail, showRatingButtons = 
             width: '100%'
           }
         }} ref={buttonsRef}>
-          {/* Discover Post Button */}
-          <Tooltip title={isLoggedIn ? "Post this fact-check to our community" : "Login to create a post"}>
+          {/* Discover Post Button - Coming Soon */}
+          <Tooltip title="Post to Discover - Coming Soon!">
             <Box sx={{ 
               display: 'flex', 
               flexDirection: 'column', 
@@ -894,24 +876,25 @@ const TaskActions = ({ conversation_id, task_id, userEmail, showRatingButtons = 
             }}>
               <IconButton
                 className="post-button"
-                onClick={() => setPostDialogOpen(true)}
+                onClick={handleDiscoverPostReward}
                 sx={{ 
                   padding: '6px', 
-                  color: isLoggedIn ? '#505050' : '#c0c0c0',
+                  color: '#c0c0c0',
                   backgroundColor: 'transparent',
+                  opacity: 0.6,
                   '&:hover': {
-                    backgroundColor: isLoggedIn ? 'rgba(255,255,255,0.5)' : 'transparent',
-                    transform: isLoggedIn ? 'translateY(-2px) scale(1.05)' : 'none',
-                    boxShadow: isLoggedIn ? '0 2px 5px rgba(0,0,0,0.06)' : 'none'
+                    backgroundColor: 'transparent',
+                    transform: 'none',
+                    boxShadow: 'none'
                   },
                   '&:active': {
-                    transform: isLoggedIn ? 'translateY(1px) scale(0.98)' : 'none',
+                    transform: 'none',
                     boxShadow: 'none'
                   },
                   transition: 'all 0.2s ease',
-                  cursor: isLoggedIn ? 'pointer' : 'not-allowed'
+                  cursor: 'not-allowed'
                 }}
-                disabled={loading || !isLoggedIn}
+                disabled={true}
                 size="small"
               >
                 <PostAddIcon fontSize="small" />
@@ -920,7 +903,7 @@ const TaskActions = ({ conversation_id, task_id, userEmail, showRatingButtons = 
                 variant="caption" 
                 sx={{ 
                   fontSize: '0.7rem', 
-                  color: isLoggedIn ? TASK_ACTIONS_FEEDBACK_COLOR : '#c0c0c0',
+                  color: '#c0c0c0',
                   fontWeight: 'bold',
                   position: 'absolute',
                   bottom: '-16px',
@@ -934,6 +917,26 @@ const TaskActions = ({ conversation_id, task_id, userEmail, showRatingButtons = 
                 }}
               >
                 Post (+4)
+              </Typography>
+              <Typography 
+                variant="caption" 
+                sx={{ 
+                  fontSize: '0.6rem', 
+                  color: '#999',
+                  fontWeight: 'normal',
+                  position: 'absolute',
+                  bottom: '-32px',
+                  minWidth: '70px',
+                  textAlign: 'center',
+                  whiteSpace: 'nowrap',
+                  fontStyle: 'italic',
+                  '@media (max-width: 400px)': {
+                    fontSize: '0.5rem',
+                    minWidth: '56px'
+                  }
+                }}
+              >
+                Coming Soon
               </Typography>
             </Box>
           </Tooltip>
@@ -1422,7 +1425,7 @@ const TaskActions = ({ conversation_id, task_id, userEmail, showRatingButtons = 
         </Alert>
       </Popover>
 
-      {/* DiscoverPostButton */}
+      {/* DiscoverPostButton - Coming Soon */}
       <DiscoverPostButton
         userEmail={userEmail}
         backendUrl={backendUrl}
