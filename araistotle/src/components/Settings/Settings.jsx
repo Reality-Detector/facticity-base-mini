@@ -45,13 +45,29 @@ import {
   Error as ErrorIcon,
   AutoAwesome as AutoAwesomeIcon,
   ArrowBack as ArrowBackIcon,
-  InfoOutlined as InfoOutlinedIcon
+  InfoOutlined as InfoOutlinedIcon,
+  Email as EmailIcon,
+  Add as AddIcon,
+  CheckCircle as CheckCircleIcon2
 } from '@mui/icons-material';
+
+// Custom X (Twitter) icon component
+const XIcon = (props) => (
+  <svg
+    {...props}
+    viewBox="0 0 24 24"
+    fill="currentColor"
+    xmlns="http://www.w3.org/2000/svg"
+  >
+    <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
+  </svg>
+);
 import useAuth from '../../useAuthHook';
 import { useNavigate } from 'react-router-dom';
 import { useAppContext } from '../../AppProvider';
 import Loader from './Loader';
 import Credits from '../../Credits';
+import { useUser, useWallets, useLinkAccount, usePrivy } from '@privy-io/react-auth';
 
 const Settings = ({ onClose }) => {
   const { user, isAuthenticated, logout } = useAuth();
@@ -76,6 +92,101 @@ const Settings = ({ onClose }) => {
     userCredits,
     creditsLoading
   } = useAppContext();
+
+  // Privy hooks for progressive onboarding
+  const { refreshUser } = useUser();
+  const { wallets: connectedWallets, ready: walletsReady } = useWallets();
+  const privy = usePrivy();
+  const { linkEmail, linkWallet, linkOAuth } = useLinkAccount({
+    onSuccess: async () => {
+      console.log('Link account success callback triggered');
+      await refreshUser();
+      // Reset loading states
+      setConnectionLoading({
+        email: false,
+        wallet: false,
+        x: false,
+      });
+    },
+    onError: (err) => {
+      console.error('Link account error callback triggered:', err);
+      // Reset loading states on error
+      setConnectionLoading({
+        email: false,
+        wallet: false,
+        x: false,
+      });
+    },
+  });
+
+  // Debug: Log Privy hooks availability
+  console.log('Privy hooks debug:', {
+    linkEmail: !!linkEmail,
+    linkWallet: !!linkWallet,
+    linkOAuth: !!linkOAuth,
+    refreshUser: !!refreshUser,
+    privy: !!privy,
+    privyLinkOAuth: !!(privy?.linkOAuth),
+    privyMethods: privy ? Object.keys(privy) : [],
+    useLinkAccountMethods: useLinkAccount ? Object.keys(useLinkAccount) : []
+  });
+
+  // Enhanced connection actions with loading states
+  const handleLinkEmail = async () => {
+    setConnectionLoading(prev => ({ ...prev, email: true }));
+    try {
+      await linkEmail();
+    } catch (error) {
+      console.error('Email linking failed:', error);
+    }
+  };
+
+  const handleLinkWallet = async () => {
+    setConnectionLoading(prev => ({ ...prev, wallet: true }));
+    try {
+      await linkWallet();
+    } catch (error) {
+      console.error('Wallet linking failed:', error);
+    }
+  };
+
+  const handleLinkX = async () => {
+    console.log('handleLinkX called');
+    setConnectionLoading(prev => ({ ...prev, x: true }));
+    try {
+      console.log('Attempting to link Twitter account...');
+      
+      // Check if Twitter OAuth is available
+      if (!privy) {
+        throw new Error('Privy not available');
+      }
+      
+      console.log('Available privy methods:', Object.keys(privy));
+      
+      // Use the correct linkTwitter method
+      if (privy.linkTwitter) {
+        console.log('Using privy.linkTwitter');
+        await privy.linkTwitter();
+      } else {
+        // Show user-friendly message
+        alert('Twitter OAuth is not configured in your Privy dashboard. Please enable Twitter OAuth in your Privy app settings.');
+        throw new Error('Twitter OAuth not configured');
+      }
+      
+      console.log('Twitter account linked successfully');
+      await refreshUser();
+      setConnectionLoading(prev => ({ ...prev, x: false }));
+    } catch (error) {
+      console.error('X (Twitter) linking failed:', error);
+      
+      // Show user-friendly error message
+      if (error.message?.includes('not allowed') || error.message?.includes('403')) {
+        alert('Twitter OAuth is not enabled in your Privy dashboard. Please:\n\n1. Go to dashboard.privy.io\n2. Select your app\n3. Enable Twitter OAuth in Login Methods\n4. Configure Twitter OAuth credentials');
+      }
+      
+      setConnectionLoading(prev => ({ ...prev, x: false }));
+    }
+  };
   
   const navigate = useNavigate();
   const theme = useTheme();
@@ -100,6 +211,13 @@ const Settings = ({ onClose }) => {
     conversion: false,
   });
 
+  // Connection loading states
+  const [connectionLoading, setConnectionLoading] = useState({
+    email: false,
+    wallet: false,
+    x: false,
+  });
+
   // Profile data state
   const [profileData, setProfileData] = useState({
     name: '',
@@ -122,6 +240,7 @@ const Settings = ({ onClose }) => {
   const sections = [
     // { id: "profile", label: "Profile Edit", icon: User },
     // { id: "password", label: "Change Password", icon: Shield },
+    { id: "connections", label: "Connections", icon: Link },
     { id: "personalization", label: "Personalization", icon: Palette },
     // { id: "billing", label: "Billing Plan", icon: CreditCard },
     { id: "web3", label: "Web3 Blockchain", icon: Wallet },
@@ -143,7 +262,10 @@ const Settings = ({ onClose }) => {
 
   // Generate handle suggestions
   const generateSuggestions = () => {
-    const base = user?.email?.split('@')[0] || 'user';
+    const email = user?.email;
+    const base = (typeof email === 'string' && email.includes('@')) 
+      ? email.split('@')[0] 
+      : 'user';
     const suggestions = [
       `${base}_${Math.floor(Math.random() * 1000)}`,
       `anon_${Math.floor(Math.random() * 10000)}`,
@@ -153,9 +275,9 @@ const Settings = ({ onClose }) => {
     setHandleSuggestions(suggestions);
   };
 
-  // Generate user handle
-  const generateUserHandle = async () => {
-    if (!isHandleValid) return;
+  // Generate user handle from X (Twitter) username
+  const generateUserHandleFromX = async () => {
+    if (!xAccount?.username) return;
     
     setHandleLoading(true);
     setHandleError('');
@@ -175,14 +297,12 @@ const Settings = ({ onClose }) => {
         headers: headers,
         body: JSON.stringify({ 
           email: user.email,
-          requested_handle: handleInput 
+          requested_handle: xAccount.username 
         }),
       });
       const data = await response.json();
       if (data.handle) {
         setUserHandle(data.handle);
-        setShowCreateHandle(false);
-        setHandleInput('');
       } else {
         setHandleError(data.error || 'Failed to generate handle');
         if (data.error_details) {
@@ -190,7 +310,7 @@ const Settings = ({ onClose }) => {
         }
       }
     } catch (error) {
-      console.error('Error generating user handle:', error);
+      console.error('Error generating user handle from X:', error);
       setHandleError('Failed to generate handle');
     } finally {
       setHandleLoading(false);
@@ -215,12 +335,7 @@ const Settings = ({ onClose }) => {
     }
   }, [profile]);
 
-  // Generate suggestions when user has no handle
-  useEffect(() => {
-    if (isAuthenticated && userHandle === '' && !handleLoading) {
-      generateSuggestions();
-    }
-  }, [userHandle, handleLoading, isAuthenticated]);
+
 
   // Update personalization data when context changes
   useEffect(() => {
@@ -329,6 +444,73 @@ const Settings = ({ onClose }) => {
       default: return '#888';
     }
   };
+
+  // Connection status detection
+  const hasEmail = Boolean(user?.email?.address || user?.email);
+  const linkedWallets = (user?.linkedAccounts || []).filter(a => a.type === 'wallet');
+  const hasAnyLinkedWallet = linkedWallets.length > 0;
+  
+  // Debug: Log user object to see the structure
+  console.log('User object for connection detection:', user);
+  console.log('User oauthAccounts:', user?.oauthAccounts);
+  console.log('User linkedAccounts:', user?.linkedAccounts);
+  
+  // Try different ways to find Twitter connection
+  const xAccount = user?.twitter || 
+                   user?.linkedAccounts?.find(a => a.type === 'twitter_oauth') ||
+                   user?.oauthAccounts?.find(a => a.provider === 'twitter') || 
+                   user?.linkedAccounts?.find(a => a.type === 'oauth' && a.provider === 'twitter') ||
+                   user?.linkedAccounts?.find(a => a.type === 'twitter');
+  const hasX = Boolean(xAccount);
+  
+  console.log('X account found:', xAccount);
+  console.log('Has X:', hasX);
+
+  // Auto-generate username from X when connected
+  useEffect(() => {
+    if (isAuthenticated && hasX && !userHandle && !handleLoading) {
+      // Auto-generate username from X (Twitter) username
+      generateUserHandleFromX();
+    }
+  }, [hasX, userHandle, handleLoading, isAuthenticated]);
+
+  // Connection types configuration
+  const connectionTypes = [
+    {
+      id: 'email',
+      label: 'Email',
+      icon: EmailIcon,
+      connected: hasEmail,
+      description: hasEmail ? (user?.email?.address || user?.email) : 'Connect your email address',
+      action: hasEmail ? null : handleLinkEmail,
+      actionLabel: 'Connect Email',
+      loading: connectionLoading.email
+    },
+    {
+      id: 'wallet',
+      label: 'Wallet',
+      icon: Wallet,
+      connected: hasAnyLinkedWallet,
+      description: hasAnyLinkedWallet 
+        ? linkedWallets.length > 1 
+          ? `${linkedWallets.length} wallets connected`
+          : `${linkedWallets[0]?.address?.slice(0, 6)}...${linkedWallets[0]?.address?.slice(-4)}`
+        : 'Connect your crypto wallet',
+      action: hasAnyLinkedWallet ? null : handleLinkWallet,
+      actionLabel: 'Connect Wallet',
+      loading: connectionLoading.wallet
+    },
+    {
+      id: 'x',
+      label: 'X (Twitter)',
+      icon: XIcon,
+      connected: hasX,
+      description: hasX ? `@${xAccount?.username || xAccount?.name || 'Connected'}` : 'Connect your X (Twitter) account',
+      action: hasX ? null : handleLinkX,
+      actionLabel: 'Connect X',
+      loading: connectionLoading.x
+    }
+  ];
 
   return (
     <Box sx={{ minHeight: '100vh', bgcolor: '#F8FAFF' }}>
@@ -490,7 +672,7 @@ const Settings = ({ onClose }) => {
                           Loading...
                         </Typography>
                         <Typography variant="body2" color="text.secondary">
-                          Fetching username
+                          Setting up username
                         </Typography>
                       </Box>
                     </Box>
@@ -504,147 +686,213 @@ const Settings = ({ onClose }) => {
                         <Typography variant="h5" sx={{ fontWeight: 600 }}>
                           @{userHandle}
                         </Typography>
+                        <Typography variant="body2" color="text.secondary">
+                          Username from X (Twitter)
+                        </Typography>
+                      </Box>
+                    </Box>
+                  ) : hasX ? (
+                    // X connected but no username generated yet
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                      <Avatar sx={{ width: 64, height: 64 }}>
+                        <XIcon style={{ width: 32, height: 32 }} />
+                      </Avatar>
+                      <Box sx={{ flex: 1 }}>
+                        <Typography variant="h5" sx={{ fontWeight: 600, color: 'text.secondary' }}>
+                          @{xAccount?.username}
+                        </Typography>
+                        <Typography variant="body2" color="text.secondary">
+                          X (Twitter) connected - generating username...
+                        </Typography>
+                        <Button
+                          variant="contained"
+                          size="small"
+                          onClick={() => generateUserHandleFromX()}
+                          disabled={handleLoading}
+                          startIcon={handleLoading ? <CircularProgress size={16} /> : <AutoAwesomeIcon />}
+                          sx={{ mt: 1, textTransform: 'none' }}
+                        >
+                          {handleLoading ? 'Generating...' : 'Generate Username'}
+                        </Button>
                       </Box>
                     </Box>
                   ) : (
-                    // Show create handle option
-                    <Box>
-                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 3 }}>
-                        <Avatar sx={{ width: 64, height: 64 }}>
-                          U
-                        </Avatar>
-                        <Box sx={{ flex: 1 }}>
-                          <Typography variant="h5" sx={{ fontWeight: 600, color: 'text.secondary' }}>
-                            No username set
-                          </Typography>
-                          <Typography variant="body2" color="text.secondary">
-                            Create a username to get started
-                          </Typography>
-                          {!showCreateHandle && (
-                            <Button
-                              variant="outlined"
-                              size="small"
-                              onClick={() => setShowCreateHandle(true)}
-                              sx={{ mt: 1 }}
-                            >
-                              Create Username
-                            </Button>
-                          )}
-                        </Box>
+                    // No X connection - show connect X message
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                      <Avatar sx={{ width: 64, height: 64, bgcolor: 'action.hover' }}>
+                        <XIcon style={{ width: 32, height: 32, color: 'text.secondary' }} />
+                      </Avatar>
+                      <Box sx={{ flex: 1 }}>
+                        <Typography variant="h5" sx={{ fontWeight: 600, color: 'text.secondary' }}>
+                          No username set
+                        </Typography>
+                        <Typography variant="body2" color="text.secondary">
+                          Connect your X (Twitter) account to generate a username
+                        </Typography>
+                        <Button
+                          variant="outlined"
+                          size="small"
+                          onClick={handleLinkX}
+                          disabled={connectionLoading.x}
+                          startIcon={connectionLoading.x ? <CircularProgress size={16} /> : <XIcon />}
+                          sx={{ mt: 1, textTransform: 'none' }}
+                        >
+                          {connectionLoading.x ? 'Connecting...' : 'Connect X (Twitter)'}
+                        </Button>
                       </Box>
-
-                      {showCreateHandle && (
-                        <Box sx={{ mt: 3, p: 3, bgcolor: 'rgba(0, 102, 255, 0.05)', borderRadius: 2 }}>
-                          <Typography variant="subtitle1" sx={{ mb: 2, fontWeight: 600 }}>
-                            Create Your Username
-                          </Typography>
-                          
-                          <TextField
-                            fullWidth
-                            value={handleInput}
-                            onChange={handleHandleInputChange}
-                            placeholder="Enter your username"
-                            variant="outlined"
-                            size="small"
-                            InputProps={{
-                              startAdornment: (
-                                <InputAdornment position="start">
-                                  <PersonIcon sx={{ color: 'text.secondary' }} />
-                                </InputAdornment>
-                              ),
-                              endAdornment: (
-                                <InputAdornment position="end">
-                                  {handleInput && (
-                                    isHandleValid ? 
-                                      <CheckCircleIcon sx={{ color: 'success.main' }} /> :
-                                      <ErrorIcon sx={{ color: 'error.main' }} />
-                                  )}
-                                </InputAdornment>
-                              )
-                            }}
-                            sx={{ mb: 2 }}
-                          />
-                          
-                          <Typography variant="caption" sx={{ 
-                            color: 'text.secondary', 
-                            mb: 2, 
-                            display: 'block'
-                          }}>
-                            Username must be 3-20 characters long and contain only letters, numbers, and underscores
-                          </Typography>
-                          
-                          {handleSuggestions.length > 0 && (
-                            <Box sx={{ mb: 3 }}>
-                              <Typography variant="caption" sx={{ 
-                                color: 'text.secondary', 
-                                display: 'block', 
-                                mb: 1 
-                              }}>
-                                Suggested usernames:
-                              </Typography>
-                              <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
-                                {handleSuggestions.map((suggestion, index) => (
-                                  <Tooltip key={index} title="Click to use this username">
-                                    <Button
-                                      size="small"
-                                      variant="outlined"
-                                      onClick={() => {
-                                        setHandleInput(suggestion);
-                                        setIsHandleValid(true);
-                                      }}
-                                      sx={{
-                                        borderRadius: '16px',
-                                        textTransform: 'none',
-                                        fontSize: '0.75rem'
-                                      }}
-                                    >
-                                      {suggestion}
-                                    </Button>
-                                  </Tooltip>
-                                ))}
-                              </Box>
-                            </Box>
-                          )}
-
-                          <Box sx={{ display: 'flex', gap: 2 }}>
-                            <Button
-                              variant="contained"
-                              onClick={generateUserHandle}
-                              disabled={!isHandleValid || handleLoading}
-                              startIcon={handleLoading ? <CircularProgress size={20} /> : <AutoAwesomeIcon />}
-                              sx={{ textTransform: 'none' }}
-                            >
-                              {handleLoading ? 'Creating...' : 'Create Username'}
-                            </Button>
-                            <Button
-                              variant="outlined"
-                              onClick={() => {
-                                setShowCreateHandle(false);
-                                setHandleInput('');
-                                setHandleError('');
-                              }}
-                              sx={{ textTransform: 'none' }}
-                            >
-                              Cancel
-                            </Button>
-                          </Box>
-
-                          {handleError && (
-                            <Alert severity="error" sx={{ mt: 2 }}>
-                              <Typography variant="body2" sx={{ fontWeight: 500 }}>
-                                {handleError}
-                              </Typography>
-                              {handleErrorDetails && (
-                                <Typography variant="caption" sx={{ display: 'block', mt: 0.5 }}>
-                                  {handleErrorDetails}
-                                </Typography>
-                              )}
-                            </Alert>
-                          )}
-                        </Box>
-                      )}
                     </Box>
                   )}
+
+                  {handleError && (
+                    <Alert severity="error" sx={{ mt: 2 }}>
+                      <Typography variant="body2" sx={{ fontWeight: 500 }}>
+                        {handleError}
+                      </Typography>
+                      {handleErrorDetails && (
+                        <Typography variant="caption" sx={{ display: 'block', mt: 0.5 }}>
+                          {handleErrorDetails}
+                        </Typography>
+                      )}
+                    </Alert>
+                  )}
+                </CardContent>
+              </Card>
+            </Box>
+
+            {/* Connections Section */}
+            <Box id="connections" sx={{ scrollMarginTop: 4 }}>
+              <Box sx={{ mb: 3 }}>
+                <Typography variant="h4" sx={{ fontWeight: 'bold', mb: 1 }}>
+                  Connections
+                </Typography>
+                <Typography variant="body1" color="text.secondary">
+                  Connect your accounts to enhance your experience and unlock additional features.
+                </Typography>
+              </Box>
+              <Card>
+                <CardContent sx={{ p: 3 }}>
+                  <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+                    {connectionTypes.map((connection) => {
+                      const Icon = connection.icon;
+                      return (
+                        <Box
+                          key={connection.id}
+                          sx={{
+                            display: 'flex',
+                            justifyContent: 'space-between',
+                            alignItems: 'center',
+                            p: 2,
+                            border: 1,
+                            borderColor: connection.connected ? 'success.light' : 'divider',
+                            borderRadius: 2,
+                            bgcolor: connection.connected ? 'success.light' : 'background.paper',
+                            opacity: connection.connected ? 1 : 0.7,
+                            transition: 'all 0.2s ease-in-out',
+                            '&:hover': {
+                              opacity: 1,
+                              borderColor: connection.connected ? 'success.main' : 'primary.light',
+                            }
+                          }}
+                        >
+                          <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                            <Box
+                              sx={{
+                                width: 40,
+                                height: 40,
+                                borderRadius: 2,
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                bgcolor: connection.connected ? 'success.main' : 'action.hover',
+                                color: connection.connected ? 'white' : 'text.secondary'
+                              }}
+                            >
+                              <Icon sx={{ fontSize: 20 }} />
+                            </Box>
+                            <Box>
+                              <Typography 
+                                variant="body1" 
+                                sx={{ 
+                                  fontWeight: 500,
+                                  color: connection.connected ? 'success.dark' : 'text.primary'
+                                }}
+                              >
+                                {connection.label}
+                              </Typography>
+                              <Typography 
+                                variant="body2" 
+                                color="text.secondary"
+                                sx={{ 
+                                  color: connection.connected ? 'success.dark' : 'text.secondary'
+                                }}
+                              >
+                                {connection.description}
+                              </Typography>
+                            </Box>
+                          </Box>
+                          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                            {connection.connected ? (
+                              <Chip
+                                icon={<CheckCircleIcon2 sx={{ fontSize: 16 }} />}
+                                label="Connected"
+                                color="success"
+                                size="small"
+                                sx={{ 
+                                  bgcolor: 'success.main',
+                                  color: 'white',
+                                  '& .MuiChip-icon': {
+                                    color: 'white'
+                                  }
+                                }}
+                              />
+                            ) : (
+                              <Button
+                                variant="outlined"
+                                size="small"
+                                startIcon={connection.loading ? <CircularProgress size={16} /> : <AddIcon sx={{ fontSize: 16 }} />}
+                                onClick={connection.action}
+                                disabled={connection.loading}
+                                sx={{
+                                  textTransform: 'none',
+                                  borderColor: 'primary.main',
+                                  color: 'primary.main',
+                                  '&:hover': {
+                                    borderColor: 'primary.dark',
+                                    bgcolor: 'primary.light',
+                                    color: 'primary.dark'
+                                  }
+                                }}
+                              >
+                                {connection.loading ? 'Connecting...' : connection.actionLabel}
+                              </Button>
+                            )}
+                          </Box>
+                        </Box>
+                      );
+                    })}
+                  </Box>
+                  
+                  {/* Connection Status Summary */}
+                  <Box sx={{ mt: 3, p: 2, bgcolor: 'rgba(0, 102, 255, 0.05)', borderRadius: 2 }}>
+                    <Typography variant="subtitle2" sx={{ fontWeight: 600, mb: 1 }}>
+                      Connection Status
+                    </Typography>
+                    <Typography variant="body2" color="text.secondary">
+                      {connectionTypes.filter(c => c.connected).length} of {connectionTypes.length} accounts connected
+                    </Typography>
+                    <Box sx={{ mt: 1, display: 'flex', gap: 1, flexWrap: 'wrap' }}>
+                      {connectionTypes.map((connection) => (
+                        <Chip
+                          key={connection.id}
+                          label={connection.label}
+                          size="small"
+                          color={connection.connected ? "success" : "default"}
+                          variant={connection.connected ? "filled" : "outlined"}
+                          sx={{ fontSize: '0.75rem' }}
+                        />
+                      ))}
+                    </Box>
+                  </Box>
                 </CardContent>
               </Card>
             </Box>

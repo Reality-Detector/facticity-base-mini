@@ -20,6 +20,8 @@ const AuthWrapper = ({ children, usePrivy = false }) => {
           embeddedWallets: {
             createOnLogin: 'users-without-wallets',
           },
+          // Configure login methods
+          loginMethods: ['email', 'wallet', 'twitter'],
         }}
       >
         {children}
