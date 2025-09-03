@@ -36,7 +36,7 @@ const App = () => {
       <div>
         <AuthErrorBanner />
         <Routes>
-          <Route path="/tiktok" element={<TikTokDownloader/>}/>
+          {/* <Route path="/tiktok" element={<TikTokDownloader/>}/> */}
           <Route path="/" element={<Home />} />
           <Route path="/c/:id" element={<Home />} />
           <Route path="/c/" element={<Home />} />
@@ -48,14 +48,14 @@ const App = () => {
           {/* <Route path="/api" element={<Api />} /> */}
           <Route path="/writer" element={<AuthWriterWrapper />} />
           <Route path="/login" element={<LoginPage />} />
-          <Route path = "/subscription" element = {<Subscription />} />
-          <Route path = "/blog/harrisvtrump" element = {<Debate2 />} />
-          <Route path = "/blog/bidenvtrump" element = {<Debate1 />} />
+          {/* <Route path = "/subscription" element = {<Subscription />} /> */}
+          {/* <Route path = "/blog/harrisvtrump" element = {<Debate2 />} /> */}
+          {/* <Route path = "/blog/bidenvtrump" element = {<Debate1 />} /> */}
           {/* <Route path="/discover/:tab" element={<Discover />} /> */}
           {/* <Route path="/discover" element={<Navigate to="/discover/feed" replace />} /> */}
           <Route path = "/rewards" element = {<Referral />} />
-          <Route path="/success" element={<Success />} />
-          <Route path="/cancel" element={<Cancel />} />
+          {/* <Route path="/success" element={<Success />} /> */}
+          {/* <Route path="/cancel" element={<Cancel />} /> */}
           <Route path = "/credits" element = {<CreditBreakdown />} />
           {/* <Route path = "/discover" element = {<Discover />} /> */}
         </Routes>

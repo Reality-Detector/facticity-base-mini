@@ -35,6 +35,9 @@ const LoginModal = ({ open, handleClose, setShowSignUpModal, titleText = "Login 
 
   const { overlayLogin } = useAppContext();
 
+  // Debug log to check overlayLogin value
+  console.log('LoginModal - overlayLogin value:', overlayLogin);
+
   useEffect(() => {
     const error = query.get("error");
     const errorDescription = query.get("error_description");
@@ -53,6 +56,8 @@ const LoginModal = ({ open, handleClose, setShowSignUpModal, titleText = "Login 
     }
   };
 
+  console.log('LoginModal - Rendering Dialog with open:', overlayLogin);
+  
   return (
     <Dialog
       open={overlayLogin}

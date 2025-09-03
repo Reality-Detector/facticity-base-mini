@@ -68,6 +68,7 @@ import { useAppContext } from '../../AppProvider';
 import Loader from './Loader';
 import Credits from '../../Credits';
 import { useUser, useWallets, useLinkAccount, usePrivy } from '@privy-io/react-auth';
+import { getAllTiers } from '../../config/tierConfig';
 
 const Settings = ({ onClose }) => {
   const { user, isAuthenticated, logout } = useAuth();
@@ -98,9 +99,13 @@ const Settings = ({ onClose }) => {
   const { wallets: connectedWallets, ready: walletsReady } = useWallets();
   const privy = usePrivy();
   const { linkEmail, linkWallet, linkOAuth } = useLinkAccount({
-    onSuccess: async () => {
-      console.log('Link account success callback triggered');
+    onSuccess: async (linkedAccount) => {
+      console.log('Link account success callback triggered', linkedAccount);
       await refreshUser();
+      
+      // Note: Connection data is now sent to backend on user load instead of here
+      // This ensures all connections are synced when the user loads the settings page
+      
       // Reset loading states
       setConnectionLoading({
         email: false,
@@ -130,6 +135,90 @@ const Settings = ({ onClose }) => {
     privyMethods: privy ? Object.keys(privy) : [],
     useLinkAccountMethods: useLinkAccount ? Object.keys(useLinkAccount) : []
   });
+
+
+  // Function to send all existing connections to backend on user load
+  const sendAllConnectionsOnLoad = async () => {
+    if (!user?.id || !isAuthenticated) {
+      console.log('User not authenticated, skipping connection sync');
+      return;
+    }
+
+    try {
+      const connections = [];
+      
+      // Check for email connection
+      if (hasEmail) {
+        const emailValue = user?.email?.address || user?.email;
+        if (emailValue) {
+          connections.push({
+            connection_type: 'email',
+            connection_value: emailValue
+          });
+        }
+      }
+      
+      // Check for wallet connections
+      if (hasAnyLinkedWallet) {
+        linkedWallets.forEach(wallet => {
+          if (wallet?.address) {
+            connections.push({
+              connection_type: 'wallet',
+              connection_value: wallet.address
+            });
+          }
+        });
+      }
+      
+      // Check for X (Twitter) connection
+      if (hasX && xAccount) {
+        const xValue = xAccount?.username || xAccount?.name;
+        if (xValue) {
+          connections.push({
+            connection_type: 'x_twitter',
+            connection_value: xValue
+          });
+        }
+      }
+      
+      // Send all connections to backend
+      if (connections.length > 0) {
+        console.log('Sending existing connections to backend:', connections);
+        
+        const headers = {
+          'Content-Type': 'application/json',
+        };
+        
+
+        headers['Authorization'] = `Bearer ${accessToken}`;
+        headers['Validator'] = 'privy';
+        headers['Frontend'] = 'web3'
+
+        
+        const response = await fetch(`${backendUrl}/api/connection-completed`, {
+          method: 'POST',
+          headers: headers,
+          body: JSON.stringify({
+            privy_id: user.id,
+            connections: connections,
+            timestamp: new Date().toISOString(),
+            sync_type: 'user_load'
+          }),
+        });
+        
+        if (response.ok) {
+          const data = await response.json();
+          console.log('All connections synced to backend successfully:', data);
+        } else {
+          console.error('Failed to sync connections to backend:', response.statusText);
+        }
+      } else {
+        console.log('No existing connections found to sync');
+      }
+    } catch (error) {
+      console.error('Error syncing connections to backend:', error);
+    }
+  };
 
   // Enhanced connection actions with loading states
   const handleLinkEmail = async () => {
@@ -167,6 +256,12 @@ const Settings = ({ onClose }) => {
       if (privy.linkTwitter) {
         console.log('Using privy.linkTwitter');
         await privy.linkTwitter();
+        
+        // After successful Twitter linking, refresh user data
+        await refreshUser();
+        
+        // Note: Connection data is now sent to backend on user load instead of here
+        // This ensures all connections are synced when the user loads the settings page
       } else {
         // Show user-friendly message
         alert('Twitter OAuth is not configured in your Privy dashboard. Please enable Twitter OAuth in your Privy app settings.');
@@ -174,7 +269,6 @@ const Settings = ({ onClose }) => {
       }
       
       console.log('Twitter account linked successfully');
-      await refreshUser();
       setConnectionLoading(prev => ({ ...prev, x: false }));
     } catch (error) {
       console.error('X (Twitter) linking failed:', error);
@@ -241,9 +335,9 @@ const Settings = ({ onClose }) => {
     // { id: "profile", label: "Profile Edit", icon: User },
     // { id: "password", label: "Change Password", icon: Shield },
     { id: "connections", label: "Connections", icon: Link },
-    { id: "personalization", label: "Personalization", icon: Palette },
     // { id: "billing", label: "Billing Plan", icon: CreditCard },
     { id: "web3", label: "Web3 Blockchain", icon: Wallet },
+    { id: "personalization", label: "Personalization", icon: Palette },
     // { id: "advanced", label: "Advanced", icon: SettingsIcon },
   ];
 
@@ -423,14 +517,8 @@ const Settings = ({ onClose }) => {
 
 
 
-  // Tier ladder definition
-  const tiers = [
-    { name: 'None', min_balance: 0 },
-    { name: 'Bronze', min_balance: 1 },
-    { name: 'Silver', min_balance: 2 },
-    { name: 'Gold', min_balance: 3 },
-    { name: 'Platinum', min_balance: 10 },
-  ];
+  // Get tiers from config
+  const tiers = getAllTiers();
 
   // Helper to capitalize tier
   const capitalize = (str) => str ? str.charAt(0).toUpperCase() + str.slice(1) : '';
@@ -473,6 +561,13 @@ const Settings = ({ onClose }) => {
       generateUserHandleFromX();
     }
   }, [hasX, userHandle, handleLoading, isAuthenticated]);
+
+  // Send all existing connections to backend when user details are loaded
+  useEffect(() => {
+    if (isAuthenticated && user?.id && user?.email && accessToken && (hasEmail || hasAnyLinkedWallet || hasX)) {
+      sendAllConnectionsOnLoad();
+    }
+  }, [isAuthenticated, user?.id, user?.email, accessToken, hasEmail, hasAnyLinkedWallet, hasX]);
 
   // Connection types configuration
   const connectionTypes = [
@@ -779,8 +874,9 @@ const Settings = ({ onClose }) => {
                           key={connection.id}
                           sx={{
                             display: 'flex',
-                            justifyContent: 'space-between',
-                            alignItems: 'center',
+                            flexDirection: { xs: 'column', sm: 'row' },
+                            justifyContent: { xs: 'flex-start', sm: 'space-between' },
+                            alignItems: { xs: 'flex-start', sm: 'center' },
                             p: 2,
                             border: 1,
                             borderColor: connection.connected ? 'success.light' : 'divider',
@@ -788,13 +884,14 @@ const Settings = ({ onClose }) => {
                             bgcolor: connection.connected ? 'success.light' : 'background.paper',
                             opacity: connection.connected ? 1 : 0.7,
                             transition: 'all 0.2s ease-in-out',
+                            gap: { xs: 2, sm: 0 },
                             '&:hover': {
                               opacity: 1,
                               borderColor: connection.connected ? 'success.main' : 'primary.light',
                             }
                           }}
                         >
-                          <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                          <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, flex: 1, minWidth: 0 }}>
                             <Box
                               sx={{
                                 width: 40,
@@ -804,17 +901,19 @@ const Settings = ({ onClose }) => {
                                 alignItems: 'center',
                                 justifyContent: 'center',
                                 bgcolor: connection.connected ? 'success.main' : 'action.hover',
-                                color: connection.connected ? 'white' : 'text.secondary'
+                                color: connection.connected ? 'white' : 'text.secondary',
+                                flexShrink: 0
                               }}
                             >
                               <Icon sx={{ fontSize: 20 }} />
                             </Box>
-                            <Box>
+                            <Box sx={{ minWidth: 0, flex: 1 }}>
                               <Typography 
                                 variant="body1" 
                                 sx={{ 
                                   fontWeight: 500,
-                                  color: connection.connected ? 'success.dark' : 'text.primary'
+                                  color: connection.connected ? 'success.dark' : 'text.primary',
+                                  wordBreak: 'break-word'
                                 }}
                               >
                                 {connection.label}
@@ -823,14 +922,15 @@ const Settings = ({ onClose }) => {
                                 variant="body2" 
                                 color="text.secondary"
                                 sx={{ 
-                                  color: connection.connected ? 'success.dark' : 'text.secondary'
+                                  color: connection.connected ? 'success.dark' : 'text.secondary',
+                                  wordBreak: 'break-word'
                                 }}
                               >
                                 {connection.description}
                               </Typography>
                             </Box>
                           </Box>
-                          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, flexShrink: 0, alignSelf: { xs: 'flex-end', sm: 'auto' } }}>
                             {connection.connected ? (
                               <Chip
                                 icon={<CheckCircleIcon2 sx={{ fontSize: 16 }} />}
@@ -1116,105 +1216,7 @@ const Settings = ({ onClose }) => {
               </Card>
             </Box> */}
 
-            {/* Personalization Section */}
-            <Box id="personalization" sx={{ scrollMarginTop: 4 }}>
-              <Box sx={{ mb: 3 }}>
-                <Typography variant="h4" sx={{ fontWeight: 'bold', mb: 1 }}>
-                  Personalization
-                </Typography>
-                <Typography variant="body1" color="text.secondary">
-                  Customize your experience preferences.
-                </Typography>
-              </Box>
-              <Card>
-                <CardContent sx={{ p: 3 }}>
-                  {!editModes.personalization ? (
-                    // Read-only view
-                    <>
-                      <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, mb: 3 }}>
-                        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                          <Typography variant="body2" sx={{ fontWeight: 500 }}>
-                            Skip Disambiguation
-                          </Typography>
-                          <Chip 
-                            label={personalizationData.skipDisambiguation ? "Enabled" : "Disabled"}
-                            color={personalizationData.skipDisambiguation ? "primary" : "default"}
-                            size="small"
-                          />
-                        </Box>
-                        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                          <Typography variant="body2" sx={{ fontWeight: 500 }}>
-                            Show Reward Popup After Fact Checks
-                          </Typography>
-                          <Chip 
-                            label={personalizationData.showRewardPopup ? "Enabled" : "Disabled"}
-                            color={personalizationData.showRewardPopup ? "primary" : "default"}
-                            size="small"
-                          />
-                        </Box>
-                      </Box>
-                                             <Button 
-                         onClick={() => toggleEditMode("personalization")} 
-                         startIcon={<Edit sx={{ fontSize: 16 }} />}
-                         variant="contained"
-                       >
-                         Edit Preferences
-                       </Button>
-                    </>
-                  ) : (
-                    // Edit mode
-                    <>
-                      <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, mb: 3 }}>
-                        <FormControlLabel
-                          control={
-                            <Checkbox
-                              checked={editData.personalization.skipDisambiguation}
-                              onChange={(e) =>
-                                setEditData((prev) => ({
-                                  ...prev,
-                                  personalization: { ...prev.personalization, skipDisambiguation: e.target.checked },
-                                }))
-                              }
-                            />
-                          }
-                          label="Skip Disambiguation"
-                        />
-                        <FormControlLabel
-                          control={
-                            <Checkbox
-                              checked={editData.personalization.showRewardPopup}
-                              onChange={(e) =>
-                                setEditData((prev) => ({
-                                  ...prev,
-                                  personalization: { ...prev.personalization, showRewardPopup: e.target.checked },
-                                }))
-                              }
-                            />
-                          }
-                          label="Show Reward Popup After Fact Checks"
-                        />
-                      </Box>
-                                             <Box sx={{ display: 'flex', gap: 1 }}>
-                         <Button 
-                           onClick={() => saveChanges("personalization")} 
-                           startIcon={<Check sx={{ fontSize: 16 }} />}
-                           variant="contained"
-                         >
-                           Save Preferences
-                         </Button>
-                         <Button 
-                           onClick={() => cancelEdit("personalization")} 
-                           startIcon={<X sx={{ fontSize: 16 }} />}
-                           variant="outlined"
-                         >
-                           Cancel
-                         </Button>
-                       </Box>
-                    </>
-                  )}
-                </CardContent>
-              </Card>
-            </Box>
+
 
                         {/* Billing Plan Section */}
             {/* <Box id="billing" sx={{ scrollMarginTop: 4 }}>
@@ -1435,7 +1437,7 @@ const Settings = ({ onClose }) => {
                                   {tier.name}
                                 </Typography>
                                 <Typography variant="caption" sx={{ display: 'block' }}>
-                                  Min: {tier.min_balance}
+                                  Min: {tier.minBalance}
                                 </Typography>
                               </Box>
                             ))}
@@ -1452,17 +1454,17 @@ const Settings = ({ onClose }) => {
                           p: 2, 
                           border: 1, 
                           borderColor: 'divider', 
-                          borderRadius: 2 
+                          borderRadius: 2,
+                          opacity: 0.5,
+                          bgcolor: 'action.hover'
                         }}>
                                                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
-                             <RefreshCw sx={{ fontSize: 20, color: '#4caf50' }} />
+                             <RefreshCw sx={{ fontSize: 20, color: 'text.disabled' }} />
                              <Box>
-                              <Typography variant="body1" sx={{ fontWeight: 500 }}>
+                              <Typography variant="body1" sx={{ fontWeight: 500, color: 'text.disabled' }}>
                                 Convert to Platform Credits
                               </Typography>
-                              <Typography variant="body2" color="text.secondary">
-                                Exchange rate: 1 FACY = 5 Credits
-                              </Typography>
+      
                             </Box>
                           </Box>
                                                    {!editModes.conversion && (
@@ -1471,6 +1473,16 @@ const Settings = ({ onClose }) => {
                                startIcon={<Edit sx={{ fontSize: 16 }} />}
                                variant="outlined"
                                size="small"
+                               disabled
+                               sx={{ 
+                                 color: 'text.disabled',
+                                 borderColor: 'text.disabled',
+                                 '&:hover': {
+                                   color: 'text.disabled',
+                                   borderColor: 'text.disabled',
+                                   bgcolor: 'transparent'
+                                 }
+                               }}
                              >
                                Convert
                              </Button>
@@ -1506,6 +1518,106 @@ const Settings = ({ onClose }) => {
                         )}
                       </Box>
                     </Box>
+                  )}
+                </CardContent>
+              </Card>
+            </Box>
+
+            {/* Personalization Section */}
+            <Box id="personalization" sx={{ scrollMarginTop: 4 }}>
+              <Box sx={{ mb: 3 }}>
+                <Typography variant="h4" sx={{ fontWeight: 'bold', mb: 1 }}>
+                  Personalization
+                </Typography>
+                <Typography variant="body1" color="text.secondary">
+                  Customize your experience preferences.
+                </Typography>
+              </Box>
+              <Card>
+                <CardContent sx={{ p: 3 }}>
+                  {!editModes.personalization ? (
+                    // Read-only view
+                    <>
+                      <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, mb: 3 }}>
+                        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                          <Typography variant="body2" sx={{ fontWeight: 500 }}>
+                            Skip Disambiguation
+                          </Typography>
+                          <Chip 
+                            label={personalizationData.skipDisambiguation ? "Enabled" : "Disabled"}
+                            color={personalizationData.skipDisambiguation ? "primary" : "default"}
+                            size="small"
+                          />
+                        </Box>
+                        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                          <Typography variant="body2" sx={{ fontWeight: 500 }}>
+                            Show Reward Popup After Fact Checks
+                          </Typography>
+                          <Chip 
+                            label={personalizationData.showRewardPopup ? "Enabled" : "Disabled"}
+                            color={personalizationData.showRewardPopup ? "primary" : "default"}
+                            size="small"
+                          />
+                        </Box>
+                      </Box>
+                                             <Button 
+                         onClick={() => toggleEditMode("personalization")} 
+                         startIcon={<Edit sx={{ fontSize: 16 }} />}
+                         variant="contained"
+                       >
+                         Edit Preferences
+                       </Button>
+                    </>
+                  ) : (
+                    // Edit mode
+                    <>
+                      <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, mb: 3 }}>
+                        <FormControlLabel
+                          control={
+                            <Checkbox
+                              checked={editData.personalization.skipDisambiguation}
+                              onChange={(e) =>
+                                setEditData((prev) => ({
+                                  ...prev,
+                                  personalization: { ...prev.personalization, skipDisambiguation: e.target.checked },
+                                }))
+                              }
+                            />
+                          }
+                          label="Skip Disambiguation"
+                        />
+                        <FormControlLabel
+                          control={
+                            <Checkbox
+                              checked={editData.personalization.showRewardPopup}
+                              onChange={(e) =>
+                                setEditData((prev) => ({
+                                  ...prev,
+                                  personalization: { ...prev.personalization, showRewardPopup: e.target.checked },
+                                }))
+                              }
+                            />
+                          }
+                          label="Show Reward Popup After Fact Checks"
+                        />
+                      </Box>
+                                             <Box sx={{ display: 'flex', gap: 1 }}>
+                         <Button 
+                           onClick={() => saveChanges("personalization")} 
+                           startIcon={<Check sx={{ fontSize: 16 }} />}
+                           variant="contained"
+                         >
+                           Save Preferences
+                         </Button>
+                         <Button 
+                           onClick={() => cancelEdit("personalization")} 
+                           startIcon={<X sx={{ fontSize: 16 }} />}
+                           variant="outlined"
+                         >
+                           Cancel
+                         </Button>
+                       </Box>
+                    </>
                   )}
                 </CardContent>
               </Card>

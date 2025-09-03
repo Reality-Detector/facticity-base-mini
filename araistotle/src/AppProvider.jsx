@@ -113,6 +113,8 @@ export const AppProvider = ({ children }) => {
   const [userLocReg, setUserLocReg] = useState("")
   const [headlines, setHeadlines] = useState([])
   const [sourceFindMode, setSourceFindMode] = useState(false)
+
+  
   const [userCredits, setUserCredits] = useState(0)
 
   const [dailyTaskCredits, setDailyTaskCredits] = useState(0);
@@ -217,15 +219,15 @@ export const AppProvider = ({ children }) => {
         
         // setDistributedUrl('http://localhost:5052')
         // setDistributedUrl('https://ivvwnxhduu.us-west-2.awsapprunner.com')
-        // setDistributedUrl('http://localhost:5001')
-        setDistributedUrl('https://r8wncu74i2.us-west-2.awsapprunner.com')
+        setDistributedUrl('http://localhost:5000')
+        // setDistributedUrl('https://r8wncu74i2.us-west-2.awsapprunner.com')
       } catch (error) {
         console.error('Error fetching distributed URL:', error);
         // Set fallback URL on error
         // setDistributedUrl('http://localhost:5052');
         // setDistributedUrl('https://ivvwnxhduu.us-west-2.awsapprunner.com');
-        // setDistributedUrl('http://localhost:5001')
-        setDistributedUrl('https://r8wncu74i2.us-west-2.awsapprunner.com')
+        setDistributedUrl('http://localhost:5000')
+        // setDistributedUrl('https://r8wncu74i2.us-west-2.awsapprunner.com')
       }
     };
 
@@ -240,20 +242,20 @@ export const AppProvider = ({ children }) => {
   // Add new state for distributed URL
    // Default fallback URL
 
-  // const backendUrl = 'http://localhost:5001';
+  const backendUrl = 'http://localhost:5000';
   // const backendUrl = 'http://localhost:5052';
   // const backendUrl = 'https://ecsbackend.facticity.ai';
   
   
-  const backendUrl = 'https://r8wncu74i2.us-west-2.awsapprunner.com';
+  // const backendUrl = 'https://r8wncu74i2.us-west-2.awsapprunner.com';
 
 
   
   // const backendUrl = 'https://rdjinpnweu.us-west-2.awsapprunner.com'
   
-  // const claimExtractUrl = 'http://localhost:5052';
+  const claimExtractUrl = 'http://localhost:5000';
   // const claimExtractUrl = 'http://localhost:5001';
-  const claimExtractUrl = 'https://r8wncu74i2.us-west-2.awsapprunner.com';
+  // const claimExtractUrl = 'https://r8wncu74i2.us-west-2.awsapprunner.com';
 
 
   // const backendUrl = 'https://backend.facticity.ai';

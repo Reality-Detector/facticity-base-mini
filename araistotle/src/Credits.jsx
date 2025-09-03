@@ -16,7 +16,13 @@ import { useAppContext } from './AppProvider';
 const Credits = ({ credits, isLoading }) => {
     const theme = useTheme(); 
     const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
-    const { profile, profileLoading } = useAppContext();
+    const { 
+      profile, 
+      profileLoading, 
+      dailyUserCredits, 
+      dailyTaskCredits, 
+      creditsLoading 
+    } = useAppContext();
     
     // State for dropdown
     const [anchorEl, setAnchorEl] = useState(null);
@@ -49,39 +55,57 @@ const Credits = ({ credits, isLoading }) => {
       > 
         <StarsIcon sx={{ color: '#0066FF', fontSize: 16 }} />
 
-          {!isMobile && (
-            <Typography
-              variant="body2"
-              sx={{
-                color: '#0066FF',
-                fontWeight: 550,
-                fontSize: {
-                  xs: '0.80rem',  // 👈 smaller on extra-small screens (mobile)
-                  sm: '0.90rem', // 👈 normal on small and up
-                }
-              }}
-            >
-              Credits:
-            </Typography>
-          )}
-
-          {isLoading ? (
+          {creditsLoading ? (
             <CircularProgress size={14} sx={{ color: '#0066FF' }} />
           ) : (
-            <Typography
-              variant="body2"
-              sx={{
-                color: '#0066FF',
-                fontWeight: 600,
-                fontSize: {
-                  xs: '0.80rem',  // 👈 smaller on extra-small screens (mobile)
-                  sm: '0.90rem', // 👈 normal on small and up
-                },
-              }}
-            >
-              {console.log(credits)}
-              {credits}
-            </Typography>
+            <Box sx={{ 
+              display: 'flex', 
+              flexDirection: { xs: 'column', sm: 'row' },
+              alignItems: { xs: 'flex-start', sm: 'center' },
+              gap: { xs: 0.5, sm: 1 }
+            }}>
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                <img 
+                  src="/icons/credit_icons/goldcoin.png" 
+                  alt="Gold Coin" 
+                  style={{ width: '14px', height: '14px' }}
+                />
+                <Typography
+                  variant="body2"
+                  sx={{
+                    color: '#0066FF',
+                    fontWeight: 600,
+                    fontSize: {
+                      xs: '0.75rem',
+                      sm: '0.85rem',
+                    },
+                  }}
+                >
+                  {dailyUserCredits || '0'}
+                </Typography>
+              </Box>
+              
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                <img 
+                  src="/icons/credit_icons/diamond.png" 
+                  alt="Diamond" 
+                  style={{ width: '14px', height: '14px' }}
+                />
+                <Typography
+                  variant="body2"
+                  sx={{
+                    color: '#0066FF',
+                    fontWeight: 600,
+                    fontSize: {
+                      xs: '0.75rem',
+                      sm: '0.85rem',
+                    },
+                  }}
+                >
+                  {dailyTaskCredits || '0'}
+                </Typography>
+              </Box>
+            </Box>
           )}
         </Box>
 
@@ -102,17 +126,40 @@ const Credits = ({ credits, isLoading }) => {
           mt: 1,
         }}
       >
-        <Paper sx={{ p: 2, minWidth: 200 }}>
+        <Paper sx={{ p: 2, minWidth: 220 }}>
           <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-            {/* Credits Section */}
+            {/* Daily Credits Section */}
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-              <StarsIcon sx={{ color: '#0066FF', fontSize: 18 }} />
+              <img 
+                src="/icons/credit_icons/goldcoin.png" 
+                alt="Gold Coin" 
+                style={{ width: '20px', height: '20px' }}
+              />
               <Box>
                 <Typography variant="body2" sx={{ fontWeight: 600 }}>
-                  Platform Credits
+                  Fact Checking Credits
                 </Typography>
                 <Typography variant="body1" sx={{ color: '#0066FF', fontWeight: 700 }}>
-                  {isLoading ? <CircularProgress size={14} /> : credits}
+                  {creditsLoading ? <CircularProgress size={14} /> : dailyUserCredits || '0'}
+                </Typography>
+              </Box>
+            </Box>
+
+            <Divider />
+
+            {/* Lifetime Credits Section */}
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+              <img 
+                src="/icons/credit_icons/diamond.png" 
+                alt="Diamond" 
+                style={{ width: '20px', height: '20px' }}
+              />
+              <Box>
+                <Typography variant="body2" sx={{ fontWeight: 600 }}>
+                  Points
+                </Typography>
+                <Typography variant="body1" sx={{ color: '#0066FF', fontWeight: 700 }}>
+                  {creditsLoading ? <CircularProgress size={14} /> : dailyTaskCredits || '0'}
                 </Typography>
               </Box>
             </Box>

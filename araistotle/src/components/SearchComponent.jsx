@@ -1,5 +1,6 @@
 // SearchComponent.jsx
 import React, { useState, useEffect, useRef } from 'react';
+import { getTierInfo } from '../config/tierConfig';
 import {
   Typography,
   Box,
@@ -13,6 +14,7 @@ import {
   CardContent,
   Stack,
   //useTheme,
+  Button,
   Chip,
   IconButton,
   CircularProgress,
@@ -36,7 +38,7 @@ import SearchBar from './searchBar';
 import ErrorComponent from './ErrorComponent';
 import VideoParagraphComponent from '../videoExpand';
 import useAuth from '../useAuthHook';
-import { Button, setDarkModeActivation } from "nes-ui-react";
+// import { Button, setDarkModeActivation } from "nes-ui-react";
 
 
 import Snackbar from '@mui/material/Snackbar';
@@ -780,7 +782,7 @@ const InitialStatePanel = ({
               }}
             >
               <Chip
-                label="Refer and earn!"
+                label="Points Breakdown"
                 clickable
                 component="a"
                 href="/rewards"
@@ -1119,6 +1121,8 @@ const SearchComponent = ({ isSearchMoved, setIsSearchMoved, isMdUp, initialUrlPa
     searchQuery, setSearchQuery,
     setRun, setForceRun,
     accessToken,
+    dailyUserCredits,
+    profile,
     discoverPosts = [], // Get discoverPosts from AppContext with a default empty array
   } = useAppContext();
   
@@ -1270,17 +1274,30 @@ const SearchComponent = ({ isSearchMoved, setIsSearchMoved, isMdUp, initialUrlPa
   };
 
   const checkCreditBalance = async (queryType) => {
-    var message = ""
-    if(queryType == 'short'){
-          message = 'You have exhausted your daily fact-checking credits. Kindly upgrade your subscription or wait until tomorrow for the credits to refresh or refer a friend to get more credits.'
-    }
-    else{
-        message = "You've exhausted your daily fact-checking credits. We will still extract claims, but full fact-checks are paused. Kindly upgrade or refer a friend to get more credits "
-    }
-    const creditValue = userCredits
+    // Get tier from profile and use tier config for credits per day
+    const userTier = profile?.tier ? profile.tier.charAt(0).toUpperCase() + profile.tier.slice(1) : 'None';
+    const tierInfo = getTierInfo(userTier);
+    const userDailyCredits = tierInfo.creditsPerDay;
+    const resetTime = " at midnight UTC"; // You can make this dynamic if needed
+    
+    const creditDialogData = {
+      title: "Out of daily credits",
+      userTier,
+      userDailyCredits,
+      resetTime,
+      tiers: [
+        { name: "None", minBalance: 0, credits: 5 },
+        { name: "Bronze", minBalance: 50000, credits: 25 },
+        { name: "Silver", minBalance: 100000, credits: 50 },
+        { name: "Gold", minBalance: 150000, credits: 250 },
+        { name: "Platinum", minBalance: 100000000, credits: 5000 }
+      ]
+    };
+
+    const creditValue = dailyUserCredits
     console.log(creditValue)
-    if(creditValue == 0 && !creditsLoading){
-      setCreditDialogMessage(message);
+    if(creditValue < 5 && !creditsLoading){
+      setCreditDialogMessage(creditDialogData);
       setCreditDialogOpen(true);
     }
   }
@@ -1288,20 +1305,28 @@ const SearchComponent = ({ isSearchMoved, setIsSearchMoved, isMdUp, initialUrlPa
   const handleSearchClick = async () => {
     console.log("in handlesearch")
     await checkCreditBalance()
-
     
     setErrorDisplay("");
-    // Clear the search input and move the search UI if needed
     setSearchQuery("");
     setIsSearchMoved(true);
+
+    if(dailyUserCredits < 5){
+      return
+    }
     const trimmedQuery = searchQuery.trim();
 
     if (!trimmedQuery) return;
 
     // console.log("searchCount is: ", searchCount)
     // console.log("isURL: ", isUrl(trimmedQuery))
+    console.log('SearchComponent - Checking overlay conditions:', {
+      isAuthenticated,
+      isUrl: isUrl(trimmedQuery),
+      queryLength: trimmedQuery.length,
+      dailyUserCredits
+    });
+    
     if(!isAuthenticated || !isAuthenticated && isUrl(trimmedQuery) || !isAuthenticated && trimmedQuery.length>250){
-      // alert('Please login to continue searching');
       setOverlayLogin(true)
       return;
     }
@@ -1846,12 +1871,93 @@ const SearchComponent = ({ isSearchMoved, setIsSearchMoved, isMdUp, initialUrlPa
           Daily Limit Reached
         </DialogTitle>
         <DialogContent sx={{ bgcolor: '#F1F3FE', mt: 1, borderRadius: 2 }}>
-          <Typography
-            id="credit-dialog-description"
-            sx={{ fontSize: '0.9rem', fontWeight: 500, color: '#121212', textAlign: 'left' }}
-          >
-            {creditDialogMessage}
-          </Typography>
+          {typeof creditDialogMessage === 'object' && creditDialogMessage ? (
+            <Box sx={{ textAlign: 'left' }}>
+              <Typography
+                variant="h6"
+                sx={{ 
+                  fontSize: '1.1rem', 
+                  fontWeight: 600, 
+                  color: '#121212', 
+                  mb: 2,
+                  textAlign: 'center'
+                }}
+              >
+                {creditDialogMessage.title}
+              </Typography>
+              
+              <Typography
+                sx={{ 
+                  fontSize: '0.9rem', 
+                  fontWeight: 500, 
+                  color: '#121212', 
+                  mb: 2,
+                  lineHeight: 1.5
+                }}
+              >
+                Your free daily credits are determined by your $FACY balance (snapshot of your wallet). 
+                You've hit today's limit for your current tier <strong>{creditDialogMessage.userTier}</strong> ({creditDialogMessage.userDailyCredits}/day).
+              </Typography>
+
+              <Typography
+                sx={{ 
+                  fontSize: '0.9rem', 
+                  fontWeight: 500, 
+                  color: '#121212', 
+                  mb: 1,
+                  lineHeight: 1.5
+                }}
+              >
+                Want higher daily usage? That requires a paid subscription (in $FACY).
+              </Typography>
+
+              <Typography
+                sx={{ 
+                  fontSize: '0.9rem', 
+                  fontWeight: 500, 
+                  color: '#121212', 
+                  mb: 2,
+                  lineHeight: 1.5
+                }}
+              >
+                Status: Subscriptions aren't live yet. Until then, credits refresh tomorrow{creditDialogMessage.resetTime}.
+              </Typography>
+
+              <Typography
+                sx={{ 
+                  fontSize: '0.9rem', 
+                  fontWeight: 600, 
+                  color: '#121212', 
+                  mb: 1
+                }}
+              >
+                Tiers (by $FACY holdings) → free credits/day
+              </Typography>
+
+              <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.5 }}>
+                {creditDialogMessage.tiers.map((tier, index) => (
+                  <Typography
+                    key={index}
+                    sx={{ 
+                      fontSize: '0.85rem', 
+                      fontWeight: 500, 
+                      color: '#121212',
+                      fontFamily: 'monospace'
+                    }}
+                  >
+                    {tier.name} ({tier.minBalance === 0 ? '0' : `≥ ${tier.minBalance.toLocaleString()}`}) → {tier.credits}/day
+                  </Typography>
+                ))}
+              </Box>
+            </Box>
+          ) : (
+            <Typography
+              id="credit-dialog-description"
+              sx={{ fontSize: '0.9rem', fontWeight: 500, color: '#121212', textAlign: 'left' }}
+            >
+              {creditDialogMessage}
+            </Typography>
+          )}
         </DialogContent>
         <DialogActions sx={{ pt: 2, pb: 1, px: 3 }}>
           <Button
@@ -1867,7 +1973,7 @@ const SearchComponent = ({ isSearchMoved, setIsSearchMoved, isMdUp, initialUrlPa
           >
             Not Now
           </Button>
-          <Button
+          {/* <Button
             variant="contained"
             sx={{
               bgcolor: '#0066FF',
@@ -1881,7 +1987,7 @@ const SearchComponent = ({ isSearchMoved, setIsSearchMoved, isMdUp, initialUrlPa
             }}
           >
             Upgrade
-          </Button>
+          </Button> */}
         </DialogActions>
       </Dialog>
       

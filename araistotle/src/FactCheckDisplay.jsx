@@ -395,7 +395,7 @@ const PaginationControls = ({ currentPage, totalPages, onPrevious, onNext }) => 
 
 function getRenderingOptions(creditsLeft, isPro, userEmail) {
     const outOfCredits = creditsLeft <= 0;
-    const notLoggedIn = !userEmail || userEmail.trim() === "";
+    const notLoggedIn = false;
   
     let message = null;
     let button = null;
