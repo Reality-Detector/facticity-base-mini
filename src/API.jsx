@@ -41,7 +41,6 @@ const Api = () => {
 
   const createOrFetchApiKey = async (email) => {
     try {
-      //const backendUrl = "http://localhost:5000";
       const response = await fetch(backendUrl+'/create_api_key', {
         method: 'POST',
         headers: {

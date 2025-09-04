@@ -2,6 +2,7 @@ import React, { createContext, useContext, useState, useEffect, useRef } from 'r
 import useAuth from './useAuthHook';
 import { usePostHog } from 'posthog-js/react';
 import { handleAuth0Error, getTokenSafely, getTokenWithFallback } from './authUtils';
+import { ACTIVE_BACKEND_URL } from '../config.js';
 
 // Create a Context for the Disambiguation
 const AppContext = createContext();
@@ -219,14 +220,14 @@ export const AppProvider = ({ children }) => {
         
         // setDistributedUrl('http://localhost:5052')
         // setDistributedUrl('https://ivvwnxhduu.us-west-2.awsapprunner.com')
-        setDistributedUrl('http://localhost:5000')
+        setDistributedUrl(ACTIVE_BACKEND_URL)
         // setDistributedUrl('https://r8wncu74i2.us-west-2.awsapprunner.com')
       } catch (error) {
         console.error('Error fetching distributed URL:', error);
         // Set fallback URL on error
         // setDistributedUrl('http://localhost:5052');
         // setDistributedUrl('https://ivvwnxhduu.us-west-2.awsapprunner.com');
-        setDistributedUrl('http://localhost:5000')
+        setDistributedUrl(ACTIVE_BACKEND_URL)
         // setDistributedUrl('https://r8wncu74i2.us-west-2.awsapprunner.com')
       }
     };
@@ -242,26 +243,19 @@ export const AppProvider = ({ children }) => {
   // Add new state for distributed URL
    // Default fallback URL
 
-  const backendUrl = 'http://localhost:5000';
+  // const backendUrl = 'http://localhost:5000';
   // const backendUrl = 'http://localhost:5052';
   // const backendUrl = 'https://ecsbackend.facticity.ai';
   
   
-  // const backendUrl = 'https://r8wncu74i2.us-west-2.awsapprunner.com';
+  const backendUrl = ACTIVE_BACKEND_URL;
+  const claimExtractUrl = ACTIVE_BACKEND_URL; // Use same URL for consistency
 
 
   
   // const backendUrl = 'https://rdjinpnweu.us-west-2.awsapprunner.com'
   
-  const claimExtractUrl = 'http://localhost:5000';
-  // const claimExtractUrl = 'http://localhost:5001';
-  // const claimExtractUrl = 'https://r8wncu74i2.us-west-2.awsapprunner.com';
-
-
   // const backendUrl = 'https://backend.facticity.ai';
-  // const backendUrl = 'http://localhost:5000'; 
-
-  // const claimExtractUrl = 'https://backend.facticity.ai';
   const [searchQuery, setSearchQuery] = useState("");
 
   const [isProUser, setIsProUser] = useState("basic"); // basic subscription tier as default
@@ -273,44 +267,44 @@ export const AppProvider = ({ children }) => {
   const [discoverPosts, setDiscoverPosts] = useState([]);
   
   // Fetch discover posts
-  useEffect(() => {
-    const fetchDiscoverPosts = async () => {
-      try {
-        // Updated to use the same API endpoint as Discover.js with appropriate params
-        const userParam = (isAuthenticated && user?.email) ? `&user_email=${encodeURIComponent(user.email)}` : '';
-        const headers = {
-          'Content-Type': 'application/json',
-          'Validator': 'privy'
-        };
+  // useEffect(() => {
+  //   const fetchDiscoverPosts = async () => {
+  //     try {
+  //       // Updated to use the same API endpoint as Discover.js with appropriate params
+  //       const userParam = (isAuthenticated && user?.email) ? `&user_email=${encodeURIComponent(user.email)}` : '';
+  //       const headers = {
+  //         'Content-Type': 'application/json',
+  //         'Validator': 'privy'
+  //       };
         
-        if (accessToken) {
-          headers['Authorization'] = `Bearer ${accessToken}`;
-          headers['Validator'] = 'privy';
-        }
+  //       if (accessToken) {
+  //         headers['Authorization'] = `Bearer ${accessToken}`;
+  //         headers['Validator'] = 'privy';
+  //       }
         
-        const response = await fetch(
-          `${backendUrl}/api/published-posts?skip=0&limit=5&sort_by=recent${userParam}&tab=feed`,
-          {
-            method: 'GET',
-            headers: headers,
-          }
-        );
+  //       const response = await fetch(
+  //         `${backendUrl}/api/published-posts?skip=0&limit=5&sort_by=recent${userParam}&tab=feed`,
+  //         {
+  //           method: 'GET',
+  //           headers: headers,
+  //         }
+  //       );
         
-        if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
-        const data = await response.json();
-        setDiscoverPosts(data || []);
-      } catch (error) {
-        console.error("Error fetching discover posts:", error);
-      }
-    };
+  //       if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
+  //       const data = await response.json();
+  //       setDiscoverPosts(data || []);
+  //     } catch (error) {
+  //       console.error("Error fetching discover posts:", error);
+  //     }
+  //   };
     
-    fetchDiscoverPosts();
+  //   fetchDiscoverPosts();
     
-    // Set up a refresh interval for discover posts (every 5 minutes)
-    const intervalId = setInterval(fetchDiscoverPosts, 5 * 60 * 1000);
+  //   // Set up a refresh interval for discover posts (every 5 minutes)
+  //   const intervalId = setInterval(fetchDiscoverPosts, 5 * 60 * 1000);
     
-    return () => clearInterval(intervalId);
-  }, [backendUrl, isAuthenticated, user?.email, accessToken]);
+  //   return () => clearInterval(intervalId);
+  // }, [backendUrl, isAuthenticated, user?.email, accessToken]);
 
   
 
@@ -666,7 +660,6 @@ export const AppProvider = ({ children }) => {
   
   const fetchCountryNews = async (country) => {
     try {
-      //const backendUrl = 'http://localhost:5000';
       const headers = {
         'Content-Type': 'application/json',
       };
@@ -676,7 +669,8 @@ export const AppProvider = ({ children }) => {
         headers['Validator'] = 'privy';
       }
       
-      const res = await fetch(backendUrl + `/news/country?country=${country}`, {
+      // const res = await fetch(backendUrl + `/news/country?country=${country}`, {
+      const res = await fetch(`/api/news/country?country=${country}`, {
         method: 'GET',
         headers: headers,
       });
@@ -694,18 +688,18 @@ export const AppProvider = ({ children }) => {
   };
   
 
-  useEffect(() => {
-    const loadHeadlines = async () => {
-      const { country, city } = await fetchUserLocation();
-      const countryNews = await fetchCountryNews(country)
-      console.log(countryNews)
-      setUserLocCtry(country);
-      setUserLocCity(city);
-      setHeadlines(countryNews);
-    };
-    loadHeadlines();
+  // useEffect(() => {
+  //   const loadHeadlines = async () => {
+  //     const { country, city } = await fetchUserLocation();
+  //     const countryNews = await fetchCountryNews(country)
+  //     console.log(countryNews)
+  //     setUserLocCtry(country);
+  //     setUserLocCity(city);
+  //     setHeadlines(countryNews);
+  //   };
+  //   loadHeadlines();
     
-  }, []);
+  // }, []);
   
   // Function to toggle skipDisambiguation state
   const toggleSkipDisambiguation = () => {

@@ -4,6 +4,7 @@ import { AppBar, Toolbar } from '@mui/material';
 import { useMediaQuery } from '@mui/material';
 import Button from '@mui/material/Button';
 import { Link } from 'react-router-dom'; // Assuming you're using React Router
+import { ACTIVE_BACKEND_URL } from '../config.js';
 
 
 const Success = () => {
@@ -40,7 +41,7 @@ const Success = () => {
 
   const verifyPayment = async (sessionId) => {
     try {
-      const backendUrl = "https://ecsbackend.facticity.ai"
+      const backendUrl = ACTIVE_BACKEND_URL
       const response = await fetch(`${backendUrl}/verify-session/${sessionId}`);
       const data = await response.json();
       
