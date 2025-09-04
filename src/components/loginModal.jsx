@@ -9,6 +9,9 @@ import {
   Divider,
 } from "@mui/material";
 import { useAppContext } from "../AppProvider";
+import CloseIcon from "@mui/icons-material/Close";
+import { IconButton } from "@mui/material";
+
 
 // Custom hook to parse query parameters
 function useQuery() {
@@ -33,10 +36,8 @@ const LoginModal = ({ open, handleClose, setShowSignUpModal, titleText = "Login 
   const { loginWithPopup } = useAuth();
   const query = useQuery();
 
-  const { overlayLogin } = useAppContext();
+  const { overlayLogin, setOverlayLogin } = useAppContext();
 
-  // Debug log to check overlayLogin value
-  console.log('LoginModal - overlayLogin value:', overlayLogin);
 
   useEffect(() => {
     const error = query.get("error");
@@ -56,7 +57,9 @@ const LoginModal = ({ open, handleClose, setShowSignUpModal, titleText = "Login 
     }
   };
 
-  console.log('LoginModal - Rendering Dialog with open:', overlayLogin);
+  useEffect(() => {
+    console.log("overlayLogin changed:", overlayLogin);
+  }, [overlayLogin]);
   
   return (
     <Dialog
@@ -64,7 +67,7 @@ const LoginModal = ({ open, handleClose, setShowSignUpModal, titleText = "Login 
       // Disable closing the modal by clicking outside or pressing escape
       disableEscapeKeyDown
       // Prevent closing on backdrop click by not handling onClose
-      onClose={() => {}}
+      onClose={() => setOverlayLogin(false)}
       PaperProps={{
         sx: {
           minHeight: { xs: "auto", sm: "400px" },
@@ -78,6 +81,11 @@ const LoginModal = ({ open, handleClose, setShowSignUpModal, titleText = "Login 
         },
       }}
     >
+      <Box sx={{ position: "absolute", top: 8, right: 8 }}>
+        <IconButton onClick={() => setOverlayLogin(false)} size="small">
+          <CloseIcon />
+        </IconButton>
+      </Box>
       <DialogContent sx={{ p: { xs: 2, sm: 3 } }}>
         <Box
           display="flex"
