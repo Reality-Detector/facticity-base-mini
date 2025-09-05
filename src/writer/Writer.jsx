@@ -18,12 +18,11 @@ import Toolbar from './Toolbar';
 import Editor from './Editor';
 import Taskpane from './components/taskpane';
 import { AppContext } from './components/AppContext';
-import WordAddInBadge from './wordaddinbadge';
-import useAuth from '../useAuthHook';
+import useAuth from '../auth/useAuthHook';
 import { useAppContext } from '../AppProvider';
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 import { useNavigate } from 'react-router-dom';
-import Credits from '../Credits';
+import Credits from '../components/Credits';
 // Create a custom theme (optional)
 const theme = createTheme({
   palette: {

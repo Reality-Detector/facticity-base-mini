@@ -1,4 +1,4 @@
-import useAuth from './useAuthHook';
+import useAuth from './auth/useAuthHook';
 import { useEffect } from "react";
 
 export default function LoginPage() {

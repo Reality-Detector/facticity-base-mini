@@ -55,7 +55,7 @@ import { createAndCheckTask } from "./runasyncqueries";
 import stringSimilarity from "string-similarity";
 import debounce from 'lodash.debounce';
 import { useAppContext } from '../../AppProvider';
-import useAuth from '../../useAuthHook';
+import useAuth from '../../auth/useAuthHook';
 //
 // --------------- REFACTORED TASKPANE FOR WEB ---------------
 //

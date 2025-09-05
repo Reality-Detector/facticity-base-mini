@@ -2,11 +2,11 @@ import React from 'react';
 import ReactDOM from 'react-dom/client';
 import './index.css';
 import App from './App';
-import reportWebVitals from './reportWebVitals';
-import AuthWrapper from './AuthWrapper';
+import reportWebVitals from './utils/reportWebVitals';
+import AuthWrapper from './auth/AuthWrapper';
 import { BrowserRouter } from 'react-router-dom'
 import { AppProvider } from './AppProvider';
-import AppVersionCheck from './AppVersionCheck';
+import AppVersionCheck from './utils/AppVersionCheck';
 import { PostHogProvider} from 'posthog-js/react'
 
 const REACT_APP_PUBLIC_POSTHOG_KEY= 'phc_kTQMJe9yTkyGTYZAZ4rTVQWEcAendbJtGNU2GN5MbXk'

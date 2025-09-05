@@ -7,8 +7,8 @@ import './Subscription.css'; // Import the CSS file that contains the overlay st
 import { useNavigate } from 'react-router-dom';
 import ArrowBack from '@mui/icons-material/ArrowBack';
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
-import useAuth from './useAuthHook';
-import Credits from './Credits';
+import useAuth from './auth/useAuthHook';
+import Credits from './components/Credits';
 
 const Api = () => {
   const navigate = useNavigate();

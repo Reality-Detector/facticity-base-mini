@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import Joyride from "react-joyride";
-import useAuth from './useAuthHook';
+import useAuth from './auth/useAuthHook';
 import HelpOutlineIcon from "@mui/icons-material/HelpOutline";
 import IconButton from "@mui/material/IconButton";
 import { useAppContext } from './AppProvider';

@@ -1,7 +1,7 @@
 import React, { createContext, useContext, useState, useEffect, useRef } from 'react';
-import useAuth from './useAuthHook';
+import useAuth from './auth/useAuthHook.jsx';
 import { usePostHog } from 'posthog-js/react';
-import { handleAuth0Error, getTokenSafely, getTokenWithFallback } from './authUtils';
+import { handleAuth0Error, getTokenSafely, getTokenWithFallback } from './auth/authUtils.jsx';
 import { ACTIVE_BACKEND_URL } from '../config.js';
 
 // Create a Context for the Disambiguation

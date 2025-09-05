@@ -1,16 +1,15 @@
 import React from 'react';
 import { Button, Avatar, Box } from '@mui/material';
-// import useAuth from '../useAuthHook';
-import useAuth from '../auth/useAuthHook'
-// import { useNavigate } from 'react-router-dom';
+import useAuth from '../../auth/useAuthHook';
+import { useNavigate } from 'react-router-dom';
 
 const ThirdColumn = () => {
-    const { loginWithRedirect, logout, isAuthenticated, user } = useAuth();
-    // const navigate = useNavigate();
+    const { loginWithPopup, logout, isAuthenticated, user } = useAuth();
+    const navigate = useNavigate();
 
     const handleLogin = async () => {
         try {
-            await loginWithRedirect();
+            await loginWithPopup();
         } catch (error) {
             console.error('Login failed:', error);
         }
@@ -21,7 +20,7 @@ const ThirdColumn = () => {
     };
 
     const navigateToSettings = () => {
-        // navigate('/settings');
+        navigate('/settings');
     };
 
     return (

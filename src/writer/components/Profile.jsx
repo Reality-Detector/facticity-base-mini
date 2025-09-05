@@ -314,7 +314,7 @@
 
 
 import React, { useEffect } from 'react';
-import useAuth from '../../useAuthHook';
+import useAuth from '../../auth/useAuthHook';
 import {
   Avatar,
   IconButton,

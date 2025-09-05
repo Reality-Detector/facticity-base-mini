@@ -384,7 +384,7 @@ import StopIcon from '@mui/icons-material/Stop';
 import AutoAwesomeIcon from '@mui/icons-material/AutoAwesome';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import { AppContext } from './AppContext';
-import useAuth from '../../useAuthHook';
+import useAuth from '../../auth/useAuthHook';
 
 
 // Define keyframes for the "reflection" or "flowing highlight" animation

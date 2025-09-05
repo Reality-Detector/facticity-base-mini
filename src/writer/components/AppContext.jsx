@@ -1,6 +1,6 @@
 // src/context/AppContext.js
 import React, { createContext, useContext, useState, useEffect, useRef, useMemo, useCallback } from 'react';
-import useAuth from '../../useAuthHook';
+import useAuth from '../../auth/useAuthHook';
 import { useAppContext } from '../../AppProvider';
 export const AppContext = createContext();
 
