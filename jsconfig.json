@@ -1,0 +1,10 @@
+// config file to resolve imports of components in src/
+{
+    "compilerOptions": {
+      "baseUrl": "src",  // sets the root directory for resolving modules
+      "paths": {
+        "@/*": ["*"] // whenever you import something starting with @/, replace it with the corresponding path inside src/.
+      }
+    }
+  }
+  
