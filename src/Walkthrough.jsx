@@ -4,15 +4,15 @@ import useAuth from './auth/useAuthHook';
 import HelpOutlineIcon from "@mui/icons-material/HelpOutline";
 import IconButton from "@mui/material/IconButton";
 import { useAppContext } from './AppProvider';
-import { useLocation } from "react-router-dom";
+import { usePathname } from "next/navigation";
 
 
 
 
 const Walkthrough = () => {
   
-  const location = useLocation();
-  const isHomePage = location.pathname === "/";
+  const pathname = usePathname();
+  const isHomePage = pathname === "/";
   const { user, isAuthenticated } = useAuth();
   const {setSearchQuery, setHighlightSearch, backendUrl, hasSeenTut, run, setRun, forceRun, setForceRun, isProUser} = useAppContext()
 
@@ -43,7 +43,7 @@ const Walkthrough = () => {
   }, [isAuthenticated, user]);
 
   const markTutorialAsCompleted = async () => {
-    const res = await fetch(backendUrl + "/mark-tutorial-complete", {
+    const res = await fetch("/api/mark-tutorial-complete", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ userEmail: user.email }) // e.g. "auth0|abc123"

@@ -1,3 +1,4 @@
+"use client";
 import React from 'react';
 import { Auth0Provider } from '@auth0/auth0-react';
 import { PrivyProvider } from '@privy-io/react-auth';
@@ -36,7 +37,7 @@ const AuthWrapper = ({ children, usePrivy = false }) => {
       // domain="auth.facticity.ai"
       clientId="fvsQ9DT16eWAbmF6IL6ZApvkpdgjtf3L"
       authorizationParams={{
-        redirect_uri: window.location.origin,
+        redirect_uri: typeof window !== 'undefined' ? window.location.origin : 'http://localhost:3000',
         audience: 'https://backend.facticity.ai',
         scope: 'openid profile email offline_access'
       }}

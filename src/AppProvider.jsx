@@ -1,8 +1,10 @@
+"use client";
 import React, { createContext, useContext, useState, useEffect, useRef } from 'react';
 import useAuth from './auth/useAuthHook.jsx';
 import { usePostHog } from 'posthog-js/react';
 import { handleAuth0Error, getTokenSafely, getTokenWithFallback } from './auth/authUtils.jsx';
-import { ACTIVE_BACKEND_URL } from '../config.js';
+
+const backendUrl = '/api';
 
 // Create a Context for the Disambiguation
 const AppContext = createContext();
@@ -14,8 +16,11 @@ export const AppProvider = ({ children }) => {
 
   const [skipDisambiguation, setSkipDisambiguation] = useState(() => {
     try {
-      const storedValue = localStorage.getItem('skipDisambiguation');
-      return storedValue !== null ? JSON.parse(storedValue) : true;
+      if (typeof window !== 'undefined') {
+        const storedValue = localStorage.getItem('skipDisambiguation');
+        return storedValue !== null ? JSON.parse(storedValue) : true;
+      }
+      return true;
     } catch (error) {
       console.error('Error reading skipDisambiguation from localStorage:', error);
       return true;
@@ -25,15 +30,18 @@ export const AppProvider = ({ children }) => {
   // State to control whether to show reward popup
   const [showRewardPopup, setShowRewardPopup] = useState(() => {
     try {
-      // First check if user has permanently disabled the popup
-      const permanentlyDisabled = localStorage.getItem('permanentlyDisableRewardPopup');
-      if (permanentlyDisabled === 'true') {
-        return false;
+      if (typeof window !== 'undefined') {
+        // First check if user has permanently disabled the popup
+        const permanentlyDisabled = localStorage.getItem('permanentlyDisableRewardPopup');
+        if (permanentlyDisabled === 'true') {
+          return false;
+        }
+        
+        // Otherwise use the regular toggle state
+        const storedValue = localStorage.getItem('showRewardPopup');
+        return storedValue !== null ? JSON.parse(storedValue) : true;
       }
-      
-      // Otherwise use the regular toggle state
-      const storedValue = localStorage.getItem('showRewardPopup');
-      return storedValue !== null ? JSON.parse(storedValue) : true;
+      return true;
     } catch (error) {
       console.error('Error reading reward popup settings from localStorage:', error);
       return true;
@@ -220,14 +228,14 @@ export const AppProvider = ({ children }) => {
         
         // setDistributedUrl('http://localhost:5052')
         // setDistributedUrl('https://ivvwnxhduu.us-west-2.awsapprunner.com')
-        setDistributedUrl(ACTIVE_BACKEND_URL)
+        setDistributedUrl(backendUrl)
         // setDistributedUrl('https://r8wncu74i2.us-west-2.awsapprunner.com')
       } catch (error) {
         console.error('Error fetching distributed URL:', error);
         // Set fallback URL on error
         // setDistributedUrl('http://localhost:5052');
         // setDistributedUrl('https://ivvwnxhduu.us-west-2.awsapprunner.com');
-        setDistributedUrl(ACTIVE_BACKEND_URL)
+        setDistributedUrl(backendUrl)
         // setDistributedUrl('https://r8wncu74i2.us-west-2.awsapprunner.com')
       }
     };
@@ -248,8 +256,7 @@ export const AppProvider = ({ children }) => {
   // const backendUrl = 'https://ecsbackend.facticity.ai';
   
   
-  const backendUrl = ACTIVE_BACKEND_URL;
-  const claimExtractUrl = ACTIVE_BACKEND_URL; // Use same URL for consistency
+  const claimExtractUrl = backendUrl; // Use same URL for consistency
 
 
   

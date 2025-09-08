@@ -196,7 +196,7 @@ export const createAndCheckTask = async (
   isVideo,
   AccessToken
 ) => {
-  const url = backendUrl+'/fact-check-sync';
+  const url = '/api/fact-check-sync';
   // const url = 'https://backend.facticity.ai/fact-check-sync'
   // const url = 'https://backend-word-testing-934923488639.us-central1.run.app/fact-check-sync'
   let output = null;

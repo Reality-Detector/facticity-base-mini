@@ -4,14 +4,14 @@ import 'swagger-ui-react/swagger-ui.css';
 import { Box, Grid, Paper, Typography, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Button, Snackbar, Alert, AppBar, Toolbar, IconButton, useTheme, useMediaQuery } from '@mui/material'
 import { useAppContext } from './AppProvider';
 import './Subscription.css'; // Import the CSS file that contains the overlay styles
-import { useNavigate } from 'react-router-dom';
+import { useRouter } from 'next/navigation';
 import ArrowBack from '@mui/icons-material/ArrowBack';
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 import useAuth from './auth/useAuthHook';
 import Credits from './components/Credits';
 
 const Api = () => {
-  const navigate = useNavigate();
+  const router = useRouter();
   const theme = useTheme();
   const isMdUp = useMediaQuery(theme.breakpoints.up('md'));
   // Replace with actual data fetching or state management logic
@@ -41,7 +41,7 @@ const Api = () => {
 
   const createOrFetchApiKey = async (email) => {
     try {
-      const response = await fetch(backendUrl+'/create_api_key', {
+      const response = await fetch('/api/create_api_key', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -78,7 +78,7 @@ const Api = () => {
     };
 
     try {
-      const response = await fetch(`${backendUrl}/submit-contact-form`, {
+      const response = await fetch('/api/submit-contact-form', {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(formDataToSend),
@@ -117,7 +117,7 @@ const Api = () => {
         <Toolbar sx={{ minHeight: '70px !important', justifyContent: 'space-between', paddingX: { xs: 2, sm: 4 } }}>
           <Box sx={{ width: { xs: 40, md: 60 }, display: 'flex', alignItems: 'center' }}>
             <IconButton
-              onClick={() => navigate('/')}
+              onClick={() => router.push('/')}
               sx={{
                 color: '#0066FF',
                 background: 'rgba(0, 102, 255, 0.08)',
@@ -159,7 +159,7 @@ const Api = () => {
               }}
             >
               <IconButton 
-                onClick={() => navigate('/rewards')} 
+                onClick={() => router.push('/rewards')} 
                 size="small" 
                 sx={{ 
                   color: '#0066FF',
