@@ -69,7 +69,7 @@ export function useUtils() {
     const splitText = async (text) => {
         try {
             const data = { query: text };
-            const response = await fetch(`${url}/split_sentence`, {
+            const response = await fetch('/api/split_sentence', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -93,7 +93,7 @@ export function useUtils() {
     const rewriteText = async (text) => {
         try {
             const data = { query: text };
-            const response = await fetch(`${url}/rewrite`, {
+            const response = await fetch('/api/rewrite', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

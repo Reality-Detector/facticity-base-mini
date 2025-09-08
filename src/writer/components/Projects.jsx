@@ -44,7 +44,7 @@ const ProjectsSection = () => {
     }
     console.log(payload);
     try {
-      const response = await fetch(backendUrl+'/create-project', {
+      const response = await fetch('/api/create-project', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -69,7 +69,7 @@ const ProjectsSection = () => {
     const fetchProjects = async () => {
       console.log("fetching projects" + email);
       try {
-        const response = await fetch(backendUrl+'/get-projects', {
+        const response = await fetch('/api/get-projects', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',

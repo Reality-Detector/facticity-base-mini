@@ -40,8 +40,8 @@ export const createAndCheckTask = async (
   AccessToken,
   backendUrl
 ) => {
-  const createTaskUrl = `${backendUrl}/fact-check`;
-  const checkStatusUrl = (taskId) => `${backendUrl}/check-task-status?task_id=${taskId}`;
+  const createTaskUrl = '/api/fact-check';
+  const checkStatusUrl = (taskId) => `/api/check-task-status?task_id=${taskId}`;
   
   // Initialize response variables
   let output = null;

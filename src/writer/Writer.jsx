@@ -21,7 +21,7 @@ import { AppContext } from './components/AppContext';
 import useAuth from '../auth/useAuthHook';
 import { useAppContext } from '../AppProvider';
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
-import { useNavigate } from 'react-router-dom';
+import { useRouter } from 'next/navigation';
 import Credits from '../components/Credits';
 // Create a custom theme (optional)
 const theme = createTheme({
@@ -47,7 +47,7 @@ function Writer() {
 
   const { isAuthenticated } = useAuth();
   const { userCredits, creditsLoading, componentsLoaded } = useAppContext();
-  const navigate = useNavigate();
+  const router = useRouter();
   const isMdUp = useMediaQuery(theme.breakpoints.up('md'));
 
   const [isModalOpen, setModalOpen] = useState(false);
@@ -266,7 +266,7 @@ function Writer() {
                 transition: 'opacity 0.6s ease-in-out 0.4s',
               }}
             >
-              <IconButton onClick={() => navigate('/rewards')} size="small" sx={{ ml: 1 }}>
+              <IconButton onClick={() => router.push('/rewards')} size="small" sx={{ ml: 1 }}>
               <InfoOutlinedIcon fontSize="small" />
             </IconButton>
               <Credits credits={userCredits} isLoading={creditsLoading} />

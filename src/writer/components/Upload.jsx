@@ -598,7 +598,7 @@ const UploadToPinecone = ({ currentProject, showToast, setIsExpanded}) => {
     formData.append('index_name', indexName);
   
     try {
-      const response = await fetch(url + '/upload', {
+      const response = await fetch('/api/upload', {
         method: 'POST',
         body: formData,
       });

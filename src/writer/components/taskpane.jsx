@@ -122,7 +122,7 @@ const Taskpane = (props) => {
     try {
         console.log({accessToken})
         const data = { query: text };
-        const response = await fetch(`${url}/split_sentence`, {
+        const response = await fetch('/api/split_sentence', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -260,7 +260,7 @@ const updateReferenceState = (metadata) => {
 const rewriteText = async (text) => {
     try {
         const data = { query: text };
-        const response = await fetch(`${url}/rewrite`, {
+        const response = await fetch('/api/rewrite', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
