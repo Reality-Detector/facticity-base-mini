@@ -1,5 +1,9 @@
+"use client";
 import React from 'react';
-import Plot from 'react-plotly.js';
+import dynamic from 'next/dynamic';
+
+// Dynamically import Plot to avoid SSR issues
+const Plot = dynamic(() => import('react-plotly.js'), { ssr: false });
 
 const ScatterPlot = ({ claim, data }) => {
   // Separate data based on the 'url' property

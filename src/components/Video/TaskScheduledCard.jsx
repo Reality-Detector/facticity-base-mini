@@ -22,7 +22,7 @@ const TaskScheduledCard = ({ progressDetails, taskId, userEmail, backendUrl }) =
     setIsTerminating(true);
     setTerminateError(null);
     try {
-      const response = await fetch(`${backendUrl}/terminate-task`, {
+      const response = await fetch('/api/terminate-task', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

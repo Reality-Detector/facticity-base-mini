@@ -1,16 +1,16 @@
 import React, { useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useRouter } from 'next/navigation';
 import useAuth from '../../auth/useAuthHook';
 import { CircularProgress, Box, Typography } from '@mui/material';
 
 const SignupEmailRedirect = () => {
-  const navigate = useNavigate();
+  const router = useRouter();
   const { loginWithRedirect, isAuthenticated } = useAuth();
 
   useEffect(() => {
     // If user is already authenticated, redirect to home
     if (isAuthenticated) {
-      navigate('/', { replace: true });
+      router.replace('/');
       return;
     }
 
@@ -27,7 +27,7 @@ const SignupEmailRedirect = () => {
       } catch (error) {
         console.error('Email signup redirect failed:', error);
         // On error, redirect to home
-        navigate('/', { replace: true });
+        router.replace('/');
       }
     };
 

@@ -27,7 +27,8 @@ import {
   ListItemText,
   Collapse,
 } from "@mui/material";
-import FactCheckDisplay from '../FactCheckDisplay/FactCheckDisplay';
+// import FactCheckDisplay from '../FactCheckDisplay/FactCheckDisplay';
+import FactCheckDisplay from '@/components/FactCheckDisplay'
 import '../animation.css'; // Ensure .search-container styles are removed/commented out
 import '../scrollbar.css';
 import { useAppContext } from '../../AppProvider';
@@ -49,7 +50,7 @@ import ExampleCards from "./Examples";
 import {  } from '@mui/icons-material';
 import EmojiEventsIcon from '@mui/icons-material/EmojiEvents';
 
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useRouter, usePathname } from 'next/navigation';
 
 import {
   Dialog,
@@ -60,7 +61,7 @@ import {
 
 //import { Collapse } from "@mui/material";
 import ErrorOutlineIcon from "@mui/icons-material/ErrorOutline";
-import { Link } from 'react-router-dom';
+import Link from 'next/link';
 
 import { KeyboardArrowLeft, KeyboardArrowRight, KeyboardArrowDown, KeyboardArrowUp, Image as ImageIcon, Description as FileTextIcon, YouTube as YoutubeIcon, TextFields as TextIcon, UnfoldLess as UnfoldLessIcon, UnfoldMore as UnfoldMoreIcon, ShoppingCart as ShoppingCartIcon, ShoppingBagSharp } from "@mui/icons-material";
 
@@ -112,7 +113,7 @@ const CompactLeaderboardDisplay = () => {
   const [userHandle, setUserHandle] = useState('');
   const { backendUrl, accessToken } = useAppContext();
   const { isAuthenticated, user } = useAuth();
-  const navigate = useNavigate();
+  const router = useRouter();
 
   // Fetch user handle when authenticated
   useEffect(() => {
@@ -133,7 +134,7 @@ const CompactLeaderboardDisplay = () => {
         headers['Validator'] = 'privy';
       }
       
-      const response = await fetch(`${backendUrl}/api/get_userhandle?email=${encodeURIComponent(user.email)}`, {
+      const response = await fetch(`/api/api/get_userhandle?email=${encodeURIComponent(user.email)}`, {
         headers: headers,
       });
       if (!response.ok) throw new Error('Failed to fetch user handle');
@@ -152,7 +153,7 @@ const CompactLeaderboardDisplay = () => {
   const fetchGamefiles = async () => {
     setLoading(true);
     try {
-      const response = await fetch(`${backendUrl}/get-all-gamefiles`);
+      const response = await fetch('/api/get-all-gamefiles');
       
       if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
       const data = await response.json();
@@ -193,7 +194,7 @@ const CompactLeaderboardDisplay = () => {
     setLeaderboardLoading(prev => ({ ...prev, [gameId]: true }));
     
     try {
-      const response = await fetch(`${backendUrl}/api/leaderboard/game/${gameId}`);
+      const response = await fetch(`/api/api/leaderboard/game/${gameId}`);
       
       if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
       const data = await response.json();
@@ -612,7 +613,7 @@ const InitialStatePanel = ({
                       <br /><br />
                       Plus, meet the{' '}
                       <Link
-                        to="/writer"
+                        href="/writer"
                         style={{
                           color: "#0066FF",
                           textDecoration: "underline",
@@ -795,8 +796,8 @@ const SearchComponent = ({ isSearchMoved, setIsSearchMoved, isMdUp, initialUrlPa
   const [isProDialogOpen, setProDialogOpen] = useState(false);
   const [showExamples, setShowExamples] = useState(true);
   const [aboutExpanded, setAboutExpanded] = useState(false); // Add state for about expansion
-  const location = useLocation();
-  const isGamePath = location.pathname === '/game';
+  const pathname = usePathname();
+  const isGamePath = pathname === '/game';
 
   const {
     version,
@@ -851,7 +852,7 @@ const SearchComponent = ({ isSearchMoved, setIsSearchMoved, isMdUp, initialUrlPa
   const [externalTrigger, setExternalTrigger] = useState(true)
   const [conversationIdMatch, setConversationIdMatch] = useState(true)
 
-  const navigate = useNavigate(); // React Router's navigation hook
+  const router = useRouter(); // React Router's navigation hook
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
 
@@ -860,7 +861,7 @@ const SearchComponent = ({ isSearchMoved, setIsSearchMoved, isMdUp, initialUrlPa
       if (!currentConversation || !user?.email) return;
       
       try {
-        const response = await fetch(backendUrl+`/check-convo-user-mapping`, {
+        const response = await fetch(`/api/check-convo-user-mapping`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -951,7 +952,7 @@ const SearchComponent = ({ isSearchMoved, setIsSearchMoved, isMdUp, initialUrlPa
 
   const sendCurrentConversation = async (email, currentConversation, query) => {
     try {
-      await fetch(backendUrl+'/update_ids', {
+      await fetch('/api/update_ids', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -1543,7 +1544,7 @@ const SearchComponent = ({ isSearchMoved, setIsSearchMoved, isMdUp, initialUrlPa
             }}
             onClick={() => {
               handleCreditDialogClose();
-              navigate('/subscription');
+              router.push('/subscription');
             }}
           >
             Upgrade
@@ -1573,7 +1574,7 @@ const SearchComponent = ({ isSearchMoved, setIsSearchMoved, isMdUp, initialUrlPa
             color="primary"
             onClick={() => {
               handleProDialogClose();
-              navigate("/subscription")
+              router.push("/subscription")
             }}
           >
             Go Pro

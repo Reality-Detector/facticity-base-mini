@@ -1,3 +1,4 @@
+"use client";
 import React, { useEffect } from "react";
 import useAuth from '../../auth/useAuthHook';
 import {
@@ -11,12 +12,7 @@ import {
 import { useAppContext } from "../../AppProvider";
 import CloseIcon from "@mui/icons-material/Close";
 import { IconButton } from "@mui/material";
-
-
-// Custom hook to parse query parameters
-function useQuery() {
-  return new URLSearchParams(window.location.search);
-}
+import { useSearchParams } from 'next/navigation';
 
 // Enhanced Divider with centered text
 const DividerWithText = ({ text }) => (
@@ -34,20 +30,20 @@ const DividerWithText = ({ text }) => (
 
 const LoginModal = ({ open, handleClose, setShowSignUpModal, titleText = "Login required", bodyText = "Please log in or create an account to continue." }) => {
   const { loginWithPopup } = useAuth();
-  const query = useQuery();
+  const searchParams = useSearchParams();
 
   const { overlayLogin, setOverlayLogin } = useAppContext();
 
 
   useEffect(() => {
-    const error = query.get("error");
-    const errorDescription = query.get("error_description");
+    const error = searchParams.get("error");
+    const errorDescription = searchParams.get("error_description");
 
     if (error === "access_denied") {
       // notify(decodeURIComponent(errorDescription)); // This line was removed from the new_code, so it's removed here.
       // console.log(decodeURIComponent(errorDescription));
     }
-  }, [query]); // Removed notify from dependency array as it's no longer imported.
+  }, [searchParams]); // Removed notify from dependency array as it's no longer imported.
 
   const handleLogin = async () => {
     try {

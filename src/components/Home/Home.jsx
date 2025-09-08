@@ -1,3 +1,5 @@
+"use client";
+import { usePathname, useParams, useSearchParams, useRouter } from 'next/navigation';
 import React, { useState, useEffect } from 'react';
 import Sidebar from './Sidebar';
 import { IconButton, Grid, Box, Typography, useTheme, useMediaQuery, AppBar, Toolbar } from '@mui/material';
@@ -7,8 +9,8 @@ import Credits from '../Credits';
 import ThirdColumn from './ThirdColumn';
 import useAuth from '../../auth/useAuthHook';
 import { useAppContext } from '../../AppProvider';
-import { useParams, useLocation } from 'react-router-dom';
-import { useNavigate } from 'react-router-dom';
+
+
 // import EditNoteIcon from '@mui/icons-material/EditNote';
 import LoginModal from './loginModal';
 import AddBoxOutlinedIcon from '@mui/icons-material/AddBoxOutlined';
@@ -39,23 +41,25 @@ const Home = () => {
     temporaryExpiries
   } = useAppContext();
   
+
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+  const router = useRouter();
+  
   const { id } = useParams(); // Retrieve the ID from the URL
-  const location = useLocation();
   const theme = useTheme();
   const isSmUp = useMediaQuery(theme.breakpoints.up('sm'));
   const isMdUp = useMediaQuery(theme.breakpoints.up('md'));
 
   const [isBannerVisible, setIsBannerVisible] = useState(true);
   const [initialUrlParam, setInitialUrlParam] = useState(null);
-  const navigate = useNavigate();
   
   // Check if we're on the game path
-  const isGamePath = location.pathname === '/game';
+  const isGamePath = pathname === '/game';
   
   useEffect(() => {
     // Handle URL parameter
-    const queryParams = new URLSearchParams(location.search);
-    const encodedUrl = queryParams.get('url');
+    const encodedUrl = searchParams.get('url');
     if (encodedUrl) {
       const decodedUrl = decodeURIComponent(encodedUrl);
       console.log('Encoded URL:', encodedUrl);
@@ -69,7 +73,7 @@ const Home = () => {
     if (!id) {
       setNewSearch(true);
     }
-  }, [id, location.search, setCurrentConversation, setNewSearch]);
+  }, [id, searchParams, setCurrentConversation, setNewSearch]);
 
   useEffect(() => {
     if (isSearchMoved) {
@@ -191,7 +195,7 @@ const Home = () => {
             {isAuthenticated && (
               <>
                 <IconButton 
-                  onClick={() => navigate('/rewards')} 
+                  onClick={() => router.push('/rewards')} 
                   size="small" 
                   sx={{ 
                     color: '#0066FF',

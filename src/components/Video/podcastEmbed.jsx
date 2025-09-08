@@ -15,7 +15,7 @@ function PodcastEmbed({ podcastLink, height }) {
     const fetchPodcastDetails = async () => {
       setLoading(true);
       try {
-        const response = await fetch(`${backendUrl}/get-podcast-details`, {
+        const response = await fetch('/api/get-podcast-details', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',

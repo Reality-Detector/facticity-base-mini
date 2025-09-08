@@ -18,14 +18,16 @@ import VideoProcessingLoader from './videoLoading';
 import Fab from '@mui/material/Fab';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import { motion } from 'framer-motion';
-import FactCheckDisplay from '../FactCheckDisplay/FactCheckDisplay';
+// import FactCheckDisplay from '../FactCheckDisplay/FactCheckDisplay';
+import FactCheckDisplay from '@/components/FactCheckDisplay';
 import { useAppContext } from '../../AppProvider';
 import ShareIcon from '@mui/icons-material/Share';
 import PodcastEmbed from './podcastEmbed';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import ExpandLessIcon from '@mui/icons-material/ExpandLess';
 import TaskScheduledCard from './TaskScheduledCard';
-import TaskActions from '../Interactions/InteractionBar';
+// import TaskActions from '../Interactions/InteractionBar'
+import TaskActions from '@/components/Interactions';
 // import { useRef } from 'react';
 import Popover from '@mui/material/Popover';
 import DownloadIcon from '@mui/icons-material/Download';
@@ -172,7 +174,7 @@ const VideoParagraphComponent = memo(({ id, claim, email, readyin, AccessToken})
   } 
 
   async function addTaskId(id) {
-    const url = backendUrl+"/add_task_id";
+    const url = "/api/add_task_id";
     const data = {
         "_id": id,
         "mode":"extractFacts",
@@ -204,7 +206,7 @@ const VideoParagraphComponent = memo(({ id, claim, email, readyin, AccessToken})
   async function sendFeedback() {
     // console.log(id)
     try {
-      const apiUrl = backendUrl+'/SendDetailedFeedback';
+      const apiUrl = '/api/SendDetailedFeedback';
       const requestBody = { id: { id: id }, response: value };
 
       const response = await fetch(apiUrl, {
@@ -353,7 +355,7 @@ useEffect(() => {
     }
     try {
 
-      const apiUrl = backendUrl+'/extract-claim';
+      const apiUrl = '/api/extract-claim';
       // const apiUrl = 'http://localhost:5000/extract-claim'
       // console.log(apiUrl);
       const requestBody = {

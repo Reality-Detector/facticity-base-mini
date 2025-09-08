@@ -1,3 +1,4 @@
+"use client";
 // Sidebar.jsx
 import PropTypes from 'prop-types';
 import {
@@ -22,7 +23,7 @@ import {
   ArrowBackOutlined,
 } from '@mui/icons-material';
 import Subscription from '@mui/icons-material/AddCard';
-import { Link } from 'react-router-dom';
+import Link from 'next/link';
 import { useAppContext } from '../../AppProvider';
 import ConversationItem from './conversationComponent';
 import EditNoteIcon from '@mui/icons-material/EditNote';
@@ -191,7 +192,7 @@ const Sidebar = ({
                 <ListItemButton 
                   className="menu-button"
                   component={Link} 
-                  to="https://facticity.ai" 
+                  href="https://facticity.ai" 
                   target="_blank"
                   sx={{
                     borderRadius: 2, 
@@ -302,7 +303,7 @@ const Sidebar = ({
                 <ListItemButton 
                   className="menu-button"
                   component={Link} 
-                  to="/writer"
+                  href="/writer"
                   sx={{
                     borderRadius: 2, 
                     my: 0,
@@ -354,7 +355,7 @@ const Sidebar = ({
                 <ListItemButton 
                   className="menu-button"
                   component={Link}
-                  to="/rewards"
+                  href="/rewards"
                   sx={{
                     borderRadius: 2, 
                     my: 0,
@@ -594,7 +595,7 @@ const Sidebar = ({
             <ListItemButton
               className="menu-button"
               component={Link}
-              to="/settings"
+                  href="/settings"
               sx={{
                 borderRadius: 2,
                 background: "rgba(20,81,242,0.04)",

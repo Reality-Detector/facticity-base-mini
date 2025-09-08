@@ -32,7 +32,8 @@ import ExpandMoreIcon from '@mui/icons-material/ExpandMore'; // Import ExpandMor
 import ExpandLessIcon from '@mui/icons-material/ExpandLess'; // Import ExpandLessIcon
 import useAuth from '../../auth/useAuthHook';
 import PropTypes from 'prop-types';
-import TaskActions from '../Interactions/InteractionBar';
+// import TaskActions from '../Interactions/InteractionBar';
+import TaskActions from '@/components/Interactions';
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 import ArrowDropUpIcon from '@mui/icons-material/ArrowDropUp';
 import ScatterPlot from './plot';
@@ -567,8 +568,8 @@ const FactCheckDisplay = ({ query, id, process, setDone, skipDisambiguation, max
         distributedUrl
     } = useAppContext();
 
-    const DISAMBIGUATE_URL = backendUrl +'/disambiguate';
-    const MODIFYQUERY_URL = backendUrl +'/modifyquery';
+    const DISAMBIGUATE_URL = '/api/disambiguate';
+    const MODIFYQUERY_URL = '/api/modifyquery';
     
     const toggleDisambSection = () => {
         setDisambIsOpen((prev) => !prev);
@@ -593,7 +594,7 @@ const FactCheckDisplay = ({ query, id, process, setDone, skipDisambiguation, max
 
     async function updateProSearches(userEmail) {
         try {
-        const response = await axios.post(backendUrl+"/update_pro_searches", {
+        const response = await axios.post("/api/update_pro_searches", {
             userEmail: userEmail, // Pass the logged-in user's email
         });
     
@@ -679,7 +680,7 @@ const FactCheckDisplay = ({ query, id, process, setDone, skipDisambiguation, max
     
 
     async function addTaskId(id, taskId) {
-        const url = backendUrl+"/add_task_id";
+        const url = "/api/add_task_id";
         const data = {
             "_id": id,
             "task_id": taskId,
@@ -711,7 +712,7 @@ const FactCheckDisplay = ({ query, id, process, setDone, skipDisambiguation, max
 
     async function addCachedTasktodB(id, input, result) {
         
-        const url = backendUrl+"/add_cache_db";
+        const url = "/api/add_cache_db";
         result['userEmail'] = email
         const data = {
             "_id": id,

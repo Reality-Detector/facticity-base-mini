@@ -1,3 +1,4 @@
+"use client";
 import React, { useState, useEffect } from 'react';
 import {
   Typography,
@@ -19,7 +20,7 @@ import AccountBalanceWalletIcon from '@mui/icons-material/AccountBalanceWallet';
 import { useAppContext } from '../../AppProvider';
 import useAuth from '../../auth/useAuthHook';
 import ThirdColumn from '../Home/ThirdColumn';
-import { useNavigate } from 'react-router-dom';
+import { useRouter } from 'next/navigation';
 import CreditBreakdown from './CreditBreakdown';
 import Credits from '../Credits';
 
@@ -79,7 +80,7 @@ const CreditsPage = () => {
   const {userCredits, creditsLoading} = useAppContext()
 
   const { isAuthenticated } = useAuth();
-  const navigate = useNavigate()
+  const router = useRouter()
   // Responsive Design
   const theme = useTheme();
   const isMdUp = useMediaQuery(theme.breakpoints.up('md'));
@@ -145,7 +146,7 @@ const CreditsPage = () => {
         <Toolbar sx={{ minHeight: '70px !important', justifyContent: 'space-between', paddingX: { xs: 2, sm: 4 } }}>
           <Box sx={{ width: { xs: 40, md: 60 }, display: 'flex', alignItems: 'center' }}>
             <IconButton
-              onClick={() => navigate('/')}
+              onClick={() => router.push('/')}
               sx={{
                 color: '#0066FF',
                 background: 'rgba(0, 102, 255, 0.08)',
@@ -186,7 +187,7 @@ const CreditsPage = () => {
             {isAuthenticated && (
               <>
                 <IconButton 
-                  onClick={() => navigate('/rewards')} 
+                  onClick={() => router.push('/rewards')} 
                   size="small" 
                   sx={{ 
                     color: '#0066FF',

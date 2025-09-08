@@ -30,12 +30,12 @@ import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import ErrorIcon from '@mui/icons-material/Error';
 import AutoAwesomeIcon from '@mui/icons-material/AutoAwesome';
 import PersonIcon from '@mui/icons-material/Person';
-import { useNavigate } from 'react-router-dom';
+import { useRouter } from 'next/navigation';
 import { useAppContext } from '../../AppProvider';
 const TASK_ACTIONS_FEEDBACK_COLOR = '#0066FF';
 
 const DiscoverPostButton = ({ userEmail, backendUrl, open: externalOpen, onClose: externalOnClose, onPostSuccess }) => {
-    const navigate = useNavigate();
+    const router = useRouter();
     const [internalOpen, setInternalOpen] = useState(false);
     const [loading, setLoading] = useState(false);
     const [success, setSuccess] = useState(false);
@@ -118,7 +118,7 @@ const DiscoverPostButton = ({ userEmail, backendUrl, open: externalOpen, onClose
                 headers['Validator'] = 'privy';
             }
             
-            const response = await fetch(`${backendUrl}/api/get_userhandle?email=${userEmail}`, {
+            const response = await fetch(`/api/api/get_userhandle?email=${userEmail}`, {
                 method: 'GET',
                 headers: headers,
             });
@@ -174,7 +174,7 @@ const DiscoverPostButton = ({ userEmail, backendUrl, open: externalOpen, onClose
                 headers['Authorization'] = `Bearer ${accessToken}`;
             }
             
-            const response = await fetch(`${backendUrl}/api/generate_userhandle`, {
+            const response = await fetch('/api/api/generate_userhandle', {
                 method: 'POST',
                 headers: headers,
                 body: JSON.stringify({ 
@@ -232,7 +232,7 @@ const DiscoverPostButton = ({ userEmail, backendUrl, open: externalOpen, onClose
                 headers['Validator'] = 'privy';
             }
             
-            const response = await fetch(`${backendUrl}/api/publish_post`, {
+            const response = await fetch('/api/api/publish_post', {
                 method: 'POST',
                 headers: headers,
                 body: JSON.stringify(postPayload),
@@ -249,7 +249,7 @@ const DiscoverPostButton = ({ userEmail, backendUrl, open: externalOpen, onClose
             }
             setTimeout(() => {
                 handleDialogClose();
-                navigate('/discover/my-posts');
+                router.push('/discover/my-posts');
             }, 1500);
         } catch (error) {
             console.error('Error creating post:', error);

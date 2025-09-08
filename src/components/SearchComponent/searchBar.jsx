@@ -160,7 +160,7 @@ function SearchBar({
   const checkYouTubeCaptions = async (url) => {
     try {
       const response = await fetch(
-        backendUrl+`/check-youtube-transcript?input_url=${encodeURIComponent(
+        `/api/check-youtube-transcript?input_url=${encodeURIComponent(
           url
         )}`,
         {

@@ -1,3 +1,4 @@
+"use client";
 import React, { useState, useEffect } from 'react';
 import {
   Container,
@@ -63,7 +64,7 @@ const XIcon = (props) => (
   </svg>
 );
 import useAuth from '../../auth/useAuthHook';
-import { useNavigate } from 'react-router-dom';
+import { useRouter } from 'next/navigation';
 import { useAppContext } from '../../AppProvider';
 import Loader from './Loader';
 import Credits from '../Credits';
@@ -195,7 +196,7 @@ const Settings = ({ onClose }) => {
         headers['Frontend'] = 'web3'
 
         
-        const response = await fetch(`${backendUrl}/api/connection-completed`, {
+        const response = await fetch('/api/api/connection-completed', {
           method: 'POST',
           headers: headers,
           body: JSON.stringify({
@@ -282,7 +283,7 @@ const Settings = ({ onClose }) => {
     }
   };
   
-  const navigate = useNavigate();
+  const router = useRouter();
   const theme = useTheme();
   const isMdUp = useMediaQuery(theme.breakpoints.up('md'));
   
@@ -386,7 +387,7 @@ const Settings = ({ onClose }) => {
         headers['Validator'] = 'privy';
       }
       
-      const response = await fetch(`${backendUrl}/api/generate_userhandle`, {
+      const response = await fetch('/api/api/generate_userhandle', {
         method: 'POST',
         headers: headers,
         body: JSON.stringify({ 
@@ -621,7 +622,7 @@ const Settings = ({ onClose }) => {
         <Toolbar sx={{ minHeight: '70px !important', justifyContent: 'space-between', paddingX: { xs: 2, sm: 4 } }}>
           <Box sx={{ width: { xs: 40, md: 60 }, display: 'flex', alignItems: 'center' }}>
             <IconButton
-              onClick={() => navigate('/')}
+              onClick={() => router.push('/')}
               sx={{
                 color: '#0066FF',
                 background: 'rgba(0, 102, 255, 0.08)',
@@ -663,7 +664,7 @@ const Settings = ({ onClose }) => {
               }}
             >
               <IconButton 
-                onClick={() => navigate('/rewards')} 
+                onClick={() => router.push('/rewards')} 
                 size="small" 
                 sx={{ 
                   color: '#0066FF',

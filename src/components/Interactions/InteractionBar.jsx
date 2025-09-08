@@ -137,7 +137,7 @@ const TaskActions = ({ conversation_id, task_id, userEmail, showRatingButtons = 
         headers['Authorization'] = `Bearer ${accessToken}`;
       }
       
-      const response = await fetch(backendUrl+`/api/tasks/${task_id}/${actionType}`, {
+      const response = await fetch(`/api/api/tasks/${task_id}/${actionType}`, {
         method: 'POST',
         headers: headers,
         body: JSON.stringify({
