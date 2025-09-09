@@ -211,7 +211,12 @@ const Settings = ({ onClose }) => {
           const data = await response.json();
           console.log('All connections synced to backend successfully:', data);
         } else {
-          console.error('Failed to sync connections to backend:', response.statusText);
+          const errorText = await response.text();
+          console.error('Failed to sync connections to backend:', {
+            status: response.status,
+            statusText: response.statusText,
+            error: errorText
+          });
         }
       } else {
         console.log('No existing connections found to sync');

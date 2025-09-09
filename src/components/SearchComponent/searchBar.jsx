@@ -465,7 +465,8 @@ function SearchBar({
           <ClickAwayListener onClickAway={() => setOpenRecommend(false)}>
             <Box sx={{ width: '100%', position: 'relative' }}>
               <TextField
-              className= 'facti-tut-search-bar-text-field'
+                id="search-bar-text-field"
+                className= 'facti-tut-search-bar-text-field'
                 variant="standard"
                 placeholder="Type a claim or paste a link..."
                 value={searchQuery}

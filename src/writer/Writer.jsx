@@ -44,7 +44,12 @@ function Writer() {
   const [fontName, setFontName] = useState('Arial');
   const [fontColor, setFontColor] = useState('#000000');
   const [isTaskpaneVisible, setTaskpaneVisible] = useState(true);
-  const [isLandscape, setIsLandscape] = useState(window.innerWidth > window.innerHeight);
+  const [isLandscape, setIsLandscape] = useState(() => {
+    if (typeof window !== 'undefined') {
+      return window.innerWidth > window.innerHeight;
+    }
+    return true; // Default to landscape for SSR
+  });
 
   const { isAuthenticated } = useAuth();
   const { userCredits, creditsLoading, componentsLoaded } = useAppContext();

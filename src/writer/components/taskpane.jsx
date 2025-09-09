@@ -1262,9 +1262,7 @@ const handleCorrection = async (inputText, correctedText) => {
             </IconButton>
           </Tooltip>
           <Tooltip title="Profile" placement="left">
-            <IconButton sx={{ padding: 1 }}>
-              <Profile sx={{ fontSize: 25 }} />
-            </IconButton>
+            <Profile sx={{ fontSize: 25 }} />
           </Tooltip>
         </Box>
         {/* <br></br> */}
