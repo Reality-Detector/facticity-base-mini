@@ -1,3 +1,4 @@
+"use client";
 // SearchComponent.jsx
 import React, { useState, useEffect, useRef } from 'react';
 import {
@@ -68,7 +69,9 @@ import { KeyboardArrowLeft, KeyboardArrowRight, KeyboardArrowDown, KeyboardArrow
 // Buy $FACY Button Component
 const BuyFACYButton = ({ variant = "contained", size = "medium", sx = {} }) => {
   const handleBuyFACY = () => {
-    window.open('https://app.uniswap.org/swap?chain=base&inputCurrency=NATIVE&outputCurrency=0xfac77f01957ed1b3dd1cbea992199b8f85b6e886', '_blank', 'noopener,noreferrer');
+    if (typeof window !== 'undefined') {
+      window.open('https://app.uniswap.org/swap?chain=base&inputCurrency=NATIVE&outputCurrency=0xfac77f01957ed1b3dd1cbea992199b8f85b6e886', '_blank', 'noopener,noreferrer');
+    }
   };
 
   const isOutlined = variant === 'outlined';
@@ -1101,7 +1104,9 @@ const SearchComponent = ({ isSearchMoved, setIsSearchMoved, isMdUp, initialUrlPa
 
       // Send conversation data and update URL without page navigation
       await sendCurrentConversation(email, newConversationId, trimmedQuery);
-      window.history.replaceState(null, "", `/c/${newConversationId}`);
+      if (typeof window !== 'undefined') {
+        window.history.replaceState(null, "", `/c/${newConversationId}`);
+      }
     }
     if(!isAuthenticated){
       setSearchCount(searchCount + 1)

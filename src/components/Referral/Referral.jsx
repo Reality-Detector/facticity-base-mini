@@ -112,7 +112,7 @@ const CreditsPage = () => {
   // Track active section based on scroll position
   useEffect(() => {
     const handleScroll = () => {
-      const scrollPosition = window.scrollY + 100;
+      const scrollPosition = typeof window !== 'undefined' ? window.scrollY + 100 : 0;
 
       for (const section of sections) {
         const element = document.getElementById(section.id);
@@ -126,8 +126,10 @@ const CreditsPage = () => {
       }
     };
 
-    window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
+    if (typeof window !== 'undefined') {
+      window.addEventListener("scroll", handleScroll);
+      return () => window.removeEventListener("scroll", handleScroll);
+    }
   }, []);
 
 

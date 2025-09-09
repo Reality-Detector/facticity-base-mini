@@ -137,9 +137,6 @@ function Toolbar({ onCommand, fontSize, setFontSize, fontName, setFontName, font
             handleCommand('foreColor', e.target.value);
           }}
           sx={{ width: 50, padding: 0 }}
-          InputProps={{
-            disableUnderline: true,
-          }}
         />
       </Tooltip>
 
@@ -153,9 +150,6 @@ function Toolbar({ onCommand, fontSize, setFontSize, fontName, setFontName, font
             handleCommand('hiliteColor', e.target.value);
           }}
           sx={{ width: 50, padding: 0 }}
-          InputProps={{
-            disableUnderline: true,
-          }}
         />
       </Tooltip>
     </Box>

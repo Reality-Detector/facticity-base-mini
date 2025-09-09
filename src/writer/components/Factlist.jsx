@@ -13,7 +13,7 @@ import {
   Menu,
   MenuItem,
 } from '@mui/material';
-import { useNavigate } from 'react-router-dom';
+import { useRouter } from 'next/navigation';
 import InfoIcon from '@mui/icons-material/Info';
 import FactDetailsModal from './FactDetailsModal'; // Import the FactDetailsModal component
 // import { green, red, grey } from '@mui/material/colors';
@@ -45,7 +45,7 @@ const classificationBorderColor = {
 
 const FactList = ({ facts = [], onCorrect, onCorrectHyperlink, handleAdd, handleAddCitation, onDismiss, commentClaim, filter }) => {
   const demoFacts = [...facts];
-  const navigate = useNavigate();
+  const router = useRouter();
   const { userCredits, setUserCredits } = useAppContext();
 
 
@@ -489,7 +489,7 @@ const FactList = ({ facts = [], onCorrect, onCorrectHyperlink, handleAdd, handle
                   <Link
                     component="button"
                     variant="body2"
-                    onClick={() => navigate('/subscription')}
+                    onClick={() => router.push('/subscription')}
                     sx={{
                       color: '#1E9AFF',
                       textDecoration: 'none',
@@ -505,7 +505,7 @@ const FactList = ({ facts = [], onCorrect, onCorrectHyperlink, handleAdd, handle
                   <Link
                     component="button"
                     variant="body2"
-                    onClick={() => navigate('/subscription')}
+                    onClick={() => router.push('/subscription')}
                     sx={{
                       color: '#1E9AFF',
                       textDecoration: 'none',

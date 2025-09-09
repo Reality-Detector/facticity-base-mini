@@ -17,7 +17,7 @@ const ThirdColumn = () => {
     };
 
     const handleLogout = () => {
-        logout({ returnTo: window.location.origin });
+        logout({ returnTo: typeof window !== 'undefined' ? window.location.origin : 'http://localhost:3000' });
     };
 
     const navigateToSettings = () => {

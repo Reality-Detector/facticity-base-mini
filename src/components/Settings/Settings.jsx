@@ -498,7 +498,7 @@ const Settings = ({ onClose }) => {
   // Track active section based on scroll position
   useEffect(() => {
     const handleScroll = () => {
-      const scrollPosition = window.scrollY + 100;
+      const scrollPosition = typeof window !== 'undefined' ? window.scrollY + 100 : 0;
 
       for (const section of sections) {
         const element = document.getElementById(section.id);
@@ -512,8 +512,10 @@ const Settings = ({ onClose }) => {
       }
     };
 
-    window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
+    if (typeof window !== 'undefined') {
+      window.addEventListener("scroll", handleScroll);
+      return () => window.removeEventListener("scroll", handleScroll);
+    }
   }, []);
 
 
@@ -728,7 +730,7 @@ const Settings = ({ onClose }) => {
                {/* Log Out Button */}
                <Box sx={{ pt: 2, borderTop: 1, borderColor: 'divider', mt: 2 }}>
                  <Button
-                   onClick={() => logout({ returnTo: window.location.origin })}
+                   onClick={() => logout({ returnTo: typeof window !== 'undefined' ? window.location.origin : 'http://localhost:3000' })}
                    sx={{
                      justifyContent: 'flex-start',
                      gap: 1.5,

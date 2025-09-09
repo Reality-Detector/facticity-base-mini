@@ -1,3 +1,4 @@
+"use client";
 import React, { useState, useContext, useEffect } from 'react';
 import {
   Grid,
@@ -309,7 +310,11 @@ function Writer() {
               <Button
                 variant="contained"
                 color="primary"
-                onClick={() => (window.location.href = '/')} // Navigate to the root
+                onClick={() => {
+                  if (typeof window !== 'undefined') {
+                    window.location.href = '/';
+                  }
+                }} // Navigate to the root
                 sx={{ marginTop: '16px' }}
               >
                 Return to Facticity Web
