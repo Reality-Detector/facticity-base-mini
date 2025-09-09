@@ -3,7 +3,7 @@ import SwaggerUI from 'swagger-ui-react';
 import 'swagger-ui-react/swagger-ui.css';
 import { Box, Grid, Paper, Typography, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Button, Snackbar, Alert, AppBar, Toolbar, IconButton, useTheme, useMediaQuery } from '@mui/material'
 import { useAppContext } from './AppProvider';
-import './Subscription.css'; // Import the CSS file that contains the overlay styles
+import '@/styles/Subscription.css'; // Import the CSS file that contains the overlay styles
 import { useRouter } from 'next/navigation';
 import ArrowBack from '@mui/icons-material/ArrowBack';
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';

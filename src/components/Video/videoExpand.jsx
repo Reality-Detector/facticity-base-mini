@@ -3,8 +3,7 @@ import { Button, Collapse, Typography, Card, CardContent, Badge, Chip, Box, Grid
 
 import TextField from '@mui/material/TextField';
 
-import '../../tooltip.css';
-import '../animation.css';
+import '@/styles/globals.css'; // Tooltip and animation styles are now in globals.css
 
 import useMediaQuery from '@mui/material/useMediaQuery';
 import { useTheme } from '@mui/material/styles';

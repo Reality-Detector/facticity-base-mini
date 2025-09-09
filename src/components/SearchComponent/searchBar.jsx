@@ -39,7 +39,7 @@ import useAuth from '../../auth/useAuthHook';
 import { useTheme } from '@mui/material/styles';
 import FormatQuoteIcon from '@mui/icons-material/FormatQuote';
 // ... [Rest of your imports and sampleRecommendations]
-import './searchBar.css'
+import '@/styles/searchBar.css'
 function SearchBar({
   searchQuery,
   setSearchQuery,

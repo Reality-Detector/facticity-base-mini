@@ -30,8 +30,7 @@ import {
 } from "@mui/material";
 // import FactCheckDisplay from '../FactCheckDisplay/FactCheckDisplay';
 import FactCheckDisplay from '@/components/FactCheckDisplay'
-import '../animation.css'; // Ensure .search-container styles are removed/commented out
-import '../scrollbar.css';
+import '@/styles/globals.css'; // Animation and scrollbar styles are now in globals.css
 import { useAppContext } from '../../AppProvider';
 import { v4 as uuidv4 } from 'uuid';
 import SearchBar from './searchBar';

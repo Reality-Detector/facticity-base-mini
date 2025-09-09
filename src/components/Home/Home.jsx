@@ -16,7 +16,7 @@ import LoginModal from './loginModal';
 import AddBoxOutlinedIcon from '@mui/icons-material/AddBoxOutlined';
 import Banner from './Banner';
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
-import '../animation.css';
+import '@/styles/globals.css'; // Animation styles are now in globals.css
 
 const Home = () => {
   const [isSidebarOpen, setSidebarOpen] = useState(false);
