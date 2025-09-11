@@ -248,14 +248,7 @@ export const AppProvider = ({ children }) => {
     console.log("Distributed URL updated:", distributedUrl);
   }, [distributedUrl]);
 
-  // Add new state for distributed URL
-   // Default fallback URL
 
-  // const backendUrl = 'http://localhost:5000';
-  // const backendUrl = 'http://localhost:5052';
-  // const backendUrl = 'https://ecsbackend.facticity.ai';
-  
-  
   const claimExtractUrl = backendUrl; // Use same URL for consistency
 
 
@@ -336,7 +329,7 @@ export const AppProvider = ({ children }) => {
   const fetchProfile = async (token = accessToken) => {
     if (user && !profileLoaded) {
       setProfileLoading(true);
-      const url = backendUrl + `/get-user-web3?wallet_id=${user.wallet.address}`;
+      const url = `/api/get-user-web3?wallet_id=${user.wallet.address}`;
       try {
         const headers = {
           'Content-Type': 'application/json',
@@ -374,7 +367,7 @@ export const AppProvider = ({ children }) => {
         headers['Validator'] = 'privy';
       }
       
-      const response = await fetch(`${backendUrl}/api/get_userhandle?email=${encodeURIComponent(user.email)}`, {
+      const response = await fetch(`/api/api/get_userhandle?email=${encodeURIComponent(user.email)}`, {
         method: 'GET',
         headers: headers,
       });
@@ -402,7 +395,7 @@ export const AppProvider = ({ children }) => {
     if (isAuthenticated && (user?.email || user?.sub)) {
       console.log("fetching subscription status 3")
       try {
-        const response = await fetch(`${backendUrl}/get_user_subscription_by_email`, {
+        const response = await fetch('/api/get_user_subscription_by_email', {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -437,7 +430,7 @@ export const AppProvider = ({ children }) => {
           headers['Validator'] = 'privy';
         }
         
-        const response = await fetch(`${backendUrl}/check_credits_util`, {
+        const response = await fetch(`/api/check_credits_util`, {
           method: "POST",
           headers: headers,
           body: JSON.stringify({userEmail: user.email, wallet_id: user.wallet.address})
@@ -492,7 +485,7 @@ export const AppProvider = ({ children }) => {
           headers['Validator'] = 'privy';
         }
         
-        const response = await fetch(backendUrl+'/update_ids', {
+        const response = await fetch('/api/update_ids', {
           method: 'POST',
           headers: headers,
           body: JSON.stringify({
@@ -525,15 +518,16 @@ export const AppProvider = ({ children }) => {
     const getHasSeenTutFlag = async () => {
       try {
         const headers = {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
+          "Validator": "privy",
+          "Frontend": "web3"
         };
-        
         if (accessToken) {
           headers['Authorization'] = `Bearer ${accessToken}`;
           headers['Validator'] = 'privy';
         }
         
-        const response = await fetch(backendUrl + '/has-seen-tut', {
+        const response = await fetch('/api/has-seen-tut', {
           method: 'POST', 
           headers: headers,
           body : JSON.stringify({
@@ -576,7 +570,7 @@ export const AppProvider = ({ children }) => {
         
       }
       
-      const response = await fetch(backendUrl+'/check-multiple-task-status', {
+      const response = await fetch('/api/check-multiple-task-status', {
         method: 'POST',
         headers: headers,
         body: JSON.stringify({ _id: conversationId }), // assuming the conversationId matches the "_id" expected by the endpoint
