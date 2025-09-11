@@ -21,7 +21,7 @@ const AuthErrorBanner = ({ error, onRetry, onDismiss }) => {
 
   const handleLogout = async () => {
     try {
-      await logout({ logoutParams: { returnTo: window.location.origin } });
+      await logout({ returnTo: window.location.origin });
     } catch (error) {
       console.error('Error during logout:', error);
     }
