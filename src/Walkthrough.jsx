@@ -43,9 +43,15 @@ const Walkthrough = () => {
   }, [isAuthenticated, user]);
 
   const markTutorialAsCompleted = async () => {
+    const headers = {
+      "Content-Type": "application/json",
+      "Validator": "privy",
+      "Frontend": "web3"
+    };
+    
     const res = await fetch("/api/mark-tutorial-complete", {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: headers,
       body: JSON.stringify({ userEmail: user.email }) // e.g. "auth0|abc123"
     });
   
