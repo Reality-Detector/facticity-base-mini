@@ -29,7 +29,7 @@ const CreditBreakdown = ({loadingReferral}) => {
           <Tooltip title="Fact Checking Coins: used for fact checking" arrow>
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
               <img 
-                src="/public/icons/credit_icons/goldcoin.png" 
+                src="/icons/credit_icons/goldcoin.png" 
                 alt="Gold Coin" 
                 style={{ width: '20px', height: '20px' }}
               />
@@ -52,7 +52,7 @@ const CreditBreakdown = ({loadingReferral}) => {
           <Tooltip title="Community Diamonds: used for earning FACY" arrow>
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
               <img 
-                src="/public/icons/credit_icons/diamond.png" 
+                src="/icons/credit_icons/diamond.png" 
                 alt="Diamond" 
                 style={{ width: '20px', height: '20px' }}
               />
