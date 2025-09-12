@@ -17,7 +17,6 @@ import VideoProcessingLoader from './videoLoading';
 import Fab from '@mui/material/Fab';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import { motion } from 'framer-motion';
-// import FactCheckDisplay from '../FactCheckDisplay/FactCheckDisplay';
 import FactCheckDisplay from '@/components/FactCheckDisplay';
 import { useAppContext } from '../../AppProvider';
 import ShareIcon from '@mui/icons-material/Share';
@@ -25,9 +24,7 @@ import PodcastEmbed from './podcastEmbed';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import ExpandLessIcon from '@mui/icons-material/ExpandLess';
 import TaskScheduledCard from './TaskScheduledCard';
-// import TaskActions from '../Interactions/InteractionBar'
 import TaskActions from '@/components/Interactions';
-// import { useRef } from 'react';
 import Popover from '@mui/material/Popover';
 import DownloadIcon from '@mui/icons-material/Download';
 import ClaimSelectionInterface from './ClaimSelectionInterface';
@@ -53,13 +50,8 @@ const VideoParagraphComponent = memo(({ id, claim, email, readyin, AccessToken})
   const isMobile = useMediaQuery(theme.breakpoints.down('md')); // Changed to match Grid md breakpoint
   const isXs = useMediaQuery(theme.breakpoints.down('sm'));
 
-  // const defaultUrl = "https://backend-word-testing-934923488639.us-central1.run.app"
-  // const defaultUrl = "https://facticity-backend-a4xncz5jja-as.a.run.app"
-  //const defaultUrl = "http://127.0.0.1:8000"
-  //const defaultUrl = "https://fastapi-backend-endpoints-934923488639.us-central1.run.app"
   const { claimExtractUrl, setClaimsRecieved, currentConversation, progress, setProgress, userCredits, setPostClaims, backendUrl } = useAppContext();
 
-  const defaultUrl = claimExtractUrl
   const [title, setTitle] = useState("")
   const [showPopup, setShowPopup] = useState(false);
   const [manualTitle, setManualTitle] = useState('');
@@ -203,7 +195,6 @@ const VideoParagraphComponent = memo(({ id, claim, email, readyin, AccessToken})
 }
 
   async function sendFeedback() {
-    // console.log(id)
     try {
       const apiUrl = '/api/SendDetailedFeedback';
       const requestBody = { id: { id: id }, response: value };
@@ -338,7 +329,6 @@ const isInitialRender = React.useRef(true);
 
 useEffect(() => {
   const fetchData = async () => {
-    // console.log("fetching")
     console.log({queries})
     if (idHistory && Object.keys(idHistory).length > 0) {
       addClaims(queries, true);
@@ -355,8 +345,6 @@ useEffect(() => {
     try {
 
       const apiUrl = '/api/extract-claim';
-      // const apiUrl = 'http://localhost:5000/extract-claim'
-      // console.log(apiUrl);
       const requestBody = {
         query: claim,
         location: "",
@@ -433,12 +421,8 @@ useEffect(() => {
   };
 
 
-  // if (isInitialRender.current) {
-  //   isInitialRender.current = false;
-  // } else {
     setClaims([]);
     setCount({ True: 0, False: 0, Inconclusive: 0 });
-    // Reset selection phase state
     setShowClaimSelection(false);
     setIsInSelectionPhase(false);
     setExtractedClaimsForSelection([]);
@@ -594,19 +578,6 @@ const renderClaims = () => {
     return acc;
   }, {});
 
-  // const classificationCounts = useMemo(() => {
-  //   const counts = claims.reduce(
-  //       (acc, claim) => {
-  //           acc[claim.classification] = (acc[claim.classification] || 0) + 1;
-  //           return acc;
-  //       },
-  //       { True: 0, False: 0, Inconclusive: 0, Unverifiable: 0 }
-  //   );
-    
-  //   // console.log({claims}); // Log the result
-  //   return counts;
-  // }, [claims]);
-
 
   const classificationCounts = useMemo(() => {
     const currentClaims = claimsRef.current;
@@ -644,29 +615,6 @@ const renderClaims = () => {
       return youtubeRegex.test(url);
     };
 
-
-//   useEffect(() => {
-//     const fetchVideoTitle = async () => {
-//         try {
-//             if (isValidUrl(claim)) {
-//                 const title = await getYoutubeVideoDetails(claim);
-//                 setTitle(`${title.title} by the Youtube channel: ${title.channel}`);
-//                 var dur = durationToSeconds(title.duration)
-//                 // console.log(`${title.title} by the Youtube channel: ${title.channel} +${title.duration}+${dur}`)
-//                 setDuration(dur)
-//             } else {
-//                 setDuration(60)
-//                 // setShowPopup(true);
-//             }
-//         } catch (error) {
-//             setDuration(60)
-//             console.error('Error fetching video title:', error);
-//             // setShowPopup(true);
-//         }
-//     };
-
-//     fetchVideoTitle();
-// }, [claim]);
 
 
 useEffect(() => {

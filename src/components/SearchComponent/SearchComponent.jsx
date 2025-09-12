@@ -13,7 +13,6 @@ import {
   CardActionArea,
   CardContent,
   Stack,
-  //useTheme,
   Chip,
   IconButton,
   CircularProgress,
@@ -23,12 +22,7 @@ import {
   TableContainer,
   TableHead,
   TableRow,
-  List,
-  ListItem,
-  ListItemText,
-  Collapse,
 } from "@mui/material";
-// import FactCheckDisplay from '../FactCheckDisplay/FactCheckDisplay';
 import FactCheckDisplay from '@/components/FactCheckDisplay'
 import '@/styles/globals.css'; // Animation and scrollbar styles are now in globals.css
 import { useAppContext } from '../../AppProvider';
@@ -37,13 +31,11 @@ import SearchBar from './searchBar';
 import ErrorComponent from './ErrorComponent';
 import VideoParagraphComponent from '../Video/videoExpand';
 import useAuth from '../../auth/useAuthHook';
-import { Button as NESButton, setDarkModeActivation } from "nes-ui-react";
 import MUIButton from "@mui/material/Button";
 
 
 import Snackbar from '@mui/material/Snackbar';
 import Alert from '@mui/material/Alert';
-import axios from "axios";
 import HeadlineDisplay from './HeadlineDisplay';
 import ExampleCards from "./Examples";
 
@@ -59,7 +51,6 @@ import {
   DialogActions,
 } from "@mui/material";
 
-//import { Collapse } from "@mui/material";
 import ErrorOutlineIcon from "@mui/icons-material/ErrorOutline";
 import Link from 'next/link';
 
@@ -783,7 +774,6 @@ const InitialStatePanel = ({
 };
 
 const SearchComponent = ({ isSearchMoved, setIsSearchMoved, isMdUp, initialUrlParam }) => {
-  //const [searchQuery, setSearchQuery] = useState("");
   const [isProMode, setIsProMode] = useState(false);
   const { user, getAccessTokenSilently, isAuthenticated } = useAuth();
   const [searchVersion, setSearchVersion] = useState("basic"); // Default to 'basic'
@@ -838,7 +828,6 @@ const SearchComponent = ({ isSearchMoved, setIsSearchMoved, isMdUp, initialUrlPa
   
 
 
-  // const theme = useTheme();
   // const isSmUp = useMediaQuery(theme.breakpoints.up('sm')); // >=600px
   // const isMdUp = useMediaQuery(theme.breakpoints.up('md')); // >=900px
   const scrollableDivRef = useRef(null);
@@ -886,7 +875,6 @@ const SearchComponent = ({ isSearchMoved, setIsSearchMoved, isMdUp, initialUrlPa
   
         const data = await response.json();
         const convoMatch = data.id_match;
-        console.log({convoMatch})
         if (convoMatch === false) {
           setConversationIdMatch(false);
         }
@@ -993,7 +981,6 @@ const SearchComponent = ({ isSearchMoved, setIsSearchMoved, isMdUp, initialUrlPa
         message = "You've exhausted your daily fact-checking credits. We will still extract claims, but full fact-checks are paused. Kindly upgrade or refer a friend to get more credits "
     }
     const creditValue = userCredits
-    console.log(creditValue)
     if(creditValue == 0 && !creditsLoading){
       setCreditDialogMessage(message);
       setCreditDialogOpen(true);
@@ -1013,10 +1000,7 @@ const SearchComponent = ({ isSearchMoved, setIsSearchMoved, isMdUp, initialUrlPa
 
     if (!trimmedQuery) return;
 
-    // console.log("searchCount is: ", searchCount)
-    // console.log("isURL: ", isUrl(trimmedQuery))
     if(!isAuthenticated || !isAuthenticated && isUrl(trimmedQuery) || !isAuthenticated && trimmedQuery.length>250){
-      // alert('Please login to continue searching');
       setOverlayLogin(true)
       return;
     }
@@ -1025,10 +1009,8 @@ const SearchComponent = ({ isSearchMoved, setIsSearchMoved, isMdUp, initialUrlPa
 
     let newMode = mode;
     let newQueries = [...queries];
-    // console.log({ newQueries });
     let newLink = null;
 
-    let newSearchState = false;
     // Determine if a new conversation should be started
     const shouldStartNewConversation =
       queries.length === 0 || isUrl(trimmedQuery) || mode === 'extractFacts' || conversationIdMatch === false;
@@ -1084,7 +1066,6 @@ const SearchComponent = ({ isSearchMoved, setIsSearchMoved, isMdUp, initialUrlPa
     if (newLink) setLink(newLink);
     setMode(newMode);
     setQueries(newQueries);
-    // console.log({ trimmedQuery });
 
     if (shouldStartNewConversation) {
       setIdHistory({});
@@ -1120,98 +1101,6 @@ const SearchComponent = ({ isSearchMoved, setIsSearchMoved, isMdUp, initialUrlPa
     }
   }, [queries, workspaceLoading, mode, link]); // Add dependencies as needed
 
-  // useEffect(() => {
-  //   console.log("use effect check daily credits left")
-
-  //   const checkCreditBalance = async () => {
-  //     try {
-      
-  //     const response = await axios.post(`${backendUrl}/check_credits_util`, {
-  //       userEmail: user.email,
-  //     });
-  //     if(response.data.success){
-  //       const alertValue = false
-  //       alertValue = response.data.userCredits == 0 ? true: false
-  //       console.log(response.data.userCredits )
-  //       setToastMessage("You have exhausted your daily fact-checking limits. Kindly upgrade your subscription or wait until tomorrow for the credits to refresh.")
-  //       setToastOpen(true)
-  //       setManualRefresh(!manualRefresh)
-  //     }
-  //     }
-  //     catch{
-
-  //     }
-  //   }
-
-  //   if(mode == 'verify')
-  //     {
-  //       checkCreditBalance();
-  //     }
-  // }, [manualRefresh])
-
-  useEffect(() => {
-    console.log("use effect checkPro running")
-    const checkProSearches = async () => {
-      try {
-        if(isProUser == false){
-          const response = await axios.post(`${backendUrl}/check_pro_searches`, {
-            userEmail: user.email,
-          });
-          //truth table logic
-          // if sys is pro, user search pro -> pro
-          // if sys is basic, user search basic -> basic
-          // if sys is pro, user basic -> basic => alert/toast
-          // if sys is basic, user pro -> basic
-          
-          if(response.data.success)
-          {
-            const userSearch = response.data.hasProSearches? 'pro': 'basic'
-            console.log("userSearch is: ", userSearch)
-
-            if(version == 'pro' && userSearch == 'pro')
-            {
-              setSearchVersion("pro")
-              setResultVersion("pro")
-            }
-            else if (version == 'basic' && userSearch == 'basic') {
-            setSearchVersion("basic")
-            setResultVersion("basic")
-            }
-            else if (version == 'pro' && userSearch == 'basic') // throw toastie
-            {
-                setToastMessage("You have exhausted your 'pro' searches for the day. Your searches will be processed using 'basic' mode.");
-                setToastOpen(true);
-                setProDialogOpen(true)
-                setSearchVersion("basic")
-                setResultVersion("basic")
-                setVersion("basic")
-              }
-            else {
-              setSearchVersion("basic")
-              setResultVersion("basic")
-            }      
-
-          }
-          else{
-            setSearchVersion("basic")
-            setResultVersion("basic")
-          }       
-
-        }
-        else { //user has a pro subscription
-          setSearchVersion("pro")
-          setResultVersion(version)
-        }
-      } catch (error) {
-        console.error("Error checking pro searches:", error);
-        setSearchVersion("basic"); // Fallback to 'basic' on error
-      }
-    };
-    if(mode == 'verify')
-    {
-      //checkProSearches();
-    }
-  }, [manualRefresh]); // Run on component mount
 
   const handleCloseToast = () => {
     setToastOpen(false);

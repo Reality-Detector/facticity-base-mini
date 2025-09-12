@@ -90,24 +90,6 @@ const fetchDuckDuckGo = async (query) => {
 
 
 
-
-// async function updateProSearches(userEmail) {
-//     try {
-//       const response = await axios.post(`${backendUrl}/update_pro_searches`, {
-//         userEmail: userEmail, // Pass the logged-in user's email
-//       });
-
-//       if (response.data.success) {
-//         console.log("Pro search count updated successfully:", response.data.message);
-//       } else {
-//         console.error("Failed to update pro search count:", response.data.error);
-//       }
-//     } catch (error) {
-//       console.error("Error while updating pro search count:", error.message);
-//     }
-//   }
-// Subcomponents
-
 const ClarificationSection = ({
     clarification,
     options,
@@ -807,9 +789,7 @@ const FactCheckDisplay = ({ query, id, process, setDone, skipDisambiguation, max
 
     // Function to perform the final search
     const performSearch = async (finalQuery) => {
-        // console.log("perform search initiated")
         if (output){
-            // console.log({output})
             setResult(output);
             setTaskId(output['task_id'])
             setSteps(output['intermediate_steps'])
@@ -874,7 +854,6 @@ const FactCheckDisplay = ({ query, id, process, setDone, skipDisambiguation, max
                 setCommunityCredits(output.visualisationMode.communityCredits || 0)
             }
 
-            console.log({output})
             if (output?.sourceCount === 0 && output?.new_search === true) {
                 handleRedo();
                 setDisableRetry(true);
@@ -930,7 +909,6 @@ const FactCheckDisplay = ({ query, id, process, setDone, skipDisambiguation, max
                 setError(null);
                 // Show reward popup after a short delay if enabled
                 console.log("show reward popup")
-                // Show reward popup after a short delay if enabled
                 scrollToOverallAssessment();
                 setTimeout(() => {
                     handleShowRewardPopup();
@@ -1058,9 +1036,6 @@ const FactCheckDisplay = ({ query, id, process, setDone, skipDisambiguation, max
         }
     }, [query, skipDisambiguation, process]);
 
-    // useEffect(() => {
-    //     console.log(sortedSteps)
-    // }, [sortedSteps])
 
     const parseAndSortSteps = (steps) => {
         if (!Array.isArray(steps)) return [];
@@ -1080,15 +1055,12 @@ const FactCheckDisplay = ({ query, id, process, setDone, skipDisambiguation, max
     };
 
     useEffect(() => {
-        console.log("hit")
         const sorted = parseAndSortSteps(steps);
         if (sorted.length > 0) {
             setSortedSteps(sorted);
         } else {
             setSortedSteps([]);
         }
-
-        // Optionally handle result.Classification here
 
     }, [steps, result]);
 
@@ -1134,9 +1106,9 @@ const FactCheckDisplay = ({ query, id, process, setDone, skipDisambiguation, max
                 backgroundColor: 'transparent',
                 color: '#333',
                 textAlign: 'left',
-            }}
-        >
-                  {/* <WalkthroughFactCheck /> */}
+            }}>
+            
+            {/* <WalkthroughFactCheck /> */}
 
             <div>
                 {/* Display Query and Classification with Expand/Collapse Button if expandable */}
@@ -1174,7 +1146,6 @@ const FactCheckDisplay = ({ query, id, process, setDone, skipDisambiguation, max
                             </Button>
                         ) : result ? (
                             <>
-                            {console.log({result})}
                             <Chip
                                 className = 'facti-tut-step-7'
                                 label={result.Classification}
@@ -1262,7 +1233,6 @@ const FactCheckDisplay = ({ query, id, process, setDone, skipDisambiguation, max
                             </div>
                         ) : result ? (
                             <>
-                            {console.log({result})}
                             <Grow in={Boolean(result)} >
                                 <div style={{ fontFamily: 'Arial' }} >
                                         <div style={{ marginTop: '10px', textAlign: 'left' }}>
@@ -1395,7 +1365,6 @@ const FactCheckDisplay = ({ query, id, process, setDone, skipDisambiguation, max
                                         <div>
                                             {result.bias && Array.isArray(result.bias) && result.bias.length > 1 && (
                                                 <div>
-                                                    {/* {console.log("plotting")} */}
                                                     <Grid container spacing={2}>
                                                     <Grid item xs={12} md={5}>
                                                         <div>
@@ -1515,7 +1484,6 @@ const FactCheckDisplay = ({ query, id, process, setDone, skipDisambiguation, max
                             </div>
                         ) : result ? (
                             <>
-                            {console.log({result})}
                             <Grow in={Boolean(result)}>
                                 <div style={{ fontFamily: 'Arial' }} className='facti-tut-step-8'>
                                         <div style={{ marginTop: '10px', textAlign: 'left' }}>
@@ -1652,7 +1620,6 @@ const FactCheckDisplay = ({ query, id, process, setDone, skipDisambiguation, max
                                         <div>
                                             {result.bias && Array.isArray(result.bias) && result.bias.length > 1 && (
                                                 <div>
-                                                    {/* {console.log("plotting")} */}
                                                     <Grid container spacing={2}>
                                                     <Grid item xs={12} md={5}>
                                                         <div>

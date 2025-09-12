@@ -126,7 +126,6 @@ const TaskActions = ({ conversation_id, task_id, userEmail, showRatingButtons = 
   // Centralized function to handle POST requests
   const postTaskAction = async (actionType, data = {}) => {
     setLoading(true);
-    // console.log({ task_id });
     try {
       const headers = {
         'Content-Type': 'application/json',

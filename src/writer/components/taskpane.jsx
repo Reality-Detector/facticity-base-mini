@@ -120,7 +120,6 @@ const Taskpane = (props) => {
 
   const splitText = async (text, accessToken) => {
     try {
-        console.log({accessToken})
         const data = { query: text };
         const response = await fetch('/api/split_sentence', {
             method: 'POST',
@@ -763,7 +762,6 @@ const handleCorrection = async (inputText, correctedText) => {
 
     await updateQueue;
 
-    // console.log(`Replaced "${inputText}" with "${correctedText}" and applied styling.`);
   } catch (error) {
     console.error("An error occurred while processing the correction:", error);
     setError("An error occurred while replacing the text.");
@@ -797,7 +795,6 @@ const handleCorrection = async (inputText, correctedText) => {
     await updateQueue;
   };
   
-  // etc...
 
   // -------------- References Logic (Optional) -------------------
   /**
