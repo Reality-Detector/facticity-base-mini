@@ -24,12 +24,22 @@ const useAuth = () => {
     const privyInstance = privy;
     // Map Privy's interface to match Auth0's common interface
     const privyLogout = (options = {}) => {
-      // Privy's logout doesn't take returnTo parameter, handle redirect manually if needed
-      privyInstance.logout();
-      if (options.returnTo) {
-        setTimeout(() => {
+      try {
+        // Privy's logout doesn't take returnTo parameter, handle redirect manually if needed
+        privyInstance.logout();
+        if (options.returnTo) {
+          setTimeout(() => {
+            if (typeof window !== 'undefined') {
+              window.location.href = options.returnTo;
+            }
+          }, 100);
+        }
+      } catch (error) {
+        console.error('Logout error:', error);
+        // Still try to redirect even if logout fails
+        if (options.returnTo && typeof window !== 'undefined') {
           window.location.href = options.returnTo;
-        }, 100);
+        }
       }
     };
 

@@ -8,7 +8,7 @@ const AppVersionCheck = () => {
     const storedVersion = localStorage.getItem('app_version');
     if (storedVersion !== REQUIRED_VERSION) {
       localStorage.setItem('app_version', REQUIRED_VERSION);
-      logout({ logoutParams: { returnTo: "https://app.facticity.ai" } });
+      logout({ returnTo: "https://app.facticity.ai" });
     }
   }, []);
 
