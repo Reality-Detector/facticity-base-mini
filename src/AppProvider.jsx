@@ -173,7 +173,6 @@ export const AppProvider = ({ children }) => {
           console.log({user})
         }
         if (token) {
-          console.log("Token:", token);
           setAccessToken(token);
           // Load subscription status, profile, and user handle once when token is available
           subscriptionFetched.current = true;

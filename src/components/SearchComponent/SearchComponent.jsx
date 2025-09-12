@@ -868,6 +868,7 @@ const SearchComponent = ({ isSearchMoved, setIsSearchMoved, isMdUp, initialUrlPa
           headers: {
             'Content-Type': 'application/json',
             'Authorization': `Bearer ${accessToken}`,
+            'Validator': 'privy',
             // 'X-API-KEY': frontend_key,
           },
           body: JSON.stringify({

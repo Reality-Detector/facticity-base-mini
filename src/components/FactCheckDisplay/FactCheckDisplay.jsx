@@ -52,6 +52,9 @@ const DUCKDUCKGO_API = 'https://api.allorigins.win/raw?url=';
 
 // Utility Functions
 const getDomain = (url) => {
+    if (!url || url === undefined || url === null) {
+        return '';
+    }
     try {
         const { hostname } = new URL(url);
         return hostname;
@@ -179,7 +182,7 @@ const SourceCard = ({ step, index, tags, userEmail, blurred = false }) => {
         }
     };
 
-    const domain = getDomain(step.link);
+    const domain = getDomain(step?.link);
     const faviconUrl = domain
         ? `https://www.google.com/s2/favicons?domain=${domain}`
         : '';
@@ -239,7 +242,7 @@ const SourceCard = ({ step, index, tags, userEmail, blurred = false }) => {
                                         style={{ width: '16px', height: '16px', marginRight: '6px' }}
                                     />
                                 )}
-                                {step.link ? (
+                                {step?.link ? (
                                     <Typography variant="body2" color="textSecondary">
                                         <a
                                             href={step.link}
@@ -684,8 +687,8 @@ const FactCheckDisplay = ({ query, id, process, setDone, skipDisambiguation, max
         const data = {
             "_id": id,
             "task_id": taskId,
-            "mode":mode,
-            "link":link
+            "mode": mode,
+            "link": link
         };
 
         try {
@@ -1145,7 +1148,7 @@ const FactCheckDisplay = ({ query, id, process, setDone, skipDisambiguation, max
                         justifyContent: 'space-between',
                     }}
                     >
-                    <Typography style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center' }}>
+                    <Typography component="div" style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center' }}>
                         {/* {factDisplay} */}
                         {timestamp && <div
                                     style={{

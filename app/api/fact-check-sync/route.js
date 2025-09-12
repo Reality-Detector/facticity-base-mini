@@ -7,7 +7,8 @@ export async function POST(request) {
   const init = {
     method: 'POST',
     headers: new Headers(request.headers),
-    body: request.body
+    body: request.body,
+    duplex: 'half'
   };
   
   init.headers.delete('host');
