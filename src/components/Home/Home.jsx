@@ -18,7 +18,7 @@ import Banner from './Banner';
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 import '@/styles/globals.css'; // Animation styles are now in globals.css
 
-const Home = () => {
+const Home = ({conversationId}) => {
   const [isSidebarOpen, setSidebarOpen] = useState(false);
   const [componentsLoaded, setComponentsLoaded] = useState(false);
   
@@ -45,8 +45,12 @@ const Home = () => {
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const router = useRouter();
+
+  // Temporary solution to use pathname for conversationId if undefined
+  const id = conversationId ?? (
+    pathname.startsWith("/c/") ? pathname.split("/")[2] : undefined
+  );
   
-  const { id } = useParams(); // Retrieve the ID from the URL
   const theme = useTheme();
   const isSmUp = useMediaQuery(theme.breakpoints.up('sm'));
   const isMdUp = useMediaQuery(theme.breakpoints.up('md'));
@@ -67,8 +71,8 @@ const Home = () => {
       setInitialUrlParam(decodedUrl);
     }
 
-    // console.log({ id });
-    setCurrentConversation(id);
+    console.log("🔍 Home useEffect - id from useParams:", { id, type: typeof id, isUndefined: id === undefined });
+    setCurrentConversation(id || ''); // Fix: use empty string if id is undefined
     setNewSearch(false);
     if (!id) {
       setNewSearch(true);

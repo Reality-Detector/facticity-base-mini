@@ -257,9 +257,11 @@ const VideoParagraphComponent = memo(({ id, claim, email, readyin, AccessToken})
           });
         }
       }
-      setPostClaims(newClaims);
       return updatedClaims;
     });
+    
+    // Move setPostClaims outside the setClaims callback
+    setPostClaims(newClaims);
   }, [ids, idHistory]);
 
   useEffect(() => {
