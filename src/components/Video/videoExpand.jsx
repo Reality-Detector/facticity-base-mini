@@ -543,8 +543,9 @@ const renderClaims = () => {
             return claim_i.classification === filter;
           }
         })
-        .map((claim_i) => (
-          <Box key={claim_i.id} mb={2}>
+        .map((claim_i, index) => (
+          // a string made from the list index + a snippet of the claim text (to still make it unique enough for React)
+          <Box key={claim_i.id || `claim-${index}-${claim_i.claim.slice(0, 20)}`} mb={2}> 
             <FactCheckDisplay 
               query={claim_i.claim} 
               id={claim_i.id} 
