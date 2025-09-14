@@ -413,7 +413,7 @@ function getRenderingOptions(creditsLeft, isPro, userEmail) {
 }
   
 // New component for reward popup
-const RewardPopup = ({ open, onClose, taskId, userEmail, backendUrl, interactionBarRef, onPermanentDisable, scrollToInteractionBar }) => {
+const RewardPopup = ({ open, onClose, taskId, userEmail, backendUrl, interactionBarRef, onPermanentDisable, scrollToInteractionBar, enableSharePoints }) => {
     const [loading, setLoading] = useState(false);
 
     const handleEarnCredits = () => {
@@ -456,7 +456,10 @@ const RewardPopup = ({ open, onClose, taskId, userEmail, backendUrl, interaction
             </DialogTitle>
             <DialogContent>
                 <Typography variant="body1" sx={{ mb: 2 }}>
-                    Share your fact check or give feedback to earn additional credits. This helps us improve and expand our services.
+                    {enableSharePoints 
+                        ? 'Share your fact check or give feedback to earn additional credits. This helps us improve and expand our services.'
+                        : 'Share your fact check or give feedback. This helps us improve and expand our services.'
+                    }
                 </Typography>
             </DialogContent>
             <DialogActions sx={{ justifyContent: 'space-between', pb: 2, px: 3 }}>
@@ -550,7 +553,8 @@ const FactCheckDisplay = ({ query, id, process, setDone, skipDisambiguation, max
         setCommunityCredits,
         showRewardPopup,
         setShowRewardPopup,
-        distributedUrl
+        distributedUrl,
+        enableSharePoints
     } = useAppContext();
 
     const DISAMBIGUATE_URL = '/api/disambiguate';
@@ -596,7 +600,7 @@ const FactCheckDisplay = ({ query, id, process, setDone, skipDisambiguation, max
 
 
     useEffect(() => {
-        var tag = getRenderingOptions(visualisationMode.userCredits, visualisationMode.isPro, email)
+        var tag = getRenderingOptions(visualisationMode.dailyCredits, visualisationMode.isPro, email)
         setTags(tag);
       }, [visualisationMode, setTags]); 
 
@@ -1724,6 +1728,7 @@ const FactCheckDisplay = ({ query, id, process, setDone, skipDisambiguation, max
                 interactionBarRef={interactionBarRef}
                 onPermanentDisable={handlePermanentDisable}
                 scrollToInteractionBar={scrollToInteractionBar}
+                enableSharePoints={enableSharePoints}
             />
             
             {/* Add a data attribute for TaskActions to find */}

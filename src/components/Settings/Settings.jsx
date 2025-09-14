@@ -1394,6 +1394,11 @@ const Settings = ({ onClose }) => {
                             <Typography variant="caption" color="text.secondary">
                               FACY
                             </Typography>
+                            {profile.average_balance_30d && (
+                              <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mt: 0.5 }}>
+                                30d avg: {profile.average_balance_30d}
+                              </Typography>
+                            )}
                           </Box>
                         </Box>
                       </Box>

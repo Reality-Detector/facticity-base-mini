@@ -229,6 +229,8 @@ export const AppProvider = ({ children }) => {
 
   // Add state for discover posts
   const [discoverPosts, setDiscoverPosts] = useState([]);
+  const [enableSharePoints, setEnableSharePoints] = useState(false);
+
   
   // Fetch discover posts
   // useEffect(() => {
@@ -329,9 +331,11 @@ export const AppProvider = ({ children }) => {
       if (token) {
         headers['Authorization'] = `Bearer ${token}`;
         headers['Validator'] = 'privy';
+        headers['Frontend'] = 'web3';
       }
       
-      const response = await fetch(`/api/api/get_userhandle?email=${encodeURIComponent(user.email)}`, {
+      // Changed from user.email to user.id to match the commit. But it has zero impact as backend function completely ignores query parameters
+      const response = await fetch(`/api/api/get_userhandle?email=${encodeURIComponent(user.id)}`, {
         method: 'GET',
         headers: headers,
       });
@@ -707,6 +711,7 @@ export const AppProvider = ({ children }) => {
         dailyUserCredits, setDailyUserCredits,
         dailyTaskCredits, setDailyTaskCredits,
         CommunityCredits, setCommunityCredits,
+        enableSharePoints, setEnableSharePoints, // Controls whether user can earn credits for sharing content. Affects the UI in popups and interaction for sharing based on whether this flag is set
         temporaryUserCreditsList, setTemporaryUserCreditsList,
         temporaryExpiries, setTemporaryExpiries,
         totalTemporaryUserCredits, setTotalTemporaryUserCredits,

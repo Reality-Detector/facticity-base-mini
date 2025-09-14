@@ -380,7 +380,7 @@ const GameContent = ({ onClose }) => {
     message: '',
     severity: 'success',
   });
-  const { email, backendUrl, setUserCredits, accessToken } = useAppContext();
+  const { email, backendUrl, setUserCredits, accessToken, enableSharePoints } = useAppContext();
   const { loginWithPopup, isAuthenticated, user } = useAuth();
   const [points, setPoints] = useState(0);
   const [isExplanationExpanded, setIsExplanationExpanded] = useState(false);
@@ -1124,7 +1124,9 @@ const GameContent = ({ onClose }) => {
         setTimeout(() => setCopied(false), 2000);
         setSnackbar({
           open: true,
-          message: 'Results copied to clipboard! Share with friends to earn 5 credits!',
+          message: enableSharePoints 
+            ? 'Results copied to clipboard! Share with friends to earn 5 credits!'
+            : 'Results copied to clipboard! Share with friends!',
           severity: 'success',
         });
         
@@ -1587,6 +1589,11 @@ const GameContent = ({ onClose }) => {
 
   // Handle awarding share credits
   const handleShareCredit = async (platform, points = 2) => {
+    // Only award points if sharing points are enabled
+    if (!enableSharePoints) {
+      return;
+    }
+
     const canAwardPoints = await rewardBonusPoint(`share_${platform}`, points);
     
     if (canAwardPoints) {
@@ -1790,7 +1797,7 @@ const GameContent = ({ onClose }) => {
                         },
                       }}
                     >
-                      Share Results & Earn Credits
+                      {enableSharePoints ? 'Share Results & Earn Credits' : 'Share Results'}
                     </Button>
                     
                     {!leaderboardSubmitted ? (
@@ -2056,7 +2063,10 @@ const GameContent = ({ onClose }) => {
           <Divider />
           <DialogContent sx={{ padding: '24px' }}>
             <Typography variant="body2" sx={{ mb: 3, color: '#666' }}>
-              Share your game results with your network: +2 credits per social share.
+            {enableSharePoints 
+                ? 'Share your game results with your network: +2 credits per social share.'
+                : 'Share your game results with your network.'
+            }
             </Typography>
             
             <Stack spacing={2}>
@@ -3023,7 +3033,7 @@ const HandleSelectionForm = ({ email, score, onSubmit }) => {
   const [handleCreated, setHandleCreated] = useState(false);
   const [createdHandle, setCreatedHandle] = useState('');
   const [loading, setLoading] = useState(true);
-  const { backendUrl, accessToken } = useAppContext();
+  const { backendUrl, accessToken, enableSharePoints } = useAppContext();
   
   // Check if user already has a handle
   useEffect(() => {

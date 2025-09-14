@@ -1,34 +1,47 @@
 // Tier configuration for $FACY token holders
+export const TIER_MULTIPLIERS = {
+  "bronze": 1.0,
+  "silver": 2.5,
+  "gold": 5.0,
+  "platinum": 7.5,
+  "none": 0,
+};
+
 export const TIER_CONFIG = {
   None: {
     name: 'None',
     minBalance: 0,
+    maxBalance: 499,
     creditsPerDay: 5,
-    description: 'Basic tier for users with no $FACY tokens'
+    description: 'Basic tier for users with 0-499 $FACY tokens'
   },
   Bronze: {
     name: 'Bronze',
-    minBalance: 50000,
+    minBalance: 500,
+    maxBalance: 49999,
     creditsPerDay: 25,
-    description: 'Bronze tier for users with ≥ 50,000 $FACY tokens'
+    description: 'Bronze tier for users with 500-49,999 $FACY tokens'
   },
   Silver: {
     name: 'Silver',
-    minBalance: 100000,
+    minBalance: 50000,
+    maxBalance: 149999,
     creditsPerDay: 50,
-    description: 'Silver tier for users with ≥ 100,000 $FACY tokens'
+    description: 'Silver tier for users with 50,000-149,999 $FACY tokens'
   },
   Gold: {
     name: 'Gold',
     minBalance: 150000,
+    maxBalance: 399999,
     creditsPerDay: 250,
-    description: 'Gold tier for users with ≥ 150,000 $FACY tokens'
+    description: 'Gold tier for users with 150,000-399,999 $FACY tokens'
   },
   Platinum: {
-    name: 'Platinum',
-    minBalance: 100000000,
+    name: 'Stakeholders Platinum',
+    minBalance: 400000,
+    maxBalance: null,
     creditsPerDay: 5000,
-    description: 'Platinum tier for users with ≥ 100,000,000 $FACY tokens'
+    description: 'Stakeholders Platinum tier for users with 400,000+ $FACY tokens'
   }
 };
 

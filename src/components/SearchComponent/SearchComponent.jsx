@@ -127,7 +127,7 @@ const CompactLeaderboardDisplay = () => {
         headers['Validator'] = 'privy';
       }
       
-      const response = await fetch(`/api/api/get_userhandle?email=${encodeURIComponent(user.email)}`, {
+      const response = await fetch(`/api/api/get_userhandle?email=${encodeURIComponent(user.id)}`, {
         headers: headers,
       });
       if (!response.ok) throw new Error('Failed to fetch user handle');

@@ -58,7 +58,7 @@ const TaskActions = ({ conversation_id, task_id, userEmail, showRatingButtons = 
   const [feedbackText, setFeedbackText] = useState('');
   const [feedbackReason, setFeedbackReason] = useState([]);
   const [loading, setLoading] = useState(false);
-  const { backendUrl, accessToken } = useAppContext();
+  const { backendUrl, accessToken, enableSharePoints } = useAppContext();
   const [postDialogOpen, setPostDialogOpen] = useState(false);
   // const backendUrl = 'http://localhost:5000';
 
@@ -548,6 +548,10 @@ const TaskActions = ({ conversation_id, task_id, userEmail, showRatingButtons = 
 
   // Function to handle share completion and reward
   const handleShareComplete = async (platform) => {
+    // Only award points if sharing points are enabled
+    if (!enableSharePoints) {
+      return;
+    }
     // Show animation for credits after 2 seconds
     setTimeout(async () => {
       // Check if we can award bonus points
@@ -941,7 +945,7 @@ const TaskActions = ({ conversation_id, task_id, userEmail, showRatingButtons = 
           </Tooltip>
 
           {/* Share Button */}
-          <Tooltip title={isLoggedIn ? "Share and earn 8 credits (2 per social share)" : "Login to share"}>
+          <Tooltip title={isLoggedIn ? (enableSharePoints ? "Share and earn 8 credits (2 per social share)" : "Share this fact-check)") : "Login to share"}>
             <Box sx={{ 
               display: 'flex', 
               flexDirection: 'column', 
@@ -989,7 +993,7 @@ const TaskActions = ({ conversation_id, task_id, userEmail, showRatingButtons = 
                   }
                 }}
               >
-                Share (+8)
+                {enableSharePoints ? 'Share (+8)' : 'Share'}
               </Typography>
             </Box>
           </Tooltip>
@@ -1150,7 +1154,10 @@ const TaskActions = ({ conversation_id, task_id, userEmail, showRatingButtons = 
         <Divider />
         <DialogContent sx={{ padding: '24px' }}>
           <Typography variant="body2" sx={{ mb: 3, color: '#666' }}>
-            Share this fact-check with your network: +2 credits per social share.
+          {enableSharePoints 
+              ? 'Share this fact-check with your network: +2 credits per social share.'
+              : 'Share this fact-check with your network.'
+            }
           </Typography>
           
           <Stack spacing={2}>

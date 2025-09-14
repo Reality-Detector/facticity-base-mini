@@ -53,7 +53,7 @@ const Credits = ({ credits, isLoading }) => {
           },
         }}
       > 
-        <StarsIcon sx={{ color: '#0066FF', fontSize: 16 }} />
+        {/* <StarsIcon sx={{ color: '#0066FF', fontSize: 16 }} /> */}
 
           {creditsLoading ? (
             <CircularProgress size={14} sx={{ color: '#0066FF' }} />

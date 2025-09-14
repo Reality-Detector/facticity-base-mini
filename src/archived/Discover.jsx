@@ -304,7 +304,7 @@ const Discover = () => {
         headers['Validator'] = 'privy';
       }
       
-      const response = await fetch(`${backendUrl}/api/get_userhandle?email=${encodeURIComponent(user.email)}`, {
+      const response = await fetch(`${backendUrl}/api/get_userhandle?email=${encodeURIComponent(user.id)}`, {
         method: 'GET',
         headers: headers,
       });
