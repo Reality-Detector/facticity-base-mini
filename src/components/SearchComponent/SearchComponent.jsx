@@ -38,6 +38,7 @@ import Snackbar from '@mui/material/Snackbar';
 import Alert from '@mui/material/Alert';
 import HeadlineDisplay from './HeadlineDisplay';
 import ExampleCards from "./Examples";
+import DexScreener from './dexscreener';
 
 import {  } from '@mui/icons-material';
 import EmojiEventsIcon from '@mui/icons-material/EmojiEvents';
@@ -758,7 +759,28 @@ const InitialStatePanel = ({
                   </Box>
                 )}
 
-
+                {/* DexScreener Chart */}
+                <Box sx={{ 
+                  border: '2px solid rgba(0, 102, 255, 0.2)',
+                  borderRadius: 2,
+                  p: 2,
+                  bgcolor: '#F1F3FE',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  flexShrink: 0,
+                  height: { xs: 'auto', md: 'auto' },
+                  minHeight: { xs: 'auto', md: '400px' },
+                  boxShadow: '0 4px 12px rgba(0, 102, 255, 0.15)',
+                }}>
+                  <Box sx={{ 
+                    flex: 1,
+                    overflow: 'hidden',
+                    borderRadius: 1,
+                  }}>
+                    <DexScreener />
+                  </Box>
+                </Box>
+                
               </Box>
             </Box>
           </Box>

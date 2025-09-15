@@ -377,31 +377,17 @@ const PaginationControls = ({ currentPage, totalPages, onPrevious, onNext }) => 
 );
 
 function getRenderingOptions(creditsLeft, isPro, userEmail) {
-    const outOfCredits = creditsLeft <= 0;
-    const notLoggedIn = false;
-  
-    let message = null;
-    let button = null;
-  
-    if (notLoggedIn) {
-      message = "Please log in for free daily fact checks.";
-      button = "login";
-    } else if (outOfCredits) {
-      message = isPro
-        ? "Your daily credits will refresh tomorrow, so come back tomorrow for more."
-        : "Your daily credits will refresh tomorrow. Subscribe to Pro for more daily credits.";
-      button = "subscription";
-    }
-  
+    // Disabled visualization mode - always return default options
+
     return {
-      limitSource: outOfCredits,
-      blur: outOfCredits,
-      hideDisambiguation: outOfCredits,
-      truncateExplanation: outOfCredits,
-      hideBias: outOfCredits,
-      message: message,
-      button: button,
-      isPro: isPro
+      limitSource: false,
+      blur: false,
+      hideDisambiguation: false,
+      truncateExplanation: false,
+      hideBias: false,
+      message: null,
+      button: null,
+      isPro: false
     };
   }
   
@@ -600,6 +586,7 @@ const FactCheckDisplay = ({ query, id, process, setDone, skipDisambiguation, max
 
 
     useEffect(() => {
+        // Keep credit tracking but disable UI restrictions
         var tag = getRenderingOptions(visualisationMode.dailyCredits, visualisationMode.isPro, email)
         setTags(tag);
       }, [visualisationMode, setTags]); 

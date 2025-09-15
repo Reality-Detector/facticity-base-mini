@@ -38,6 +38,7 @@ import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 const TASK_ACTIONS_FEEDBACK_COLOR = '#0066FF'; // Define the custom blue color
+import { TIER_MULTIPLIERS } from '../../config/tierConfig';
 
 /**
  * TaskActions component that provides interaction buttons for a task
