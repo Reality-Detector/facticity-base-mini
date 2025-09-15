@@ -30,7 +30,7 @@ const Walkthrough = () => {
     { target: ".facti-tut-step-5", content: "Configure your fact-checking settings using the options here." },
     { target: ".facti-tut-step-4", content: "Enter a text claim or URL of a Youtube, TikTok, Instagram video or an Apple Podcast as input. We have filled in a news headline for you to fact-check", placement: 'top' },
     { target: ".facti-tut-step-6", content: "Hit the search icon to initiate the fact-check." },
-    { target: ".facti-tut-step-sidebar", content: "Explore other features such as the Facticity Writer, API, Subscription Page, Fact-check History and more using the navigation menu," },
+    { target: ".facti-tut-step-sidebar", content: "Explore other features such as the API, Subscription Page, Fact-check History and more using the navigation menu," },
     ];
 
   useEffect(() => {

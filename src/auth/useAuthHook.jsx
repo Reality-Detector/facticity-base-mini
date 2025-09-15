@@ -72,7 +72,23 @@ const useAuth = () => {
         email: privyInstance.user.email?.address || privyInstance.user.email,
         // Map other common Auth0 user fields
         name: privyInstance.user.name || '',
-        picture: privyInstance.user.picture || '',
+        // Prioritize Twitter profile picture if available, otherwise use default picture
+        picture: (() => {
+          // Try to get Twitter profile picture first
+          const twitterAccount = privyInstance.user.twitter || 
+                                privyInstance.user.linkedAccounts?.find(a => a.type === 'twitter_oauth') ||
+                                privyInstance.user.oauthAccounts?.find(a => a.provider === 'twitter') || 
+                                privyInstance.user.linkedAccounts?.find(a => a.type === 'oauth' && a.provider === 'twitter') ||
+                                privyInstance.user.linkedAccounts?.find(a => a.type === 'twitter');
+          
+          if (twitterAccount?.profilePictureUrl) {
+            // Remove '_normal' suffix to get original size image
+            return twitterAccount.profilePictureUrl.replace('_normal', '');
+          }
+          
+          // Fallback to default picture
+          return privyInstance.user.picture || '';
+        })(),
         email_verified: privyInstance.user.email?.verified || false,
         // Keep original Privy user object for advanced usage
         ...privyInstance.user,

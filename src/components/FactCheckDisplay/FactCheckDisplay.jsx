@@ -1094,7 +1094,7 @@ const FactCheckDisplay = ({ query, id, process, setDone, skipDisambiguation, max
                 maxWidth: maxWidth,
                 margin: '0px auto',
                 overflowY: 'auto',
-                backgroundColor: 'transparent',
+                backgroundColor: '#ffffff',
                 color: '#333',
                 textAlign: 'left',
             }}>

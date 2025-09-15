@@ -169,10 +169,10 @@ const CreditsPage = () => {
             </IconButton>
           </Box>
           <Box sx={{ flexGrow: 1, display: 'flex', justifyContent: 'center' }}>
-            <a href="https://app.facticity.ai" style={{ textDecoration: 'none', display: 'flex', alignItems: 'center' }}>
+            <a href="/" style={{ textDecoration: 'none', display: 'flex', alignItems: 'center' }}>
               <img
-                src="/facticityailogo-02.png"
-                alt="Facticity.AI"
+                src="https://see.fontimg.com/api/rf5/KVdLp/YzgwNzgzNWY1N2M2NDc1MzgzNTExOWYzMWFkY2ViMmQudHRm/QVJBSVNUT1RMRQ/spartacus.png?r=fs&h=98&w=1500&fg=0066FF&bg=FFFFFF&tb=1&s=65"
+                alt="ARAISTOTLE"
                 style={{
                   paddingTop: '2px',
                   width: 'auto',

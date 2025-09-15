@@ -511,6 +511,21 @@ const InitialStatePanel = ({
                 }}
               />
               <Chip
+                label="Tagged Tweets"
+                clickable
+                component="a"
+                href="/tagged-tweets"
+                sx={{
+                  bgcolor: "#0066FF",
+                  color: "white",
+                  fontSize: { xs: "12px", sm: "14px" },
+                  px: { xs: 0.75, sm: 1 },
+                  py: { xs: 0.2, sm: 0.25 },
+                  "&:hover": { bgcolor: "#004FCC" },
+                }}
+              />
+              {/* Writer Chip is currently disabled */}
+              {/* <Chip
                 label="Writer"
                 clickable
                 component="a"
@@ -523,7 +538,7 @@ const InitialStatePanel = ({
                   py: { xs: 0.2, sm: 0.25 },
                   "&:hover": { bgcolor: "#004FCC" },
                 }}
-              />
+              /> */}
               <BuyFACYButton 
                 variant="contained"
                 size="small"
@@ -605,7 +620,8 @@ const InitialStatePanel = ({
                     >
                       Our multi-modal and multi-lingual fact-checker can fact-check text claims, video URLs from social media platforms - try it out using the search bar below!
                       <br /><br />
-                      Plus, meet the{' '}
+                      {/* Writer link disabled */}
+                      {/* Plus, meet the{' '}
                       <Link
                         href="/writer"
                         style={{
@@ -616,7 +632,7 @@ const InitialStatePanel = ({
                       >
                         Facticity.AI "Writer"
                       </Link>
-                      {' '}to assist you in essays, assignments, and research.
+                      {' '}to assist you in essays, assignments, and research. */}
                     </Typography>
                     
                     {/* Show More/Less Button */}
@@ -658,7 +674,7 @@ const InitialStatePanel = ({
                   border: '2px solid rgba(0, 102, 255, 0.2)',
                   borderRadius: 2,
                   p: 2,
-                  bgcolor: '#F1F3FE',
+                  bgcolor: 'transparent',
                   display: 'flex',
                   flexDirection: 'column',
                   flexShrink: 0,
@@ -780,7 +796,7 @@ const InitialStatePanel = ({
                     <DexScreener />
                   </Box>
                 </Box>
-                
+
               </Box>
             </Box>
           </Box>

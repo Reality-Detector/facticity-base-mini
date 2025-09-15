@@ -103,10 +103,10 @@ const LoginModal = ({ open, handleClose, setShowSignUpModal, titleText = "Login 
               width: "100%",
             }}
           >
-              <a href="https://facticity.ai" style={{ textDecoration: 'none' }}>
+              <a href="/" style={{ textDecoration: 'none' }}>
                   <img
-                  src="/facticityailogo-02.png"
-                  alt="Facticity.AI"
+                  src="https://see.fontimg.com/api/rf5/KVdLp/YzgwNzgzNWY1N2M2NDc1MzgzNTExOWYzMWFkY2ViMmQudHRm/QVJBSVNUT1RMRQ/spartacus.png?r=fs&h=98&w=1500&fg=0066FF&bg=FFFFFF&tb=1&s=65"
+                  alt="ARAISTOTLE"
                   style={{
                       paddingTop: '12px',
                       width: 'auto',

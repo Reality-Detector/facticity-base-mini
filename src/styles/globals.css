@@ -26,6 +26,39 @@ code {
     monospace;
 }
 
+/* Custom Greek Geometric Font for Araistotle */
+@font-face {
+  font-family: 'GreekGeometric';
+  src: url('data:font/woff2;base64,') format('woff2');
+  font-display: swap;
+}
+
+.greek-geometric {
+  font-family: 'GreekGeometric', 'Courier New', monospace;
+  font-weight: bold;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  font-size: 1.1em;
+  line-height: 1;
+  color: #0066FF;
+  text-shadow: 
+    1px 1px 0px rgba(0, 102, 255, 0.3),
+    2px 2px 4px rgba(0, 102, 255, 0.2);
+  position: relative;
+}
+
+.greek-geometric::before {
+  content: '';
+  position: absolute;
+  top: -2px;
+  left: -2px;
+  right: -2px;
+  bottom: -2px;
+  background: linear-gradient(45deg, transparent 30%, rgba(0, 102, 255, 0.1) 50%, transparent 70%);
+  border-radius: 4px;
+  z-index: -1;
+}
+
 /* App styles from App.css */
 .App {
   text-align: center;

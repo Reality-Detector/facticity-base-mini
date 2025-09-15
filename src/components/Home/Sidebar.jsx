@@ -132,18 +132,27 @@ const Sidebar = ({
           mb: 1.5,
           minHeight: 54, 
         }}>
-          <Box sx={{ flex: 1, pl: 0.5 }}>
-            <a href="https://facticity.ai" style={{ textDecoration: "none" }}>
+          <Box sx={{ flex: 1, pl: 0.5, display: "flex", alignItems: "center" }}>
+          <a href="/" style={{ textDecoration: "none" }}>
               <img
-                src="/facticityailogo-03.png"
-                alt="Facticity.AI"
+                src="/icons/araistotle/profile.jpg"
+                alt="Araistotle"
                 style={{
-                  width: 36,
-                  height: 36,
-                  borderRadius: 10,
-                  background: "#fff",
-                  boxShadow: "0 0 0 3px #e8eef7",
-                  transition: "box-shadow 0.2s",
+                  width: 48,
+                  height: 48,
+                  borderRadius: "50%",
+                  objectFit: "cover",
+                  border: "3px solid #0066FF",
+                  boxShadow: "0 4px 12px rgba(0, 102, 255, 0.3)",
+                  transition: "all 0.3s ease",
+                }}
+                onMouseEnter={(e) => {
+                  e.target.style.transform = "scale(1.05)";
+                  e.target.style.boxShadow = "0 6px 16px rgba(0, 102, 255, 0.4)";
+                }}
+                onMouseLeave={(e) => {
+                  e.target.style.transform = "scale(1)";
+                  e.target.style.boxShadow = "0 4px 12px rgba(0, 102, 255, 0.3)";
                 }}
               />
             </a>
@@ -287,7 +296,8 @@ const Sidebar = ({
                 </Typography>
               </Box>
 
-              <Box 
+              {/* Writer navigation is currently disabled */}
+              {/* <Box  *
                 sx={{ 
                   mb: 0.5,
                   "&:hover .description-text": {
@@ -337,7 +347,7 @@ const Sidebar = ({
                 >
                   Try our AI-powered writing assistant now!
                 </Typography>
-              </Box>
+              </Box> */}
 
               <Box 
                 sx={{ 

@@ -130,7 +130,12 @@ const Home = ({conversationId}) => {
       sx={{
         // Ensure at least full-viewport height, but allow page to extend and scroll
         minHeight: { xs: '100svh', sm: '100vh' },
-        background: '#F8FAFF',
+        bbackground: 'transparent',
+        backgroundImage: 'url(/icons/background/background.png)',
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        backgroundRepeat: 'no-repeat',
+        backgroundAttachment: 'fixed',
         display: 'flex',
         flexDirection: 'column',
         overflowX: 'hidden',      // Hide horizontal overflow
@@ -138,6 +143,20 @@ const Home = ({conversationId}) => {
         position: 'relative',
         // Mobile momentum scrolling
         WebkitOverflowScrolling: 'touch',
+        '&::before': {
+          content: '""',
+          position: 'absolute',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          background: 'rgba(248, 250, 255, 0.85)',
+          zIndex: 0,
+        },
+        '& > *': {
+          position: 'relative',
+          zIndex: 1,
+        }
       }}
     >
       <LoginModal />
@@ -175,11 +194,11 @@ const Home = ({conversationId}) => {
               </IconButton>
             )}
           </Box>
-          <Box sx={{ flexGrow: 1, display: 'flex', justifyContent: 'center' }}>
-            <a href="https://app.facticity.ai" style={{ textDecoration: 'none', display: 'flex', alignItems: 'center' }}>
+          <Box sx={{ flexGrow: 1, display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+            <a href="/" style={{ textDecoration: 'none', display: 'flex', alignItems: 'center' }}>
               <img
-                src="/facticityailogo-02.png"
-                alt="Facticity.AI"
+                src="https://see.fontimg.com/api/rf5/KVdLp/YzgwNzgzNWY1N2M2NDc1MzgzNTExOWYzMWFkY2ViMmQudHRm/QVJBSVNUT1RMRQ/spartacus.png?r=fs&h=98&w=1500&fg=0066FF&bg=FFFFFF&tb=1&s=65"
+                alt="ARAISTOTLE"
                 style={{
                   paddingTop: '2px',
                   width: 'auto',
@@ -283,7 +302,7 @@ const Home = ({conversationId}) => {
           flex: '1 1 0', // Take remaining space after AppBar and Banner, allow shrinking to 0
           display: 'flex',
           position: 'relative',
-          background: '#F1F3FE',
+          background: 'transparent',
           opacity: componentsLoaded ? 1 : 0,
           transform: componentsLoaded ? 'translateY(0)' : 'translateY(30px)',
           transition: 'all 0.5s ease-in-out 0.3s',

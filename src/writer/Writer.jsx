@@ -11,7 +11,8 @@ import {
   Backdrop,
   Fade,
   IconButton,
-  useMediaQuery
+  useMediaQuery,
+  Avatar
 } from '@mui/material';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import CloseIcon from '@mui/icons-material/Close';
@@ -51,7 +52,7 @@ function Writer() {
     return true; // Default to landscape for SSR
   });
 
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, user } = useAuth();
   const { userCredits, creditsLoading, componentsLoaded } = useAppContext();
   const router = useRouter();
   const isMdUp = useMediaQuery(theme.breakpoints.up('md'));
@@ -276,6 +277,17 @@ function Writer() {
               <InfoOutlinedIcon fontSize="small" />
             </IconButton>
               <Credits credits={userCredits} isLoading={creditsLoading} />
+              <IconButton 
+                onClick={() => navigate('/settings')} 
+                size="small" 
+                sx={{ ml: 1 }}
+              >
+                <Avatar
+                  src={user?.picture}
+                  alt={user?.name}
+                  sx={{ width: 32, height: 32 }}
+                />
+              </IconButton>
             </Box>
           )}
 

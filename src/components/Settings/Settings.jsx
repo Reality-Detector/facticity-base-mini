@@ -667,10 +667,21 @@ const Settings = ({ onClose }) => {
             </IconButton>
           </Box>
           <Box sx={{ flexGrow: 1, display: 'flex', justifyContent: 'center' }}>
-            <a href="/" style={{ textDecoration: 'none', display: 'flex', alignItems: 'center' }}>
+          <Box 
+              onClick={() => navigate('/')} 
+              sx={{ 
+                textDecoration: 'none', 
+                display: 'flex', 
+                alignItems: 'center', 
+                cursor: 'pointer',
+                '&:hover': {
+                  opacity: 0.8
+                }
+              }}
+            >
               <img
-                src="/facticityailogo-02.png"
-                alt="Facticity.AI"
+                src="https://see.fontimg.com/api/rf5/KVdLp/YzgwNzgzNWY1N2M2NDc1MzgzNTExOWYzMWFkY2ViMmQudHRm/QVJBSVNUT1RMRQ/spartacus.png?r=fs&h=98&w=1500&fg=0066FF&bg=FFFFFF&tb=1&s=65"
+                alt="ARAISTOTLE"
                 style={{
                   paddingTop: '2px',
                   width: 'auto',
@@ -678,7 +689,7 @@ const Settings = ({ onClose }) => {
                   transition: 'all 0.3s ease-in-out',
                 }}
               />
-            </a>
+            </Box>
           </Box>
           {isAuthenticated && (
             <Box

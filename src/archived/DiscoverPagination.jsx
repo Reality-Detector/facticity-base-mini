@@ -1353,7 +1353,8 @@ const SearchComponent = ({ isSearchMoved, setIsSearchMoved, isMdUp, initialUrlPa
                             "&:hover": { bgcolor: "#004FCC" },
                           }}
                         />
-                        <Chip
+                        {/* Writer is currently disabled */}
+                        {/* <Chip
                           label="Writer"
                           clickable
                           component="a"
@@ -1366,7 +1367,7 @@ const SearchComponent = ({ isSearchMoved, setIsSearchMoved, isMdUp, initialUrlPa
                             py: { xs: 0.2, sm: 0.25 },
                             "&:hover": { bgcolor: "#004FCC" },
                           }}
-                        />
+                        /> */}
                       </Box>
                     </Box>
 

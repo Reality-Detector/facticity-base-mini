@@ -374,7 +374,7 @@ function SearchBar({
         flexDirection: 'column',
         alignItems: 'center',
         transition: 'all 0.3s ease',
-        backgroundColor: '#FFFFFF',
+        backgroundColor: 'rgba(255, 255, 255, 0.9)',
         borderRadius: '20px',
         padding: isMobile ? '8px 0px' : '12px 0px',
         boxShadow: 2,
@@ -468,7 +468,7 @@ function SearchBar({
                 id="search-bar-text-field"
                 className= 'facti-tut-search-bar-text-field'
                 variant="standard"
-                placeholder="Type a claim or paste a link..."
+                placeholder="Type a claim or paste a youtube, tiktok, instagram, or apple podcasts link..."
                 value={searchQuery}
                 onChange={(e) => {
                   const value = e.target.value;
@@ -533,7 +533,7 @@ function SearchBar({
                   ),
                   sx: {
                     borderRadius: '20px',
-                    backgroundColor: '#FFFFFF',
+                    backgroundColor: 'rgba(255, 255, 255, 0.9)',
                     width: '100%',
                     padding: '6px 10px',
                   },
