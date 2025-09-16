@@ -70,6 +70,8 @@ import Loader from './Loader';
 import Credits from '../Credits';
 import { useUser, useWallets, useLinkAccount, usePrivy } from '@privy-io/react-auth';
 import { getAllTiers, TIER_MULTIPLIERS } from '../../config/tierConfig';
+import StakingSection from './StakingSection';
+import ClaimVaultSection from './ClaimVaultSection';
 
 const Settings = ({ onClose }) => {
   const { user, isAuthenticated, logout } = useAuth();
@@ -1447,7 +1449,13 @@ const Settings = ({ onClose }) => {
                           </Box>
                         </Box>
                       </Box>
+                      
+                      {/* Staking Section */}
+                      <StakingSection />
 
+                      {/* Claim Vault Section */}
+                      <ClaimVaultSection />
+                      
                       {/* Premium Tier Display */}
                       {profile.tier && (
                         <Box sx={{ 
