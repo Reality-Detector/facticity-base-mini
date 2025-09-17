@@ -199,14 +199,14 @@ const VirtualsStakingSection = () => {
       )}
 
       {/* Staking Stats */}
-      <Box sx={{ 
+      {/* <Box sx={{ 
         display: 'grid', 
         gridTemplateColumns: { xs: '1fr', sm: '1fr 1fr' },
         gap: 2,
         mb: 2
       }}>
         {/* Total Staked */}
-        <Box sx={{ 
+        {/* <Box sx={{
           p: 1.5, 
           backgroundColor: 'rgba(255, 255, 255, 0.7)', 
           borderRadius: 1,
@@ -218,10 +218,10 @@ const VirtualsStakingSection = () => {
           <Typography variant="h6" sx={{ fontWeight: 'bold', color: '#1976d2' }}>
             {totalStakedAmount || '0'} FACY
           </Typography>
-        </Box>
+        </Box> */}
 
         {/* Active Positions */}
-        <Box sx={{ 
+        {/* <Box sx={{
           p: 1.5, 
           backgroundColor: 'rgba(255, 255, 255, 0.7)', 
           borderRadius: 1,
@@ -236,8 +236,8 @@ const VirtualsStakingSection = () => {
               {stakingPositions.length}
             </Typography>
           </Box>
-        </Box>
-      </Box>
+        </Box> */}
+      {/* </Box> */}
 
       {/* Wrong Network Warning */}
       {!isOnCorrectChain && (
@@ -265,121 +265,62 @@ const VirtualsStakingSection = () => {
         </Alert>
       )}
 
-      {/* Staking Positions */}
-      {stakingPositions && stakingPositions.length > 0 && (
-        <Box sx={{ mb: 3 }}>
-          <Typography variant="subtitle1" sx={{ mb: 2, display: 'flex', alignItems: 'center', gap: 1, fontWeight: 600 }}>
-            <TrendingUpIcon sx={{ fontSize: 18, color: '#1976d2' }} />
-            Your Staking Positions ({stakingPositions.length})
-          </Typography>
-          <Grid container spacing={2}>
-            {stakingPositions.map((position) => (
-              <Grid item xs={12} sm={6} md={4} key={position.idParam}>
-                <Card sx={{ 
-                  backgroundColor: 'rgba(25, 118, 210, 0.08)', 
-                  border: '1px solid rgba(25, 118, 210, 0.2)',
-                  borderRadius: 3,
-                  transition: 'all 0.2s ease-in-out',
-                  '&:hover': {
-                    transform: 'translateY(-2px)',
-                    boxShadow: '0 8px 25px rgba(25, 118, 210, 0.15)',
-                    border: '1px solid rgba(25, 118, 210, 0.3)'
-                  }
-                }}>
-                  <CardContent sx={{ p: 2, '&:last-child': { pb: 2 } }}>
-                    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'start', mb: 1.5 }}>
-                      <Typography variant="subtitle2" sx={{ fontWeight: 600, color: '#1976d2' }}>
-                        Position #{position.idParam}
-                      </Typography>
-                      {/* <Chip
-                        label="Active"
-                        size="small"
-                        color="primary"
-                        variant="filled"
-                      /> */}
-                    </Box>
-                    
-                    <Typography variant="body2" sx={{ mb: 1, fontWeight: 500 }}>
-                      Net Staked: <span style={{ color: '#1976d2' }}>{position.netAmount} FACY</span>
-                    </Typography>
-                    <Typography variant="caption" color="text.secondary" sx={{ mb: 1.5, display: 'block' }}>
-                      Total: {position.stakedAmount} FACY
-                      {parseFloat(position.withdrawnAmount) > 0 && (
-                        <span> • Withdrawn: {position.withdrawnAmount} FACY</span>
-                      )}
-                    </Typography>
-
-                    <Box sx={{ mb: 1.5, p: 1.5, backgroundColor: 'rgba(255, 255, 255, 0.7)', borderRadius: 1 }}>
-                      <Typography variant="caption" color="text.secondary" sx={{ mb: 0.5, display: 'block' }}>
-                        <strong>Lock End:</strong> {new Date(position.endTime * 1000).toLocaleDateString()}
-                      </Typography>
-                      <Typography 
-                        variant="caption" 
-                        color={position.endTime * 1000 > Date.now() ? "warning.main" : "success.main"} 
-                        sx={{ fontWeight: 600 }}
-                      >
-                        {position.endTime * 1000 > Date.now() 
-                          ? `🔒 Locked for ${Math.ceil((position.endTime * 1000 - Date.now()) / (1000 * 60 * 60 * 24))} days`
-                          : '🔓 Unlocked - Ready to withdraw'
-                        }
-                      </Typography>
-                    </Box>
-
-                    {position.autoRenew && (
-                      <Box sx={{ mb: 1.5 }}>
-                        <Chip 
-                          label="Auto-Renew" 
-                          size="small" 
-                          color="info" 
-                          variant="outlined"
-                        />
-                      </Box>
-                    )}
-                    <Button
-                      variant={position.endTime * 1000 > Date.now() ? "outlined" : "contained"}
-                      size="small"
-                      fullWidth
-                      onClick={() => openWithdrawDialog(position)}
-                      disabled={
-                        !canStake() || 
-                        isPending || 
-                        isConfirming || 
-                        (position.endTime * 1000 > Date.now())
-                      }
-                      color={position.endTime * 1000 > Date.now() ? "warning" : "primary"}
-                      sx={{ 
-                        py: 1, 
-                        fontWeight: 500,
-                        borderRadius: 1,
-                        textTransform: 'none',
-                        fontSize: '0.85rem'
-                      }}
-                    >
-                      {position.endTime * 1000 > Date.now()
-                        ? 'Locked'
-                        : 'Withdraw'
-                      }
-                    </Button>
-                  </CardContent>
-                </Card>
-              </Grid>
-            ))}
-          </Grid>
-        </Box>
+    {/* Transaction Status */}
+    {txError && (
+        <Alert severity="error" sx={{ mb: 2 }} onClose={() => setTxError('')}>
+        {txError}
+        </Alert>
+    )}
+    {txSuccess && (
+        <Alert severity="success" sx={{ mb: 2 }} onClose={() => setTxSuccess('')}>
+        {txSuccess}
+        </Alert>
       )}
 
-      {/* Action Buttons */}
-      {/* <Box sx={{ display: 'flex', gap: 2 }}>
-        <Button
-          variant="contained"
-          onClick={() => setShowStakeDialog(true)}
-          disabled={!canStake() || isPending || isConfirming}
-          sx={{ flex: 1 }}
-        >
-          {isPending || isConfirming ? 'Processing...' : 'Stake Tokens'}
-        </Button>
-      </Box> */}
-
+    {/* Total Staked Amount */}
+    <Box sx={{ mb: 3 }}>
+        {/* <Typography variant="subtitle1" sx={{ mb: 2, display: 'flex', alignItems: 'center', gap: 1, fontWeight: 600 }}>
+          <TrendingUpIcon sx={{ fontSize: 18, color: '#1976d2' }} />
+          Your Virtuals Staking
+        </Typography> */}
+        
+        <Box sx={{ 
+          p: 2, 
+          backgroundColor: 'rgba(25, 118, 210, 0.08)', 
+          border: '1px solid rgba(25, 118, 210, 0.2)',
+          borderRadius: 2,
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center'
+        }}>
+          <Box>
+            <Typography variant="body" color="text.secondary" sx={{ mb: 0.5 }}>
+              Total Staked Amount
+            </Typography>
+            <Typography variant="h6" sx={{ fontWeight: 600, color: '#1976d2' }}>
+              {totalStakedAmount} FACY
+            </Typography>
+          </Box>
+          
+          <Button
+            variant="contained"
+            color="primary"
+            href="https://app.virtuals.io/profile"
+            target="_blank"
+            rel="noopener noreferrer"
+            sx={{ 
+              py: 1,
+              px: 2,
+              fontWeight: 600,
+              borderRadius: 2,
+              textTransform: 'none'
+            }}
+          >
+            Manage on Virtuals.io
+          </Button>
+        </Box>
+      </Box>
+      
       {/* Stake Dialog */}
       {/* <Dialog open={showStakeDialog} onClose={() => setShowStakeDialog(false)} maxWidth="sm" fullWidth>
         <DialogTitle>Stake FACY Tokens</DialogTitle>
