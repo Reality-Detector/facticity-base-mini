@@ -114,7 +114,7 @@ const Api = () => {
           borderBottom: '1px solid rgba(0, 102, 255, 0.1)',
         }}
       >
-        <Toolbar sx={{ minHeight: '70px !important', justifyContent: 'space-between', paddingX: { xs: 2, sm: 4 } }}>
+        <Toolbar sx={{ minHeight: '50px !important', justifyContent: 'space-between', paddingX: { xs: 2, sm: 4 } }}>
           <Box sx={{ width: { xs: 40, md: 60 }, display: 'flex', alignItems: 'center' }}>
             <IconButton
               onClick={() => router.push('/')}
@@ -154,7 +154,7 @@ const Api = () => {
                 style={{
                   paddingTop: '2px',
                   width: 'auto',
-                  height: isMdUp ? '36px' : '30px',
+                  height: isMdUp ? '28px' : '24px',
                   transition: 'all 0.3s ease-in-out',
                 }}
               />

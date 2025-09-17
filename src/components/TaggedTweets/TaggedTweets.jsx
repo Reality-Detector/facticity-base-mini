@@ -349,7 +349,7 @@ const TaggedTweets = () => {
           borderBottom: '1px solid rgba(0, 102, 255, 0.1)',
         }}
       >
-        <Toolbar sx={{ minHeight: '70px !important', justifyContent: 'space-between', paddingX: { xs: 2, sm: 4 } }}>
+        <Toolbar sx={{ minHeight: '50px !important', justifyContent: 'space-between', paddingX: { xs: 2, sm: 4 } }}>
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
              <IconButton
                onClick={() => router.push('/')}

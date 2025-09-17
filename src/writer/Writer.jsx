@@ -233,7 +233,7 @@ function Writer() {
             backgroundColor: '#F1F3FE',
             boxShadow: 'none',
             borderBottom: '2px solid #0066FF',
-            padding: '8px 16px',
+            padding: '4px 16px',
             zIndex: 1201,
           }}
         >
@@ -243,7 +243,7 @@ function Writer() {
                 src="/facticityailogo-02.png"
                 alt="Facticity.AI"
                 style={{
-                  height: '32px',
+                  height: '28px',
                   width: 'auto',
                 }}
               />
