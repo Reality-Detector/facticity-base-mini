@@ -64,7 +64,42 @@ export const useStaking = () => {
   const { data: isStakingPaused, refetch: refetchStakingStatus } = useReadContract({
     address: CONTRACTS.STAKING_VAULT,
     abi: StakingVaultABI.abi,
-    functionName: 'isStakingPaused',
+    functionName: 'paused',
+    chainId: BASE_MAINNET_CHAIN_ID
+  });
+
+  // New contract reads for unstake requests
+  const { data: unstakeRequests, refetch: refetchUnstakeRequests } = useReadContract({
+    address: CONTRACTS.STAKING_VAULT,
+    abi: StakingVaultABI.abi,
+    functionName: 'getAllUserUnstakeRequests',
+    args: [userAddress],
+    chainId: BASE_MAINNET_CHAIN_ID,
+    query: { enabled: !!userAddress }
+  });
+
+  const { data: totalUnstakeAmount, refetch: refetchTotalUnstakeAmount } = useReadContract({
+    address: CONTRACTS.STAKING_VAULT,
+    abi: StakingVaultABI.abi,
+    functionName: 'getUserUnstakeRequest',
+    args: [userAddress],
+    chainId: BASE_MAINNET_CHAIN_ID,
+    query: { enabled: !!userAddress }
+  });
+
+  const { data: availableUnstakeAmount, refetch: refetchAvailableUnstakeAmount } = useReadContract({
+    address: CONTRACTS.STAKING_VAULT,
+    abi: StakingVaultABI.abi,
+    functionName: 'getAvailableUnstakeAmount',
+    args: [userAddress],
+    chainId: BASE_MAINNET_CHAIN_ID,
+    query: { enabled: !!userAddress }
+  });
+
+  const { data: lockPeriod, refetch: refetchLockPeriod } = useReadContract({
+    address: CONTRACTS.STAKING_VAULT,
+    abi: StakingVaultABI.abi,
+    functionName: 'getLockPeriod',
     chainId: BASE_MAINNET_CHAIN_ID
   });
 
@@ -78,13 +113,17 @@ export const useStaking = () => {
         refetchStakedAmount(),
         refetchAllowance(),
         refetchTotalStaked(),
-        refetchStakingStatus()
+        refetchStakingStatus(),
+        refetchUnstakeRequests(),
+        refetchTotalUnstakeAmount(),
+        refetchAvailableUnstakeAmount(),
+        refetchLockPeriod()
       ]);
     } catch (err) {
       console.error('Error refreshing staking data:', err);
       setError('Failed to refresh data');
     }
-  }, [userAddress, refetchFacyBalance, refetchStakedAmount, refetchAllowance, refetchTotalStaked, refetchStakingStatus]);
+  }, [userAddress, refetchFacyBalance, refetchStakedAmount, refetchAllowance, refetchTotalStaked, refetchStakingStatus, refetchUnstakeRequests, refetchTotalUnstakeAmount, refetchAvailableUnstakeAmount, refetchLockPeriod]);
 
   // Approve FACY tokens for staking
   const approveFacy = async (amount) => {
@@ -200,13 +239,11 @@ export const useStaking = () => {
     }
   };
 
-  // Unstake FACY tokens
-  const unstakeFacy = async (amount) => {
+  // Request unstake FACY tokens (new 2-step process)
+  const requestUnstake = async (amount) => {
     if (!isConnected) throw new Error('Wallet not connected');
     
-    // Ensure we're on Base Sepolia
     await ensureCorrectChain();
-    
     setError(null);
     
     try {
@@ -215,40 +252,113 @@ export const useStaking = () => {
       const result = await writeContract({
         address: CONTRACTS.STAKING_VAULT,
         abi: StakingVaultABI.abi,
-        functionName: 'unstake',
+        functionName: 'requestUnstake',
         args: [amountBigInt],
         chainId: BASE_MAINNET_CHAIN_ID
       });
       
       return result;
     } catch (err) {
-      console.error('Error unstaking FACY:', err);
-      setError('Failed to unstake FACY tokens');
+      console.error('Error requesting unstake:', err);
+      setError('Failed to request unstake');
       throw err;
     }
   };
 
-  // Unstake all FACY tokens
-  const unstakeAll = async () => {
+  // Request unstake all FACY tokens
+  const requestUnstakeAll = async () => {
     if (!isConnected) throw new Error('Wallet not connected');
     
-    // Ensure we're on Base Sepolia
     await ensureCorrectChain();
-    
     setError(null);
     
     try {
       const result = await writeContract({
         address: CONTRACTS.STAKING_VAULT,
         abi: StakingVaultABI.abi,
-        functionName: 'unstakeAll',
+        functionName: 'requestUnstakeAll',
         chainId: BASE_MAINNET_CHAIN_ID
       });
       
       return result;
     } catch (err) {
-      console.error('Error unstaking all FACY:', err);
-      setError('Failed to unstake all FACY tokens');
+      console.error('Error requesting unstake all:', err);
+      setError('Failed to request unstake all');
+      throw err;
+    }
+  };
+
+  // Withdraw from completed unstake requests
+  const withdrawUnstake = async (amount) => {
+    if (!isConnected) throw new Error('Wallet not connected');
+    
+    await ensureCorrectChain();
+    setError(null);
+    
+    try {
+      const amountBigInt = parseTokenAmount(amount);
+      
+      const result = await writeContract({
+        address: CONTRACTS.STAKING_VAULT,
+        abi: StakingVaultABI.abi,
+        functionName: 'withdrawUnstake',
+        args: [amountBigInt],
+        chainId: BASE_MAINNET_CHAIN_ID
+      });
+      
+      return result;
+    } catch (err) {
+      console.error('Error withdrawing unstake:', err);
+      setError('Failed to withdraw unstake');
+      throw err;
+    }
+  };
+
+  // Withdraw all available unstake requests
+  const withdrawAllUnstake = async () => {
+    if (!isConnected) throw new Error('Wallet not connected');
+    
+    await ensureCorrectChain();
+    setError(null);
+    
+    try {
+      const result = await writeContract({
+        address: CONTRACTS.STAKING_VAULT,
+        abi: StakingVaultABI.abi,
+        functionName: 'withdrawAllUnstake',
+        chainId: BASE_MAINNET_CHAIN_ID
+      });
+      
+      return result;
+    } catch (err) {
+      console.error('Error withdrawing all unstake:', err);
+      setError('Failed to withdraw all unstake');
+      throw err;
+    }
+  };
+
+  // Cancel unstake requests
+  const cancelUnstake = async (amount) => {
+    if (!isConnected) throw new Error('Wallet not connected');
+    
+    await ensureCorrectChain();
+    setError(null);
+    
+    try {
+      const amountBigInt = parseTokenAmount(amount);
+      
+      const result = await writeContract({
+        address: CONTRACTS.STAKING_VAULT,
+        abi: StakingVaultABI.abi,
+        functionName: 'cancelUnstake',
+        args: [amountBigInt],
+        chainId: BASE_MAINNET_CHAIN_ID
+      });
+      
+      return result;
+    } catch (err) {
+      console.error('Error cancelling unstake:', err);
+      setError('Failed to cancel unstake');
       throw err;
     }
   };
@@ -278,11 +388,20 @@ export const useStaking = () => {
     error,
     userAddress,
     
+    // New unstake data
+    unstakeRequests: unstakeRequests || [],
+    totalUnstakeAmount: totalUnstakeAmount ? formatTokenAmount(totalUnstakeAmount) : '0',
+    availableUnstakeAmount: availableUnstakeAmount ? formatTokenAmount(availableUnstakeAmount) : '0',
+    lockPeriod: lockPeriod ? Number(lockPeriod) : 0,
+    
     // Actions
     approveFacy,
     stakeFacy,
-    unstakeFacy,
-    unstakeAll,
+    requestUnstake,
+    requestUnstakeAll,
+    withdrawUnstake,
+    withdrawAllUnstake,
+    cancelUnstake,
     refreshData,
     
     // Utilities

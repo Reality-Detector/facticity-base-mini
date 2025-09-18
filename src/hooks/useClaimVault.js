@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useAccount, useReadContract, useWriteContract, useWaitForTransactionReceipt, useSwitchChain } from 'wagmi';
-import { CONTRACTS, BASE_MAINNET_CHAIN_ID, formatTokenAmount } from '../config/web3Config';
+import { CONTRACTS, BASE_SEPOLIA_CHAIN_ID, formatTokenAmount } from '../config/web3Config';
 import ClaimVaultABI from '../contracts/ClaimVault.json';
 
 export const useClaimVault = () => {
@@ -16,11 +16,11 @@ export const useClaimVault = () => {
 
   // Helper function to ensure we're on the correct chain (Base testnet for ClaimVault)
   const ensureCorrectChain = async () => {
-    if (chain?.id !== BASE_MAINNET_CHAIN_ID) {
+    if (chain?.id !== BASE_SEPOLIA_CHAIN_ID) {
       try {
-        await switchChain({ chainId: BASE_MAINNET_CHAIN_ID });
+        await switchChain({ chainId: BASE_SEPOLIA_CHAIN_ID });
       } catch (err) {
-        throw new Error('Please switch to Base Mainnet to continue');
+        throw new Error('Please switch to Base Sepolia to continue');
       }
     }
   };
@@ -31,7 +31,7 @@ export const useClaimVault = () => {
     abi: ClaimVaultABI.abi,
     functionName: 'getTotalClaimableAmount',
     args: [userAddress],
-    chainId: BASE_MAINNET_CHAIN_ID,
+    chainId: BASE_SEPOLIA_CHAIN_ID,
     query: { enabled: !!userAddress }
   });
 
@@ -39,21 +39,21 @@ export const useClaimVault = () => {
     address: CONTRACTS.CLAIM_VAULT,
     abi: ClaimVaultABI.abi,
     functionName: 'getShortestRemainingClaimTime',
-    chainId: BASE_MAINNET_CHAIN_ID
+    chainId: BASE_SEPOLIA_CHAIN_ID
   });
 
   const { data: activeClaimPeriods, refetch: refetchActiveperiods } = useReadContract({
     address: CONTRACTS.CLAIM_VAULT,
     abi: ClaimVaultABI.abi,
     functionName: 'getActiveClaimPeriods',
-    chainId: BASE_MAINNET_CHAIN_ID
+    chainId: BASE_SEPOLIA_CHAIN_ID
   });
 
   const { data: currentPeriodId, refetch: refetchCurrentPeriod } = useReadContract({
     address: CONTRACTS.CLAIM_VAULT,
     abi: ClaimVaultABI.abi,
     functionName: 'currentPeriodId',
-    chainId: BASE_MAINNET_CHAIN_ID
+    chainId: BASE_SEPOLIA_CHAIN_ID
   });
 
   const { data: userClaimHistory, refetch: refetchClaimHistory } = useReadContract({
@@ -61,7 +61,7 @@ export const useClaimVault = () => {
     abi: ClaimVaultABI.abi,
     functionName: 'getUserClaimHistory',
     args: [userAddress],
-    chainId: BASE_MAINNET_CHAIN_ID,
+    chainId: BASE_SEPOLIA_CHAIN_ID,
     query: { enabled: !!userAddress }
   });
 

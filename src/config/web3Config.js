@@ -5,7 +5,7 @@ export const BASE_MAINNET_CHAIN_ID = 8453;
 // Contract addresses on Base Sepolia
 export const CONTRACTS = {
     CLAIM_VAULT: '0x34d443a85E24C3294e05Ff49D4eA299E161c106e',
-    STAKING_VAULT: '0xEE3A52F09269Ac634A5f2b806C4F5e7d9c050D8d', // Replace with actual address
+    STAKING_VAULT: '0x3414c00782AA31F6E8E7C0EC27b9eA456889131C', // Replace with actual address
     VIRTUALS_STAKING: '0x0bf72f32F51f004Bb92bD234bb49e5F30f78ffe8', // Base Mainnet - Virtuals Staking
     FACY_TOKEN: '0xFAC77f01957ed1B3DD1cbEa992199B8f85B6E886', // FACY token on Base Mainnet
 };

@@ -24,10 +24,12 @@ import {
   CheckCircle as CheckIcon,
   Info as InfoIcon
 } from '@mui/icons-material';
+import useAuth from '@/auth/useAuthHook';
 import { useAccount, useSwitchChain } from 'wagmi';
 import { useVirtualsStaking } from '@/hooks/useVirtualsStaking';
 
 const VirtualsStakingSection = () => {
+  const { isAuthenticated } = useAuth();
   const {
     stakingPositions,
     totalStakedAmount,
@@ -48,6 +50,8 @@ const VirtualsStakingSection = () => {
   } = useVirtualsStaking();
 
   const { chain } = useAccount();
+  // Use both wagmi connection and auth hook authentication
+  const isWalletConnected = isConnected || (isAuthenticated && userAddress);
   const { switchChain } = useSwitchChain();
   const isOnCorrectChain = chain?.id === 8453; // Base Mainnet
 
@@ -127,7 +131,7 @@ const VirtualsStakingSection = () => {
     }
   }, [isConfirmed, refreshData]);
 
-  if (!isConnected) {
+  if (!isWalletConnected) {
     return (
       <Box sx={{ 
         p: 2, 
