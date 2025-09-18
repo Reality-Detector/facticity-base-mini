@@ -35,32 +35,32 @@ const AuthWrapper = ({ children, usePrivy = false }) => {
 
   if (shouldUsePrivy) {
     return (
-      <QueryClientProvider client={queryClient}>
-        <WagmiProvider config={wagmiConfig}>
-          <PrivyProvider
-            appId={"cmcbmq4ea0197gs0lfur2kew5"}
-            config={{
-              // Customize Privy's appearance in your app
-              appearance: {
-                theme: 'light',
-                accentColor: '#676FFF',
-              },
-              // Create embedded wallets for users who don't have a wallet
-              embeddedWallets: {
-                createOnLogin: 'users-without-wallets',
-              },
-              // Configure login methods
-              loginMethods: ['email', 'wallet', 'twitter'],
-              // Configure supported chains - Base Mainnet
-              supportedChains: [base],
-              // Set default chain to Base Mainnet
-              defaultChain: base,
-            }}
-          >
+      <PrivyProvider
+        appId={"cmcbmq4ea0197gs0lfur2kew5"}
+        config={{
+          // Customize Privy's appearance in your app
+          appearance: {
+            theme: 'light',
+            accentColor: '#676FFF',
+          },
+          // Create embedded wallets for users who don't have a wallet
+          embeddedWallets: {
+            createOnLogin: 'users-without-wallets',
+          },
+          // Configure login methods
+          loginMethods: ['email', 'wallet', 'twitter'],
+          // Configure supported chains - Base Mainnet
+          supportedChains: [base],
+          // Set default chain to Base Mainnet
+          defaultChain: base,
+        }}
+      >
+        <QueryClientProvider client={queryClient}>
+          <WagmiProvider config={wagmiConfig}>
             {children}
-          </PrivyProvider>
-        </WagmiProvider>
-      </QueryClientProvider>
+          </WagmiProvider>
+        </QueryClientProvider>
+      </PrivyProvider>
     );
   }
 
