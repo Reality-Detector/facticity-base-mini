@@ -7,7 +7,7 @@ export const CONTRACTS = {
     CLAIM_VAULT: '0x34d443a85E24C3294e05Ff49D4eA299E161c106e',
     STAKING_VAULT: '0xEE3A52F09269Ac634A5f2b806C4F5e7d9c050D8d', // Replace with actual address
     VIRTUALS_STAKING: '0x0bf72f32F51f004Bb92bD234bb49e5F30f78ffe8', // Base Mainnet - Virtuals Staking
-    FACY_TOKEN: '0xFAC77f01957ed1B3DD1cbEa992199B8f85B6E886', // Replace with actual FACY token address
+    FACY_TOKEN: '0xFAC77f01957ed1B3DD1cbEa992199B8f85B6E886', // FACY token on Base Mainnet
 };
 
 // ERC20 ABI for FACY token interactions
@@ -15,6 +15,20 @@ export const ERC20_ABI = [
   {
     "inputs": [{"internalType": "address", "name": "spender", "type": "address"}, {"internalType": "uint256", "name": "amount", "type": "uint256"}],
     "name": "approve",
+    "outputs": [{"internalType": "bool", "name": "", "type": "bool"}],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [{"internalType": "address", "name": "to", "type": "address"}, {"internalType": "uint256", "name": "amount", "type": "uint256"}],
+    "name": "transfer",
+    "outputs": [{"internalType": "bool", "name": "", "type": "bool"}],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [{"internalType": "address", "name": "from", "type": "address"}, {"internalType": "address", "name": "to", "type": "address"}, {"internalType": "uint256", "name": "amount", "type": "uint256"}],
+    "name": "transferFrom",
     "outputs": [{"internalType": "bool", "name": "", "type": "bool"}],
     "stateMutability": "nonpayable",
     "type": "function"

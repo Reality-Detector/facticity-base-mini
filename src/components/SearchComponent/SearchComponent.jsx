@@ -1476,7 +1476,7 @@ const SearchComponent = ({ isSearchMoved, setIsSearchMoved, isMdUp, initialUrlPa
             }}
             onClick={() => {
               handleCreditDialogClose();
-              router.push('/subscription');
+              router.push('/subscriptions');
             }}
           >
             Upgrade
@@ -1506,7 +1506,7 @@ const SearchComponent = ({ isSearchMoved, setIsSearchMoved, isMdUp, initialUrlPa
             color="primary"
             onClick={() => {
               handleProDialogClose();
-              router.push("/subscription")
+              router.push("/subscriptions")
             }}
           >
             Go Pro

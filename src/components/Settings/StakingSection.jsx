@@ -26,7 +26,7 @@ import {
   LockOpen as UnlockIcon
 } from '@mui/icons-material';
 import { useWaitForTransactionReceipt } from 'wagmi';
-import { useStaking } from '../../hooks/useStaking';
+import { useStaking } from '@/hooks/useStaking';
 
 const StakingSection = () => {
   const {

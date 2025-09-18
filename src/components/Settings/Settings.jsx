@@ -69,10 +69,11 @@ import { useAppContext } from '../../AppProvider';
 import Loader from './Loader';
 import Credits from '../Credits';
 import { useUser, useWallets, useLinkAccount, usePrivy } from '@privy-io/react-auth';
-import { getAllTiers, TIER_MULTIPLIERS } from '../../config/tierConfig';
+import { getAllTiers, TIER_MULTIPLIERS } from '@/config/tierConfig';
 import StakingSection from './StakingSection';
 import ClaimVaultSection from './ClaimVaultSection';
 import VirtualsStakingSection from './VirtualsStakingSection';
+import WalletBalanceSection from './WalletBalanceSection';
 
 
 const Settings = ({ onClose }) => {
@@ -1379,7 +1380,7 @@ const Settings = ({ onClose }) => {
                         borderColor: 'divider', 
                         borderRadius: 2 
                       }}>
-                                               <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
+                          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
                            <Link sx={{ fontSize: 20, color: '#1976d2' }} />
                            <Box>
                             <Typography variant="body1" sx={{ fontWeight: 500 }}>
@@ -1402,6 +1403,11 @@ const Settings = ({ onClose }) => {
                           }}
                         />
                       </Box>
+                      
+                      {/* Wallet Balance & Transfer Section */}
+                      {/* {user?.wallet?.address && (
+                        <WalletBalanceSection walletAddress={user.wallet.address} />
+                      )} */}
 
                       {/* Tokens Available */}
                       <Box sx={{ 
@@ -1453,13 +1459,13 @@ const Settings = ({ onClose }) => {
                       </Box>
                       
                       {/* Staking Section */}
-                      <StakingSection />
+                      {/* <StakingSection /> */}
 
                       {/* Virtuals Staking Section */}
                       <VirtualsStakingSection />
 
                       {/* Claim Vault Section */}
-                      <ClaimVaultSection />
+                      {/* <ClaimVaultSection /> */}
 
                       {/* Premium Tier Display */}
                       {profile.tier && (

@@ -28,8 +28,8 @@ import {
   AccessTime as ClockIcon,
   AccountBalanceWallet as WalletIcon
 } from '@mui/icons-material';
-import { useClaimVault } from '../../hooks/useClaimVault';
-import { formatTokenAmount } from '../../config/web3Config';
+import { useClaimVault } from '@/hooks/useClaimVault';
+import { formatTokenAmount } from '@/config/web3Config';
 import { useAccount, useSwitchChain } from 'wagmi';
 
 const ClaimVaultSection = () => {

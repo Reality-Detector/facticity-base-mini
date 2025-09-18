@@ -299,7 +299,7 @@ const SourceCard = ({ step, index, tags, userEmail, blurred = false }) => {
                             <>
                                 <Button
                                     variant="contained"
-                                    onClick={() => (window.location.href = '/subscription')}
+                                    onClick={() => (window.location.href = '/subscriptions')}
                                     sx={{
                                         backgroundColor: "#0066FF",
                                         borderRadius: "30px",
@@ -1262,7 +1262,7 @@ const FactCheckDisplay = ({ query, id, process, setDone, skipDisambiguation, max
                                                 </span>
                                             ) : tags.button === 'subscription' ? (
                                                 <a
-                                                    href="/subscription"
+                                                    href="/subscriptions"
                                                     style={{
                                                         marginTop: '10px',
                                                         display: 'inline-block',
@@ -1513,7 +1513,7 @@ const FactCheckDisplay = ({ query, id, process, setDone, skipDisambiguation, max
                                                     </span>
                                                 ) : tags.button === 'subscription' ? (
                                                     <a
-                                                        href="/subscription"
+                                                        href="/subscriptions"
                                                         style={{
                                                             marginTop: '10px',
                                                             display: 'inline-block',

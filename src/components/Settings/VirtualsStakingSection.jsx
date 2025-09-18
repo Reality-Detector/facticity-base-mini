@@ -25,7 +25,7 @@ import {
   Info as InfoIcon
 } from '@mui/icons-material';
 import { useAccount, useSwitchChain } from 'wagmi';
-import { useVirtualsStaking } from '../../hooks/useVirtualsStaking';
+import { useVirtualsStaking } from '@/hooks/useVirtualsStaking';
 
 const VirtualsStakingSection = () => {
   const {
@@ -138,7 +138,7 @@ const VirtualsStakingSection = () => {
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mb: 2 }}>
           <StakeIcon sx={{ fontSize: 20, color: '#1976d2' }} />
           <Typography variant="body1" sx={{ fontWeight: 500 }}>
-            Virtuals Staking
+            FACY Stake on Virtuals.io
           </Typography>
         </Box>
         <Alert severity="info">
