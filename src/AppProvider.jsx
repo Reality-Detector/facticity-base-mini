@@ -152,6 +152,12 @@ export const AppProvider = ({ children }) => {
   // User handle state
   const [userHandle, setUserHandle] = useState('');
   const [handleLoading, setHandleLoading] = useState(false);
+
+  // Global staked amount state (combines regular staking + Virtuals staking)
+  const [totalStakedAmount, setTotalStakedAmount] = useState('0');
+  const [regularStakedAmount, setRegularStakedAmount] = useState('0');
+  const [virtualsStakedAmount, setVirtualsStakedAmount] = useState('0');
+
   
   // Ref to track if subscription status has been fetched
   const subscriptionFetched = useRef(false);
@@ -658,6 +664,24 @@ export const AppProvider = ({ children }) => {
     setSkipDisambiguation(prev => !prev);
   };
 
+  // Function to update regular staked amount and recalculate total
+  const updateRegularStakedAmount = (amount) => {
+    setRegularStakedAmount(amount);
+    const regularAmount = parseFloat(amount || '0');
+    const virtualsAmount = parseFloat(virtualsStakedAmount || '0');
+    const total = (regularAmount + virtualsAmount).toString();
+    setTotalStakedAmount(total);
+  };
+
+  // Function to update Virtuals staked amount and recalculate total
+  const updateVirtualsStakedAmount = (amount) => {
+    setVirtualsStakedAmount(amount);
+    const regularAmount = parseFloat(regularStakedAmount || '0');
+    const virtualsAmount = parseFloat(amount || '0');
+    const total = (regularAmount + virtualsAmount).toString();
+    setTotalStakedAmount(total);
+  };
+
   return (
     <AppContext.Provider value={{ 
         // Disambiguation & Popup States
@@ -712,6 +736,11 @@ export const AppProvider = ({ children }) => {
         dailyTaskCredits, setDailyTaskCredits,
         CommunityCredits, setCommunityCredits,
         enableSharePoints, setEnableSharePoints, // Controls whether user can earn credits for sharing content. Affects the UI in popups and interaction for sharing based on whether this flag is set
+        totalStakedAmount, setTotalStakedAmount,
+        regularStakedAmount, setRegularStakedAmount,
+        virtualsStakedAmount, setVirtualsStakedAmount,
+        updateRegularStakedAmount,
+        updateVirtualsStakedAmount,
         temporaryUserCreditsList, setTemporaryUserCreditsList,
         temporaryExpiries, setTemporaryExpiries,
         totalTemporaryUserCredits, setTotalTemporaryUserCredits,

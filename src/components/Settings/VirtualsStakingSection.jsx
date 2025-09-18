@@ -27,9 +27,11 @@ import {
 import useAuth from '@/auth/useAuthHook';
 import { useAccount, useSwitchChain } from 'wagmi';
 import { useVirtualsStaking } from '@/hooks/useVirtualsStaking';
+import { useAppContext } from '@/AppProvider';
 
 const VirtualsStakingSection = () => {
   const { isAuthenticated } = useAuth();
+  const { updateVirtualsStakedAmount } = useAppContext();
   const {
     stakingPositions,
     totalStakedAmount,
@@ -131,6 +133,13 @@ const VirtualsStakingSection = () => {
     }
   }, [isConfirmed, refreshData]);
 
+  // Update global staked amount when Virtuals staked amount changes
+  useEffect(() => {
+    if (totalStakedAmount !== undefined && totalStakedAmount !== null) {
+      updateVirtualsStakedAmount(totalStakedAmount);
+    }
+  }, [totalStakedAmount, updateVirtualsStakedAmount]);
+  
   if (!isWalletConnected) {
     return (
       <Box sx={{ 

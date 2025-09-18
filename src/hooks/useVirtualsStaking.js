@@ -5,13 +5,16 @@ import { CONTRACTS, BASE_MAINNET_CHAIN_ID, ERC20_ABI, formatTokenAmount } from '
 import StakedTokenABI from '../contracts/StakedToken.json';
 
 export const useVirtualsStaking = () => {
-  const { address: userAddress, isConnected: wagmiConnected, chain } = useAccount();
+  const { address: wagmiAddress, isConnected: wagmiConnected, chain } = useAccount();
   const { authenticated, user } = usePrivy();
   const { writeContract, data: hash, error: writeError, isPending } = useWriteContract();
   const { switchChain } = useSwitchChain();
   
+  // Get user address from either wagmi or Privy
+  const userAddress = wagmiAddress || (user?.wallet?.address);
+  
   // Check if wallet is connected via either wagmi or Privy
-  const isConnected = wagmiConnected || (authenticated && userAddress);
+  const isConnected = wagmiConnected || (authenticated && !!userAddress);
   const [error, setError] = useState(null);
   const [stakingPositions, setStakingPositions] = useState([]);
   const [totalStakedAmount, setTotalStakedAmount] = useState('0');

@@ -1,11 +1,19 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useAccount, useReadContract, useWriteContract, useWaitForTransactionReceipt, useSwitchChain } from 'wagmi';
 import { parseEther, formatEther } from 'viem';
+import { usePrivy } from '@privy-io/react-auth';
 import { CONTRACTS, BASE_SEPOLIA_CHAIN_ID, ERC20_ABI, parseTokenAmount, formatTokenAmount, BASE_MAINNET_CHAIN_ID } from '../config/web3Config';
 import StakingVaultABI from '../contracts/StakingVault.json';
 
 export const useStaking = () => {
-  const { address: userAddress, isConnected, chain } = useAccount();
+  const { address: wagmiAddress, isConnected: wagmiConnected, chain } = useAccount();
+  const { authenticated, user } = usePrivy();
+  
+  // Get user address from either wagmi or Privy
+  const userAddress = wagmiAddress || (user?.wallet?.address);
+  
+  // Check if wallet is connected via either wagmi or Privy
+  const isConnected = wagmiConnected || (authenticated && !!userAddress);
   const { writeContract, data: hash, error: writeError, isPending } = useWriteContract();
   const { switchChain } = useSwitchChain();
   const [error, setError] = useState(null);

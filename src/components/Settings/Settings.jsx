@@ -69,7 +69,8 @@ import { useAppContext } from '../../AppProvider';
 import Loader from './Loader';
 import Credits from '../Credits';
 import { useUser, useWallets, useLinkAccount, usePrivy } from '@privy-io/react-auth';
-import { getAllTiers, TIER_MULTIPLIERS } from '@/config/tierConfig';
+import { getAllTiers, TIER_MULTIPLIERS, getTierByBalance } from '@/config/tierConfig';
+import { useStaking } from '@/hooks/useStaking';
 import StakingSection from './StakingSection';
 import ClaimVaultSection from './ClaimVaultSection';
 import VirtualsStakingSection from './VirtualsStakingSection';
@@ -97,8 +98,17 @@ const Settings = ({ onClose }) => {
     setHandleLoading,
     fetchUserHandle,
     userCredits,
-    creditsLoading
+    creditsLoading,
+    totalStakedAmount,
   } = useAppContext();
+
+  // Get staked FACY amount for tier calculation
+  const { stakedAmount } = useStaking();
+  
+  // Calculate tier based on combined staked amount (regular + Virtuals staking)
+  const stakedAmountNumber = parseFloat(totalStakedAmount || '0');
+  const currentTierInfo = getTierByBalance(stakedAmountNumber);
+  const currentTier = currentTierInfo.name.toLowerCase();
 
   // Privy hooks for progressive onboarding
   const { refreshUser } = useUser();
@@ -1426,10 +1436,7 @@ const Settings = ({ onClose }) => {
                             <Coins sx={{ fontSize: 20, color: '#9c27b0' }} />
                             <Box>
                               <Typography variant="body1" sx={{ fontWeight: 500 }}>
-                                Tokens Available
-                              </Typography>
-                              <Typography variant="body2" color="text.secondary">
-                                Your earned FACY coins
+                                Wallet Balance
                               </Typography>
                             </Box>
                           </Box>
@@ -1449,11 +1456,11 @@ const Settings = ({ onClose }) => {
                             <Typography variant="caption" color="text.secondary">
                               FACY
                             </Typography>
-                            {profile.average_balance_30d && (
+                            {/* {profile.average_balance_30d && (
                               <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mt: 0.5 }}>
                                 30d avg: {profile.average_balance_30d}
                               </Typography>
-                            )}
+                            )} */}
                           </Box>
                         </Box>
                       </Box>
@@ -1468,7 +1475,7 @@ const Settings = ({ onClose }) => {
                       {/* <ClaimVaultSection /> */}
 
                       {/* Premium Tier Display */}
-                      {profile.tier && (
+                      {currentTier && stakedAmountNumber > 0 && (
                         <Box sx={{ 
                           background: 'linear-gradient(135deg, #F8FAFF 0%, #ffffff 50%, #F8FAFF 100%)',
                           border: '2px solid #0066FF',
@@ -1508,15 +1515,17 @@ const Settings = ({ onClose }) => {
                           <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 3 }}>
                             <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
                               <Box sx={{
-                                width: 60,
-                                height: 60,
+                                width: { xs: 50, sm: 60 },
+                                height: { xs: 50, sm: 60 },
+                                minWidth: { xs: 50, sm: 60 },
+                                minHeight: { xs: 50, sm: 60 },
                                 borderRadius: '50%',
-                                background: `linear-gradient(135deg, ${getTierColor(profile.tier)} 0%, ${getTierColor(profile.tier)}CC 100%)`,
+                                background: `linear-gradient(135deg, ${getTierColor(currentTier)} 0%, ${getTierColor(currentTier)}CC 100%)`,
                                 display: 'flex',
                                 alignItems: 'center',
                                 justifyContent: 'center',
-                                boxShadow: `0 0 20px ${getTierColor(profile.tier)}40`,
-                                border: `3px solid ${getTierColor(profile.tier)}`,
+                                boxShadow: `0 0 20px ${getTierColor(currentTier)}40`,
+                                border: `3px solid ${getTierColor(currentTier)}`,
                                 position: 'relative',
                                 '&::before': {
                                   content: '""',
@@ -1526,19 +1535,19 @@ const Settings = ({ onClose }) => {
                                   right: -2,
                                   bottom: -2,
                                   borderRadius: '50%',
-                                  background: `linear-gradient(45deg, ${getTierColor(profile.tier)}20, transparent, ${getTierColor(profile.tier)}20)`,
+                                  background: `linear-gradient(45deg, ${getTierColor(currentTier)}20, transparent, ${getTierColor(currentTier)}20)`,
                                   zIndex: -1,
                                 }
                               }}>
                                 <Typography sx={{ 
-                                  fontSize: '24px',
+                                  fontSize: { xs: '20px', sm: '24px' },
                                   fontWeight: 'bold',
                                   color: 'white',
                                   textShadow: '0 2px 4px rgba(0,0,0,0.5)'
                                 }}>
-                                  {profile.tier === 'platinum' ? '💎' : 
-                                   profile.tier === 'gold' ? '🥇' : 
-                                   profile.tier === 'silver' ? '🥈' : '🥉'}
+                                  {currentTier === 'platinum' ? '💎' : 
+                                   currentTier === 'gold' ? '🥇' : 
+                                   currentTier === 'silver' ? '🥈' : '🥉'}
                                 </Typography>
                               </Box>
                               <Box>
@@ -1548,13 +1557,13 @@ const Settings = ({ onClose }) => {
                                 textTransform: 'capitalize',
                                   mb: 0.5
                                 }}>
-                                  {capitalize(profile.tier)} Member
+                                  {capitalize(currentTier)} Member
                                 </Typography>
                                 <Typography variant="body2" sx={{ 
                                   color: 'text.secondary',
                                   fontSize: '0.9rem'
                                 }}>
-                                  {profile.token_balance?.toLocaleString() || '0'} $FACY Tokens
+                                  {stakedAmountNumber.toLocaleString() || '0'} Total Staked$FACY Tokens
                             </Typography>
                             </Box>
                             </Box>
@@ -1577,13 +1586,13 @@ const Settings = ({ onClose }) => {
                           
                           {/* Progress to Next Tier */}
                           {(() => {
-                            const currentTierIndex = tiers.findIndex(t => t.name.toLowerCase() === profile.tier);
+                            const currentTierIndex = tiers.findIndex(t => t.name.toLowerCase() === currentTier);
                             const nextTier = tiers[currentTierIndex + 1];
-                            const currentTier = tiers[currentTierIndex];
+                            const currentTierData = tiers[currentTierIndex];
                             
-                            if (nextTier && currentTier) {
+                            if (nextTier && currentTierData) {
                               const progress = Math.min(
-                                ((profile.token_balance - currentTier.minBalance) / (nextTier.minBalance - currentTier.minBalance)) * 100,
+                                ((stakedAmountNumber - currentTierData.minBalance) / (nextTier.minBalance - currentTierData.minBalance)) * 100,
                                 100
                               );
                               
@@ -1615,7 +1624,7 @@ const Settings = ({ onClose }) => {
                                     <Box sx={{
                                       width: `${progress}%`,
                                       height: '100%',
-                                      background: `linear-gradient(90deg, ${getTierColor(profile.tier)} 0%, ${getTierColor(nextTier.name.toLowerCase())} 100%)`,
+                                      background: `linear-gradient(90deg, ${getTierColor(currentTier)} 0%, ${getTierColor(nextTier.name.toLowerCase())} 100%)`,
                                       borderRadius: 4,
                                       transition: 'width 0.3s ease-in-out',
                                       position: 'relative',
@@ -1637,8 +1646,8 @@ const Settings = ({ onClose }) => {
                                     mt: 0.5,
                                     display: 'block'
                                   }}>
-                                    {nextTier.minBalance - profile.token_balance > 0 
-                                      ? `${(nextTier.minBalance - profile.token_balance).toLocaleString()} more $FACY needed`
+                                    {nextTier.minBalance - stakedAmountNumber > 0 
+                                      ? `${(nextTier.minBalance - stakedAmountNumber).toLocaleString()} more staked $FACY needed`
                                       : 'Next tier unlocked!'
                                     }
                                   </Typography>
@@ -1669,8 +1678,10 @@ const Settings = ({ onClose }) => {
                                   Daily Credits
                                 </Typography>
                                 <Typography variant="h6" sx={{ color: 'text.primary', fontWeight: 'bold' }}>
-                                  {tiers.find(t => t.name.toLowerCase() === profile.tier)?.creditsPerDay || 0}
-                                </Typography>
+                                  {tiers.find(t => t.name.toLowerCase() === currentTier)?.creditsPerDay || 0}
+                                  </Typography>
+                                  <Typography variant="caption" sx={{ color: 'text.secondary', fontSize: '0.75rem' }}>
+                                    1 fact check = 5 credits                                </Typography>
                               </Box>
                               <Box sx={{ 
                                 p: 2, 
@@ -1682,7 +1693,7 @@ const Settings = ({ onClose }) => {
                                   Multiplier
                                 </Typography>
                                 <Typography variant="h6" sx={{ color: 'text.primary', fontWeight: 'bold' }}>
-                                  {TIER_MULTIPLIERS[profile.tier] || 1}x
+                                  {TIER_MULTIPLIERS[currentTier] || 1}x
                                 </Typography>
                               </Box>
                             </Box>
@@ -1700,9 +1711,11 @@ const Settings = ({ onClose }) => {
                             </Typography>
                             <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1.5 }}>
                               {tiers.map((tier, index) => {
-                                const isCurrentTier = profile.tier === tier.name.toLowerCase();
-                                const isUnlocked = profile.token_balance >= tier.minBalance;
-                                const isNextTier = index > 0 && !isUnlocked && profile.token_balance >= tiers[index - 1].minBalance;
+                              const isCurrentTier = currentTier === tier.name.toLowerCase();
+                              const isUnlocked = stakedAmountNumber >= tier.minBalance;
+                              const isNextTier = index > 0 && !isUnlocked && stakedAmountNumber >= tiers[index - 1].minBalance;
+                              // For styling purposes, current tier should always appear active regardless of unlock status
+                              const shouldAppearActive = isCurrentTier || isUnlocked;
                                 
                                 return (
                               <Box 
@@ -1713,24 +1726,24 @@ const Settings = ({ onClose }) => {
                                       p: 2,
                                       borderRadius: 2,
                                       background: isCurrentTier 
-                                        ? `linear-gradient(135deg, ${getTierColor(tier.name.toLowerCase())}20, ${getTierColor(tier.name.toLowerCase())}10)`
-                                        : isUnlocked 
+                                        ? 'linear-gradient(135deg, rgba(76, 175, 80, 0.15), rgba(76, 175, 80, 0.08))'
+                                        : shouldAppearActive 
                                           ? 'rgba(0, 102, 255, 0.08)'
                                           : 'rgba(0, 0, 0, 0.05)',
                                       border: isCurrentTier 
-                                        ? `2px solid ${getTierColor(tier.name.toLowerCase())}`
-                                        : isUnlocked 
+                                      ? '2px solid #4CAF50'
+                                      : shouldAppearActive
                                           ? '1px solid rgba(0, 102, 255, 0.2)'
                                           : '1px solid rgba(0, 0, 0, 0.1)',
                                       position: 'relative',
-                                      opacity: isUnlocked ? 1 : 0.6,
+                                      opacity: shouldAppearActive ? 1 : 0.6,
                                       transition: 'all 0.3s ease-in-out',
                                       cursor: 'pointer',
                                       '&:hover': {
                                         transform: 'translateX(4px)',
                                         boxShadow: isCurrentTier 
-                                          ? `0 4px 20px ${getTierColor(tier.name.toLowerCase())}40`
-                                          : isUnlocked 
+                                        ? '0 4px 20px rgba(76, 175, 80, 0.3)'
+                                        : shouldAppearActive 
                                             ? '0 4px 20px rgba(0, 102, 255, 0.15)'
                                             : '0 4px 20px rgba(0, 0, 0, 0.1)',
                                       },
@@ -1741,28 +1754,31 @@ const Settings = ({ onClose }) => {
                                         top: -2,
                                         bottom: -2,
                                         width: '4px',
-                                        background: `linear-gradient(180deg, ${getTierColor(tier.name.toLowerCase())} 0%, ${getTierColor(tier.name.toLowerCase())}CC 100%)`,
+                                        background: 'linear-gradient(180deg, #4CAF50 0%, #45a049 100%)',
                                         borderRadius: '2px 0 0 2px',
                                       } : {}
                                     }}
                                   >
                                     <Box sx={{ 
-                                      width: 40,
-                                      height: 40,
+                                      width: { xs: 36, sm: 40 },
+                                      height: { xs: 36, sm: 40 },
+                                      minWidth: { xs: 36, sm: 40 },
+                                      minHeight: { xs: 36, sm: 40 },
                                       borderRadius: '50%',
                                       background: isCurrentTier 
-                                        ? `linear-gradient(135deg, ${getTierColor(tier.name.toLowerCase())}, ${getTierColor(tier.name.toLowerCase())}CC)`
-                                        : isUnlocked 
+                                        ? 'linear-gradient(135deg, #4CAF50, #45a049)'
+                                        : shouldAppearActive 
                                           ? 'linear-gradient(135deg, #FFD700, #FFA500)'
                                           : 'linear-gradient(135deg, #666, #444)',
                                       display: 'flex',
                                       alignItems: 'center',
                                       justifyContent: 'center',
                                       mr: 2,
-                                      boxShadow: isCurrentTier ? `0 0 15px ${getTierColor(tier.name.toLowerCase())}40` : 'none'
+                                      flexShrink: 0,
+                                      boxShadow: isCurrentTier ? '0 0 15px rgba(76, 175, 80, 0.4)' : 'none'
                                     }}>
                                       <Typography sx={{ 
-                                        fontSize: '18px',
+                                        fontSize: { xs: '16px', sm: '18px' },
                                         color: 'white',
                                         fontWeight: 'bold'
                                       }}>
@@ -1776,7 +1792,7 @@ const Settings = ({ onClose }) => {
                                       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 0.5 }}>
                                         <Typography variant="body1" sx={{ 
                                           fontWeight: 'bold',
-                                          color: isCurrentTier ? getTierColor(tier.name.toLowerCase()) : isUnlocked ? '#0066FF' : 'text.secondary',
+                                          color: isCurrentTier ? '#4CAF50' : shouldAppearActive ? '#0066FF' : 'text.secondary',
                                           textTransform: 'capitalize'
                                         }}>
                                           {tier.name}
@@ -1784,27 +1800,27 @@ const Settings = ({ onClose }) => {
                                             <Typography component="span" sx={{ 
                                               ml: 1, 
                                               fontSize: '0.8rem',
-                                              color: '#0066FF'
+                                              color: '#4CAF50'
                                             }}>
                                               (Current)
                                             </Typography>
                                           )}
                                         </Typography>
                                         <Typography variant="body2" sx={{ 
-                                          color: isUnlocked ? 'text.secondary' : 'text.disabled',
+                                          color: shouldAppearActive ? 'text.secondary' : 'text.disabled',
                                           fontWeight: 'bold'
                                         }}>
                                           {tier.minBalance.toLocaleString()}+ $FACY
                                         </Typography>
                               </Box>
                               <Typography variant="caption" sx={{ 
-                                        color: isUnlocked ? 'text.secondary' : 'text.disabled',
+                                        color: shouldAppearActive ? 'text.secondary' : 'text.disabled',
                                         fontSize: '0.8rem'
                                       }}>
-                                        {tier.creditsPerDay} credits/day • {TIER_MULTIPLIERS[tier.name.toLowerCase()] || 1}x multiplier
+                                        {tier.creditsPerDay} credits/day • {TIER_MULTIPLIERS[tier.name.toLowerCase()]}x multiplier
                                       </Typography>
                                     </Box>
-                                    {isUnlocked && (
+                                    {shouldAppearActive && (
                                       <Box sx={{ 
                                         width: 24,
                                         height: 24,
@@ -1825,79 +1841,6 @@ const Settings = ({ onClose }) => {
                           </Box>
                         </Box>
                       )}
-
-                      {/* Convert to Platform Credits */}
-                      <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-                        <Box sx={{ 
-                          display: 'flex', 
-                          justifyContent: 'space-between', 
-                          alignItems: 'center',
-                          p: 2, 
-                          border: 1, 
-                          borderColor: 'divider', 
-                          borderRadius: 2,
-                          opacity: 0.5,
-                          bgcolor: 'action.hover'
-                        }}>
-                                                   <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
-                             <RefreshCw sx={{ fontSize: 20, color: 'text.disabled' }} />
-                             <Box>
-                              <Typography variant="body1" sx={{ fontWeight: 500, color: 'text.disabled' }}>
-                                Convert to Platform Credits
-                              </Typography>
-      
-                            </Box>
-                          </Box>
-                                                   {!editModes.conversion && (
-                             <Button 
-                               onClick={() => toggleEditMode("conversion")} 
-                               startIcon={<Edit sx={{ fontSize: 16 }} />}
-                               variant="outlined"
-                               size="small"
-                               disabled
-                               sx={{ 
-                                 color: 'text.disabled',
-                                 borderColor: 'text.disabled',
-                                 '&:hover': {
-                                   color: 'text.disabled',
-                                   borderColor: 'text.disabled',
-                                   bgcolor: 'transparent'
-                                 }
-                               }}
-                             >
-                               Convert
-                             </Button>
-                           )}
-                        </Box>
-
-                        {editModes.conversion && (
-                          <>
-                            <Box sx={{ display: 'flex', gap: 1 }}>
-                              <TextField
-                                placeholder="Enter TRUTH amount"
-                                defaultValue="10"
-                                size="small"
-                                sx={{ flex: 1 }}
-                              />
-                              <Button onClick={() => toggleEditMode("conversion")} variant="contained">
-                                Convert
-                              </Button>
-                            </Box>
-                            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                              <Typography variant="caption" color="text.secondary">
-                                You will receive ~100 Platform Credits
-                              </Typography>
-                                                           <Button 
-                                 onClick={() => cancelEdit("conversion")} 
-                                 size="small"
-                                 startIcon={<X sx={{ fontSize: 12 }} />}
-                               >
-                                 Cancel
-                               </Button>
-                            </Box>
-                          </>
-                        )}
-                      </Box>
                     </Box>
                   )}
                 </CardContent>

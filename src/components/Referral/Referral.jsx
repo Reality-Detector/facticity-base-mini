@@ -756,7 +756,7 @@ const CreditsPage = () => {
                     fontStyle: 'italic',
                     fontSize: { xs: '0.75rem', sm: '0.875rem' }
                   }}>
-                    💡 <strong>Pro Tip:</strong> The more $FACY tokens you hold, the higher your tier and the more daily credits you receive!
+                    💡 <strong>Pro Tip:</strong> The more $FACY tokens you stake, the higher your tier and the more daily credits you receive!
                   </Typography>
                 </CardContent>
               </Card>
