@@ -432,7 +432,9 @@ const ClaimsProcessingModule = ({
   const optionsMenuOpen = Boolean(anchorEl);
 
   // Calculate how many claims remain
-  setClaimsRemaining(Math.max(claims.length - totalProcessed, 0));
+  React.useEffect(() => {
+    setClaimsRemaining(Math.max(claims.length - totalProcessed, 0));
+  }, [claims.length, totalProcessed]);
 
   // Calculate progress percentage (0–100)
   const progressPercentage =

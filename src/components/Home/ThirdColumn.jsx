@@ -1,11 +1,12 @@
+"use client";
 import React from 'react';
 import { Button, Avatar, Box } from '@mui/material';
 import useAuth from '../../auth/useAuthHook';
-import { useNavigate } from 'react-router-dom';
+import { useRouter } from 'next/navigation';
 
 const ThirdColumn = () => {
     const { loginWithPopup, logout, isAuthenticated, user } = useAuth();
-    const navigate = useNavigate();
+    const router = useRouter();
 
     const handleLogin = async () => {
         try {
@@ -16,11 +17,11 @@ const ThirdColumn = () => {
     };
 
     const handleLogout = () => {
-        logout({ returnTo: window.location.origin });
+        logout({ returnTo: typeof window !== 'undefined' ? window.location.origin : 'http://localhost:3000' });
     };
 
     const navigateToSettings = () => {
-        navigate('/settings');
+        router.push('/settings');
     };
 
     return (

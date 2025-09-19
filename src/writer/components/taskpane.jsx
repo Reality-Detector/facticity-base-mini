@@ -120,9 +120,8 @@ const Taskpane = (props) => {
 
   const splitText = async (text, accessToken) => {
     try {
-        console.log({accessToken})
         const data = { query: text };
-        const response = await fetch(`${url}/split_sentence`, {
+        const response = await fetch('/api/split_sentence', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -260,7 +259,7 @@ const updateReferenceState = (metadata) => {
 const rewriteText = async (text) => {
     try {
         const data = { query: text };
-        const response = await fetch(`${url}/rewrite`, {
+        const response = await fetch('/api/rewrite', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -763,7 +762,6 @@ const handleCorrection = async (inputText, correctedText) => {
 
     await updateQueue;
 
-    // console.log(`Replaced "${inputText}" with "${correctedText}" and applied styling.`);
   } catch (error) {
     console.error("An error occurred while processing the correction:", error);
     setError("An error occurred while replacing the text.");
@@ -797,7 +795,6 @@ const handleCorrection = async (inputText, correctedText) => {
     await updateQueue;
   };
   
-  // etc...
 
   // -------------- References Logic (Optional) -------------------
   /**
@@ -1262,9 +1259,7 @@ const handleCorrection = async (inputText, correctedText) => {
             </IconButton>
           </Tooltip>
           <Tooltip title="Profile" placement="left">
-            <IconButton sx={{ padding: 1 }}>
-              <Profile sx={{ fontSize: 25 }} />
-            </IconButton>
+            <Profile sx={{ fontSize: 25 }} />
           </Tooltip>
         </Box>
         {/* <br></br> */}

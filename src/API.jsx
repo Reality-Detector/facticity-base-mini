@@ -3,15 +3,15 @@ import SwaggerUI from 'swagger-ui-react';
 import 'swagger-ui-react/swagger-ui.css';
 import { Box, Grid, Paper, Typography, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Button, Snackbar, Alert, AppBar, Toolbar, IconButton, useTheme, useMediaQuery } from '@mui/material'
 import { useAppContext } from './AppProvider';
-import './Subscription.css'; // Import the CSS file that contains the overlay styles
-import { useNavigate } from 'react-router-dom';
+import '@/styles/Subscription.css'; // Import the CSS file that contains the overlay styles
+import { useRouter } from 'next/navigation';
 import ArrowBack from '@mui/icons-material/ArrowBack';
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 import useAuth from './auth/useAuthHook';
 import Credits from './components/Credits';
 
 const Api = () => {
-  const navigate = useNavigate();
+  const router = useRouter();
   const theme = useTheme();
   const isMdUp = useMediaQuery(theme.breakpoints.up('md'));
   // Replace with actual data fetching or state management logic
@@ -41,7 +41,7 @@ const Api = () => {
 
   const createOrFetchApiKey = async (email) => {
     try {
-      const response = await fetch(backendUrl+'/create_api_key', {
+      const response = await fetch('/api/create_api_key', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -78,7 +78,7 @@ const Api = () => {
     };
 
     try {
-      const response = await fetch(`${backendUrl}/submit-contact-form`, {
+      const response = await fetch('/api/submit-contact-form', {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(formDataToSend),
@@ -114,10 +114,10 @@ const Api = () => {
           borderBottom: '1px solid rgba(0, 102, 255, 0.1)',
         }}
       >
-        <Toolbar sx={{ minHeight: '70px !important', justifyContent: 'space-between', paddingX: { xs: 2, sm: 4 } }}>
+        <Toolbar sx={{ minHeight: '50px !important', justifyContent: 'space-between', paddingX: { xs: 2, sm: 4 } }}>
           <Box sx={{ width: { xs: 40, md: 60 }, display: 'flex', alignItems: 'center' }}>
             <IconButton
-              onClick={() => navigate('/')}
+              onClick={() => router.push('/')}
               sx={{
                 color: '#0066FF',
                 background: 'rgba(0, 102, 255, 0.08)',
@@ -136,18 +136,30 @@ const Api = () => {
             </IconButton>
           </Box>
           <Box sx={{ flexGrow: 1, display: 'flex', justifyContent: 'center' }}>
-            <a href="/" style={{ textDecoration: 'none', display: 'flex', alignItems: 'center' }}>
+          <Box 
+              onClick={() => navigate('/')} 
+              sx={{ 
+                textDecoration: 'none', 
+                display: 'flex', 
+                alignItems: 'center', 
+                cursor: 'pointer',
+                '&:hover': {
+                  opacity: 0.8
+                }
+              }}
+            >
               <img
-                src="/facticityailogo-02.png"
-                alt="Facticity.AI"
+                src="https://see.fontimg.com/api/rf5/KVdLp/YzgwNzgzNWY1N2M2NDc1MzgzNTExOWYzMWFkY2ViMmQudHRm/QVJBSVNUT1RMRQ/spartacus.png?r=fs&h=98&w=1500&fg=0066FF&bg=FFFFFF&tb=1&s=65"
+                alt="ARAISTOTLE"
                 style={{
                   paddingTop: '2px',
                   width: 'auto',
-                  height: isMdUp ? '36px' : '30px',
+                  height: isMdUp ? '28px' : '24px',
                   transition: 'all 0.3s ease-in-out',
                 }}
               />
-            </a>
+            </Box>
+            
           </Box>
           {isAuthenticated && (
             <Box
@@ -159,7 +171,7 @@ const Api = () => {
               }}
             >
               <IconButton 
-                onClick={() => navigate('/rewards')} 
+                onClick={() => router.push('/rewards')} 
                 size="small" 
                 sx={{ 
                   color: '#0066FF',

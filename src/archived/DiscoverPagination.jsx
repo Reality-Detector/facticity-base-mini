@@ -29,8 +29,7 @@ import {
   Button,
 } from "@mui/material";
 import FactCheckDisplay from './FactCheckDisplay'
-import './animation.css'; // Ensure .search-container styles are removed/commented out
-import './scrollbar.css';
+import '@/styles/globals.css'; // Animation and scrollbar styles are now in globals.css
 import { useAppContext } from '../AppProvider';
 import { v4 as uuidv4 } from 'uuid';
 import SearchBar from './searchBar';
@@ -100,7 +99,7 @@ const CompactLeaderboardDisplay = () => {
         headers['Validator'] = 'privy';
       }
       
-      const response = await fetch(`${backendUrl}/api/get_userhandle?email=${encodeURIComponent(user.email)}`, {
+      const response = await fetch(`${backendUrl}/api/get_userhandle?email=${encodeURIComponent(user.id)}`, {
         headers: headers,
       });
       if (!response.ok) throw new Error('Failed to fetch user handle');
@@ -1354,7 +1353,8 @@ const SearchComponent = ({ isSearchMoved, setIsSearchMoved, isMdUp, initialUrlPa
                             "&:hover": { bgcolor: "#004FCC" },
                           }}
                         />
-                        <Chip
+                        {/* Writer is currently disabled */}
+                        {/* <Chip
                           label="Writer"
                           clickable
                           component="a"
@@ -1367,7 +1367,7 @@ const SearchComponent = ({ isSearchMoved, setIsSearchMoved, isMdUp, initialUrlPa
                             py: { xs: 0.2, sm: 0.25 },
                             "&:hover": { bgcolor: "#004FCC" },
                           }}
-                        />
+                        /> */}
                       </Box>
                     </Box>
 

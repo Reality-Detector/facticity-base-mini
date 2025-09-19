@@ -20,20 +20,32 @@ const useAuth = () => {
 
   // Use Privy if available (preferred)
   if (privy) {
+    // Capture privy in a const to ensure it's accessible in nested functions
+    const privyInstance = privy;
     // Map Privy's interface to match Auth0's common interface
     const privyLogout = (options = {}) => {
-      // Privy's logout doesn't take returnTo parameter, handle redirect manually if needed
-      privy.logout();
-      if (options.returnTo) {
-        setTimeout(() => {
+      try {
+        // Privy's logout doesn't take returnTo parameter, handle redirect manually if needed
+        privyInstance.logout();
+        if (options.returnTo) {
+          setTimeout(() => {
+            if (typeof window !== 'undefined') {
+              window.location.href = options.returnTo;
+            }
+          }, 100);
+        }
+      } catch (error) {
+        console.error('Logout error:', error);
+        // Still try to redirect even if logout fails
+        if (options.returnTo && typeof window !== 'undefined') {
           window.location.href = options.returnTo;
-        }, 100);
+        }
       }
     };
 
     const privyLogin = async (options = {}) => {
       try {
-        await privy.login();
+        await privyInstance.login();
         // Handle redirect after login if needed
         if (options.redirectUri || options.returnTo) {
           setTimeout(() => {
@@ -48,24 +60,40 @@ const useAuth = () => {
 
     return {
       // Authentication status - mapping Auth0 properties to Privy
-      isLoading: privy.loading,
-      isAuthenticated: privy.authenticated,
+      isLoading: privyInstance.loading,
+      isAuthenticated: privyInstance.authenticated,
       error: null, // Privy handles errors differently
       
       // User information - mapping Auth0 user structure to Privy
-      user: privy.user ? {
+      user: privyInstance.user ? {
         // Map Auth0's user.sub to Privy's user.id
-        sub: privy.user.id,
+        sub: privyInstance.user.id,
         // Map Auth0's user.email to Privy's user.email.address
-        email: privy.user.email?.address || privy.user.email,
+        email: privyInstance.user.email?.address || privyInstance.user.email,
         // Map other common Auth0 user fields
-        name: privy.user.name || '',
-        picture: privy.user.picture || '',
-        email_verified: privy.user.email?.verified || false,
+        name: privyInstance.user.name || '',
+        // Prioritize Twitter profile picture if available, otherwise use default picture
+        picture: (() => {
+          // Try to get Twitter profile picture first
+          const twitterAccount = privyInstance.user.twitter || 
+                                privyInstance.user.linkedAccounts?.find(a => a.type === 'twitter_oauth') ||
+                                privyInstance.user.oauthAccounts?.find(a => a.provider === 'twitter') || 
+                                privyInstance.user.linkedAccounts?.find(a => a.type === 'oauth' && a.provider === 'twitter') ||
+                                privyInstance.user.linkedAccounts?.find(a => a.type === 'twitter');
+          
+          if (twitterAccount?.profilePictureUrl) {
+            // Remove '_normal' suffix to get original size image
+            return twitterAccount.profilePictureUrl.replace('_normal', '');
+          }
+          
+          // Fallback to default picture
+          return privyInstance.user.picture || '';
+        })(),
+        email_verified: privyInstance.user.email?.verified || false,
         // Keep original Privy user object for advanced usage
-        ...privy.user,
+        ...privyInstance.user,
         // Override with mapped values to ensure consistency
-        id: privy.user.id // Some code might check user.id instead of user.sub
+        id: privyInstance.user.id // Some code might check user.id instead of user.sub
       } : null,
       
       // Authentication methods - mapping Auth0 methods to Privy
@@ -76,7 +104,7 @@ const useAuth = () => {
       // Token methods
       getAccessTokenSilently: async (options = {}) => {
         try {
-          return await privy.getAccessToken() || null;
+          return await privyInstance.getAccessToken() || null;
         } catch (error) {
           console.error('Failed to get access token:', error);
           return null;
@@ -84,16 +112,16 @@ const useAuth = () => {
       },
       
       // Additional Privy-specific methods (for advanced usage)
-      connectWallet: privy.connectWallet,
-      linkEmail: privy.linkEmail,
-      linkWallet: privy.linkWallet,
-      unlinkEmail: privy.unlinkEmail,
-      unlinkWallet: privy.unlinkWallet,
-      ready: privy.ready,
+      connectWallet: privyInstance.connectWallet,
+      linkEmail: privyInstance.linkEmail,
+      linkWallet: privyInstance.linkWallet,
+      unlinkEmail: privyInstance.unlinkEmail,
+      unlinkWallet: privyInstance.unlinkWallet,
+      ready: privyInstance.ready,
       
       // Provider identification
       _provider: 'privy',
-      _original: privy
+      _original: privyInstance
     };
   }
 

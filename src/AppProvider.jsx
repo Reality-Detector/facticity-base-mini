@@ -1,8 +1,10 @@
+"use client";
 import React, { createContext, useContext, useState, useEffect, useRef } from 'react';
 import useAuth from './auth/useAuthHook.jsx';
 import { usePostHog } from 'posthog-js/react';
 import { handleAuth0Error, getTokenSafely, getTokenWithFallback } from './auth/authUtils.jsx';
-import { ACTIVE_BACKEND_URL } from '../config.js';
+
+const backendUrl = '/api';
 
 // Create a Context for the Disambiguation
 const AppContext = createContext();
@@ -14,8 +16,11 @@ export const AppProvider = ({ children }) => {
 
   const [skipDisambiguation, setSkipDisambiguation] = useState(() => {
     try {
-      const storedValue = localStorage.getItem('skipDisambiguation');
-      return storedValue !== null ? JSON.parse(storedValue) : true;
+      if (typeof window !== 'undefined') {
+        const storedValue = localStorage.getItem('skipDisambiguation');
+        return storedValue !== null ? JSON.parse(storedValue) : true;
+      }
+      return true;
     } catch (error) {
       console.error('Error reading skipDisambiguation from localStorage:', error);
       return true;
@@ -25,15 +30,18 @@ export const AppProvider = ({ children }) => {
   // State to control whether to show reward popup
   const [showRewardPopup, setShowRewardPopup] = useState(() => {
     try {
-      // First check if user has permanently disabled the popup
-      const permanentlyDisabled = localStorage.getItem('permanentlyDisableRewardPopup');
-      if (permanentlyDisabled === 'true') {
-        return false;
+      if (typeof window !== 'undefined') {
+        // First check if user has permanently disabled the popup
+        const permanentlyDisabled = localStorage.getItem('permanentlyDisableRewardPopup');
+        if (permanentlyDisabled === 'true') {
+          return false;
+        }
+        
+        // Otherwise use the regular toggle state
+        const storedValue = localStorage.getItem('showRewardPopup');
+        return storedValue !== null ? JSON.parse(storedValue) : true;
       }
-      
-      // Otherwise use the regular toggle state
-      const storedValue = localStorage.getItem('showRewardPopup');
-      return storedValue !== null ? JSON.parse(storedValue) : true;
+      return true;
     } catch (error) {
       console.error('Error reading reward popup settings from localStorage:', error);
       return true;
@@ -144,6 +152,12 @@ export const AppProvider = ({ children }) => {
   // User handle state
   const [userHandle, setUserHandle] = useState('');
   const [handleLoading, setHandleLoading] = useState(false);
+
+  // Global staked amount state (combines regular staking + Virtuals staking)
+  const [totalStakedAmount, setTotalStakedAmount] = useState('0');
+  const [regularStakedAmount, setRegularStakedAmount] = useState('0');
+  const [virtualsStakedAmount, setVirtualsStakedAmount] = useState('0');
+
   
   // Ref to track if subscription status has been fetched
   const subscriptionFetched = useRef(false);
@@ -165,7 +179,6 @@ export const AppProvider = ({ children }) => {
           console.log({user})
         }
         if (token) {
-          console.log("Token:", token);
           setAccessToken(token);
           // Load subscription status, profile, and user handle once when token is available
           subscriptionFetched.current = true;
@@ -192,43 +205,16 @@ export const AppProvider = ({ children }) => {
   useEffect(() => {
     const fetchDistributedUrl = async () => {
       try {
-        // console.log('Fetching distributed URL from Lambda...');
-        // const response = await fetch('https://j3odd112xc.execute-api.us-west-2.amazonaws.com/requestDistributor', {
-        //   method: 'GET',
-        //   headers: {
-        //     'Content-Type': 'application/json',
-        //   },
-        // });
         
-        // if (response.ok) {
-        //   const data = await response.json();
-        //   console.log('Lambda response:', data);
-          
-        //   // Data is already in the correct format: { "backend_url": "https://..." }
-        //   if (data.backend_url) {
-        //     console.log('Setting distributed URL to:', data.backend_url);
-        //     setDistributedUrl(data.backend_url);
-        //     console.log("distributed url app provider", data.backend_url)
-        //   } else {
-        //     console.warn('No backend_url found in response, using fallback');
-        //     setDistributedUrl('https://rdjinpnweu.us-west-2.awsapprunner.com');
-        //   }
-        // } else {
-        //   console.warn('Failed to fetch distributed URL, status:', response.status);
-        //   setDistributedUrl('https://rdjinpnweu.us-west-2.awsapprunner.com');
-        // }
-        
-        // setDistributedUrl('http://localhost:5052')
-        // setDistributedUrl('https://ivvwnxhduu.us-west-2.awsapprunner.com')
-        setDistributedUrl(ACTIVE_BACKEND_URL)
+        setDistributedUrl(backendUrl)
         // setDistributedUrl('https://r8wncu74i2.us-west-2.awsapprunner.com')
       } catch (error) {
         console.error('Error fetching distributed URL:', error);
+        
         // Set fallback URL on error
         // setDistributedUrl('http://localhost:5052');
         // setDistributedUrl('https://ivvwnxhduu.us-west-2.awsapprunner.com');
-        setDistributedUrl(ACTIVE_BACKEND_URL)
-        // setDistributedUrl('https://r8wncu74i2.us-west-2.awsapprunner.com')
+        setDistributedUrl(backendUrl)
       }
     };
 
@@ -240,31 +226,17 @@ export const AppProvider = ({ children }) => {
     console.log("Distributed URL updated:", distributedUrl);
   }, [distributedUrl]);
 
-  // Add new state for distributed URL
-   // Default fallback URL
 
-  // const backendUrl = 'http://localhost:5000';
-  // const backendUrl = 'http://localhost:5052';
-  // const backendUrl = 'https://ecsbackend.facticity.ai';
-  
-  
-  const backendUrl = ACTIVE_BACKEND_URL;
-  const claimExtractUrl = ACTIVE_BACKEND_URL; // Use same URL for consistency
-
-
-  
-  // const backendUrl = 'https://rdjinpnweu.us-west-2.awsapprunner.com'
-  
-  // const backendUrl = 'https://backend.facticity.ai';
+  const claimExtractUrl = backendUrl; // Use same URL for consistency
   const [searchQuery, setSearchQuery] = useState("");
-
   const [isProUser, setIsProUser] = useState("basic"); // basic subscription tier as default
-  
   const [seektrigger, setSeekTrigger] = useState(true)
   const [highlightSearch, setHighlightSearch] = useState(false); // New state
 
   // Add state for discover posts
   const [discoverPosts, setDiscoverPosts] = useState([]);
+  const [enableSharePoints, setEnableSharePoints] = useState(false);
+
   
   // Fetch discover posts
   // useEffect(() => {
@@ -329,7 +301,7 @@ export const AppProvider = ({ children }) => {
   const fetchProfile = async (token = accessToken) => {
     if (user && !profileLoaded) {
       setProfileLoading(true);
-      const url = backendUrl + `/get-user-web3?wallet_id=${user.wallet.address}`;
+      const url = `/api/get-user-web3?wallet_id=${user.wallet.address}`;
       try {
         const headers = {
           'Content-Type': 'application/json',
@@ -365,9 +337,11 @@ export const AppProvider = ({ children }) => {
       if (token) {
         headers['Authorization'] = `Bearer ${token}`;
         headers['Validator'] = 'privy';
+        headers['Frontend'] = 'web3';
       }
       
-      const response = await fetch(`${backendUrl}/api/get_userhandle?email=${encodeURIComponent(user.email)}`, {
+      // Changed from user.email to user.id to match the commit. But it has zero impact as backend function completely ignores query parameters
+      const response = await fetch(`/api/api/get_userhandle?email=${encodeURIComponent(user.id)}`, {
         method: 'GET',
         headers: headers,
       });
@@ -389,13 +363,11 @@ export const AppProvider = ({ children }) => {
   };
 
   const fetchSubscriptionStatus = async (token = accessToken) => {
-    console.log("fetching subscription status 2")
     setCreditsLoading(true)
     console.log({isAuthenticated, user})
     if (isAuthenticated && (user?.email || user?.sub)) {
-      console.log("fetching subscription status 3")
       try {
-        const response = await fetch(`${backendUrl}/get_user_subscription_by_email`, {
+        const response = await fetch('/api/get_user_subscription_by_email', {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -430,7 +402,7 @@ export const AppProvider = ({ children }) => {
           headers['Validator'] = 'privy';
         }
         
-        const response = await fetch(`${backendUrl}/check_credits_util`, {
+        const response = await fetch(`/api/check_credits_util`, {
           method: "POST",
           headers: headers,
           body: JSON.stringify({userEmail: user.email, wallet_id: user.wallet.address})
@@ -440,13 +412,11 @@ export const AppProvider = ({ children }) => {
         {
           const data = await response.json()
           if(data.user_credits){
-            console.log(data.user_credits)
             setTotalUserCredits(data.user_credits)
             setUserCredits(data.user_credits)
           }
 
           if(data.daily_credits){
-            console.log(data.daily_credits)
             setDailyUserCredits(data.daily_credits)
           }
 
@@ -485,7 +455,7 @@ export const AppProvider = ({ children }) => {
           headers['Validator'] = 'privy';
         }
         
-        const response = await fetch(backendUrl+'/update_ids', {
+        const response = await fetch('/api/update_ids', {
           method: 'POST',
           headers: headers,
           body: JSON.stringify({
@@ -494,17 +464,12 @@ export const AppProvider = ({ children }) => {
           })
         });
 
-        if (!response.ok) {
-          // console.log("Network response was not ok");
-        } else{
-            const data = await response.json();
-            setConversations(data.ids);
+        if (response.ok) {
+          const data = await response.json();
+          setConversations(data.ids);
         }
-
-
-        // setCurrentConversation(data.ids[0]); // Set the first conversation as the current one
       } catch (error) {
-        // console.error("Error fetching conversations:", error);
+        console.error("Error fetching conversations:", error);
       }
     };
 
@@ -518,15 +483,16 @@ export const AppProvider = ({ children }) => {
     const getHasSeenTutFlag = async () => {
       try {
         const headers = {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
+          "Validator": "privy",
+          "Frontend": "web3"
         };
-        
         if (accessToken) {
           headers['Authorization'] = `Bearer ${accessToken}`;
           headers['Validator'] = 'privy';
         }
         
-        const response = await fetch(backendUrl + '/has-seen-tut', {
+        const response = await fetch('/api/has-seen-tut', {
           method: 'POST', 
           headers: headers,
           body : JSON.stringify({
@@ -534,16 +500,12 @@ export const AppProvider = ({ children }) => {
           })
         });
 
-        if(!response.ok){
-          //
-        }
-        else {
+        if (response.ok) {
           const data = await response.json();
-            setHasSeenTut(data.hasSeenTut);
+          setHasSeenTut(data.hasSeenTut);
         }
-      }
-      catch {
-        //
+      } catch (error) {
+        console.error("Error fetching tutorial status:", error);
       }
     };
     if(isAuthenticated) {
@@ -552,12 +514,10 @@ export const AppProvider = ({ children }) => {
   }, [email, accessToken])
 
   const fetchTaskStatus = async (conversationId) => {
-    // console.log("FETCHING", conversationId)
     let data = null
     try {
       setWorkspaceLoading(true);
       setIsSearchMoved(true);
-      // const response = await fetch('https://backend-word-testing-934923488639.us-central1.run.app/check-multiple-task-status'
       const headers = {
         'Content-Type': 'application/json',
         'Validator' : 'privy',
@@ -569,7 +529,7 @@ export const AppProvider = ({ children }) => {
         
       }
       
-      const response = await fetch(backendUrl+'/check-multiple-task-status', {
+      const response = await fetch('/api/check-multiple-task-status', {
         method: 'POST',
         headers: headers,
         body: JSON.stringify({ _id: conversationId }), // assuming the conversationId matches the "_id" expected by the endpoint
@@ -580,7 +540,6 @@ export const AppProvider = ({ children }) => {
   
       data = await response.json();
       // console.log({ data });
-
       // if(data && data.taskScheduled){
       //   console.log(data.progress);
       //   setMode(data.vis_mode.mode);
@@ -628,7 +587,6 @@ export const AppProvider = ({ children }) => {
   
 
   useEffect(() => {
-    // console.log({ NewSearch });
     if (!isAuthenticated && mode =="extractFacts"){
       setHideSearchBar(true)
     }
@@ -706,53 +664,62 @@ export const AppProvider = ({ children }) => {
     setSkipDisambiguation(prev => !prev);
   };
 
+  // Function to update regular staked amount and recalculate total
+  const updateRegularStakedAmount = (amount) => {
+    setRegularStakedAmount(amount);
+    const regularAmount = parseFloat(amount || '0');
+    const virtualsAmount = parseFloat(virtualsStakedAmount || '0');
+    const total = (regularAmount + virtualsAmount).toString();
+    setTotalStakedAmount(total);
+  };
+
+  // Function to update Virtuals staked amount and recalculate total
+  const updateVirtualsStakedAmount = (amount) => {
+    setVirtualsStakedAmount(amount);
+    const regularAmount = parseFloat(regularStakedAmount || '0');
+    const virtualsAmount = parseFloat(amount || '0');
+    const total = (regularAmount + virtualsAmount).toString();
+    setTotalStakedAmount(total);
+  };
+
   return (
     <AppContext.Provider value={{ 
-        skipDisambiguation, 
-        setSkipDisambiguation, 
-        toggleSkipDisambiguation,
-        showRewardPopup,
-        setShowRewardPopup,
-        toggleShowRewardPopup,
-        resetRewardPopupPreference,
-        version,
-        setVersion,
-        currentConversation,
-        setCurrentConversation,
-        queries,
-        setQueries,
-        ids,
-        setIds,
-        conversations,
-        setConversations,
-        idHistory, 
-        setIdHistory,
-        isSearchMoved, 
-        setIsSearchMoved,
-        workspaceLoading,
-        mode,
-        setMode,
-        link, setLink, errorDisplay, setErrorDisplay, email, setNewSearch,
-        overlayLogin, setOverlayLogin, hideSearchBar, setHideSearchBar, sourceFindMode, setSourceFindMode,
-        isProUser, setIsProUser, seekto, setSeekto, setSeekTrigger, seektrigger, claimExtractUrl, backendUrl, userLocCity, userLocReg, userLocCtry, headlines,
-        claimsRecieved, setClaimsRecieved,
-        creditsLoading, setCreditsLoading,
-        userCredits, setUserCredits,
+        // Disambiguation & Popup States
+        skipDisambiguation, setSkipDisambiguation, toggleSkipDisambiguation,
+        showRewardPopup, setShowRewardPopup, toggleShowRewardPopup, resetRewardPopupPreference,
+        
+        // App Configuration
+        version, setVersion,
+        mode, setMode,
+        link, setLink,
+        errorDisplay, setErrorDisplay,
+        email,
+        
+        // Conversation States
+        currentConversation, setCurrentConversation,
+        queries, setQueries,
+        ids, setIds,
+        conversations, setConversations,
+        idHistory, setIdHistory,
+        postClaims, setPostClaims,
+        
+        // UI States
+        isSearchMoved, setIsSearchMoved,
+        workspaceLoading, setWorkspaceLoading,
+        NewSearch, setNewSearch,
+        overlayLogin, setOverlayLogin,
+        hideSearchBar, setHideSearchBar,
+        sourceFindMode, setSourceFindMode,
         searchQuery, setSearchQuery,
-        highlightSearch, setHighlightSearch, progress, setProgress,
+        highlightSearch, setHighlightSearch,
+        progress, setProgress,
         hasSeenTut,
         run, setRun,
         forceRun, setForceRun,
-        totalUserCredits, setTotalUserCredits,
-        dailyUserCredits, setDailyUserCredits,
-        temporaryUserCreditsList, setTemporaryUserCreditsList,
-        temporaryExpiries, setTemporaryExpiries,
-        totalTemporaryUserCredits, setTotalTemporaryUserCredits,
-        fetchSubscriptionStatus,
-        discoverPosts, setDiscoverPosts,
-        distributedUrl, setDistributedUrl,
-        postClaims, setPostClaims, accessToken, 
-        setAccessToken,
+        
+        // User & Subscription States
+        isProUser, setIsProUser,
+        accessToken, setAccessToken,
         profile, setProfile,
         profileLoading, setProfileLoading,
         profileLoaded, setProfileLoaded,
@@ -760,8 +727,38 @@ export const AppProvider = ({ children }) => {
         userHandle, setUserHandle,
         handleLoading, setHandleLoading,
         fetchUserHandle,
+        
+        // Credits States
+        userCredits, setUserCredits,
+        creditsLoading, setCreditsLoading,
+        totalUserCredits, setTotalUserCredits,
+        dailyUserCredits, setDailyUserCredits,
         dailyTaskCredits, setDailyTaskCredits,
-        CommunityCredits, setCommunityCredits
+        CommunityCredits, setCommunityCredits,
+        enableSharePoints, setEnableSharePoints, // Controls whether user can earn credits for sharing content. Affects the UI in popups and interaction for sharing based on whether this flag is set
+        totalStakedAmount, setTotalStakedAmount,
+        regularStakedAmount, setRegularStakedAmount,
+        virtualsStakedAmount, setVirtualsStakedAmount,
+        updateRegularStakedAmount,
+        updateVirtualsStakedAmount,
+        temporaryUserCreditsList, setTemporaryUserCreditsList,
+        temporaryExpiries, setTemporaryExpiries,
+        totalTemporaryUserCredits, setTotalTemporaryUserCredits,
+        fetchSubscriptionStatus,
+        
+        // Claims & Processing States
+        claimsRecieved, setClaimsRecieved,
+        
+        // Media & Location States
+        seekto, setSeekto,
+        seektrigger, setSeekTrigger,
+        userLocCity, userLocReg, userLocCtry,
+        headlines,
+        
+        // API & External States
+        claimExtractUrl, backendUrl,
+        distributedUrl, setDistributedUrl,
+        discoverPosts, setDiscoverPosts
         }}>
       {children}
     </AppContext.Provider>

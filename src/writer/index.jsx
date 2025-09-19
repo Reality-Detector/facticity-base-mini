@@ -30,6 +30,7 @@
 
 
 
+"use client";
 import React from 'react';
 import Writer from './Writer';
 import { AppProvider } from './components/AppContext';
@@ -41,7 +42,7 @@ const AuthWriterWrapper = () => {
       domain="dev-5h33aun.us.auth0.com"
       clientId="fvsQ9DT16eWAbmF6IL6ZApvkpdgjtf3L"
       authorizationParams={{
-        redirect_uri: window.location.origin,
+        redirect_uri: typeof window !== 'undefined' ? window.location.origin : 'http://localhost:3000',
         audience: 'https://backend.facticity.ai',
         scope: 'openid profile email offline_access'
       }}

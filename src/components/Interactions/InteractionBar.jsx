@@ -10,6 +10,7 @@ import Button from '@mui/material/Button';
 import TextField from '@mui/material/TextField';
 import CircularProgress from '@mui/material/CircularProgress';
 import { useAppContext } from '../../AppProvider';
+import { TIER_CONFIG } from '../../config/tierConfig';
 import Box from '@mui/material/Box';
 import Paper from '@mui/material/Paper';
 import Badge from '@mui/material/Badge';
@@ -37,6 +38,7 @@ import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 const TASK_ACTIONS_FEEDBACK_COLOR = '#0066FF'; // Define the custom blue color
+import { TIER_MULTIPLIERS } from '../../config/tierConfig';
 
 /**
  * TaskActions component that provides interaction buttons for a task
@@ -58,7 +60,7 @@ const TaskActions = ({ conversation_id, task_id, userEmail, showRatingButtons = 
   const [feedbackText, setFeedbackText] = useState('');
   const [feedbackReason, setFeedbackReason] = useState([]);
   const [loading, setLoading] = useState(false);
-  const { backendUrl, accessToken } = useAppContext();
+  const { backendUrl, accessToken, enableSharePoints, profile } = useAppContext();
   const [postDialogOpen, setPostDialogOpen] = useState(false);
   // const backendUrl = 'http://localhost:5000';
 
@@ -95,6 +97,13 @@ const TaskActions = ({ conversation_id, task_id, userEmail, showRatingButtons = 
   // New state to track if user is logged in
   const isLoggedIn = Boolean(userEmail);
 
+  // Check if user tier is "none" to disable interaction bar
+  const isTierNone = profile?.tier === 'none' || profile?.tier === 'None';
+  const isInteractionDisabled = isTierNone;
+  
+  // Get tier multiplier for credit animations
+  const tierMultiplier = TIER_MULTIPLIERS[profile?.tier?.toLowerCase()] || TIER_MULTIPLIERS.none;
+
   // Add new state for responsive like/dislike buttons
   const [anchorEl, setAnchorEl] = useState(null);
   const [isNarrow, setIsNarrow] = useState(null); // Initialize as null to indicate not yet measured
@@ -126,7 +135,6 @@ const TaskActions = ({ conversation_id, task_id, userEmail, showRatingButtons = 
   // Centralized function to handle POST requests
   const postTaskAction = async (actionType, data = {}) => {
     setLoading(true);
-    // console.log({ task_id });
     try {
       const headers = {
         'Content-Type': 'application/json',
@@ -137,7 +145,7 @@ const TaskActions = ({ conversation_id, task_id, userEmail, showRatingButtons = 
         headers['Authorization'] = `Bearer ${accessToken}`;
       }
       
-      const response = await fetch(backendUrl+`/api/tasks/${task_id}/${actionType}`, {
+      const response = await fetch(`/api/api/tasks/${task_id}/${actionType}`, {
         method: 'POST',
         headers: headers,
         body: JSON.stringify({
@@ -426,7 +434,7 @@ const TaskActions = ({ conversation_id, task_id, userEmail, showRatingButtons = 
         // Don't proceed if no email or task ID
         if (!userEmail || !task_id) {
             console.log("Cannot reward points: missing user email or task ID");
-            return;
+            return { success: false, message: "Missing user email or task ID" };
         }
         
         const headers = {
@@ -461,14 +469,14 @@ const TaskActions = ({ conversation_id, task_id, userEmail, showRatingButtons = 
                 setDailyTaskCredits(data.lifetimeCredits || 0);
                 setCommunityCredits(data.communityCredits || 0);
             }
-            return true;
+            return { success: true, message: data.message || "Thank you!" };
         } else {
             console.error("Failed to reward points:", data.message || "Unknown error");
-            return false;
+            return { success: false, message: data.message || "Unknown error" };
         }
     } catch (error) {
         console.error("Error rewarding points:", error);
-        return false;
+        return { success: false, message: "Error processing reward" };
     }
 };
 
@@ -493,11 +501,12 @@ const TaskActions = ({ conversation_id, task_id, userEmail, showRatingButtons = 
       const pointsToAward = hasTextFeedback ? 6 : 3;
       
       // First check if we can award bonus points
-      const canAwardPoints = await rewardBonusPoint('feedback', pointsToAward);
+      const rewardResult = await rewardBonusPoint('feedback', pointsToAward);
       
-      if (canAwardPoints) {
-        // Set the credit amount for the animation
+      if (rewardResult.success) {
+        // Set the credit amount and messagefor the animation
         setCreditAmount(pointsToAward);
+        setRewardMessage(rewardResult.message);
         
         // Show credit animation
         setShowCreditAnimation(true);
@@ -509,6 +518,8 @@ const TaskActions = ({ conversation_id, task_id, userEmail, showRatingButtons = 
           setFeedbackReason([]);
         }, 2500);
       } else {
+        // Set the message for "already awarded" animation
+        setRewardMessage(rewardResult.message);
         // Show "already awarded" animation
         setShowAlreadyAwardedAnimation(true);
         
@@ -549,12 +560,18 @@ const TaskActions = ({ conversation_id, task_id, userEmail, showRatingButtons = 
 
   // Function to handle share completion and reward
   const handleShareComplete = async (platform) => {
+    // Only award points if sharing points are enabled
+    if (!enableSharePoints) {
+      return;
+    }
     // Show animation for credits after 2 seconds
     setTimeout(async () => {
       // Check if we can award bonus points
-      const canAwardPoints = await rewardBonusPoint(platform, 2);
+      const rewardResult = await rewardBonusPoint(platform, 2);
       
-      if (canAwardPoints) {
+      if (rewardResult.success) {
+        // Set the message for the animation
+        setRewardMessage(rewardResult.message);
         // Show animation for credits
         setShowShareCreditAnimation(true);
         
@@ -563,6 +580,8 @@ const TaskActions = ({ conversation_id, task_id, userEmail, showRatingButtons = 
           setShowShareCreditAnimation(false);
         }, 2500);
       } else {
+        // Set the message for "already awarded" animation
+        setRewardMessage(rewardResult.message);
         // Show "already awarded" animation
         setShowAlreadyAwardedAnimation(true);
         
@@ -584,12 +603,16 @@ const TaskActions = ({ conversation_id, task_id, userEmail, showRatingButtons = 
 
   // Add new state for credit amount
   const [creditAmount, setCreditAmount] = useState(3);
+  const [rewardMessage, setRewardMessage] = useState("");
 
   return (
     <Box sx={{ 
       padding: '10px',
       transition: 'all 0.3s ease',
-      position: 'relative' // For absolute positioning of animation
+      position: 'relative', // For absolute positioning of animation
+      opacity: isInteractionDisabled ? 0.4 : 1,
+      pointerEvents: isInteractionDisabled ? 'none' : 'auto',
+      filter: isInteractionDisabled ? 'grayscale(100%)' : 'none'
     }}>
       {/* Credit Animation */}
       <AnimatePresence>
@@ -633,7 +656,7 @@ const TaskActions = ({ conversation_id, task_id, userEmail, showRatingButtons = 
               transition={{ delay: 0.2, duration: 0.4 }}
               sx={{ mb: 1, fontWeight: 'bold', fontSize: '1.2rem' }}
             >
-              Thank You!
+              {rewardMessage || 'Thank You!'}
             </Box>
             
             <Box
@@ -660,6 +683,16 @@ const TaskActions = ({ conversation_id, task_id, userEmail, showRatingButtons = 
                 sx={{ fontSize: '1.5rem' }}
               >
                 +{creditAmount} Credits
+                {tierMultiplier > 1 && (
+                  <Box component="span" sx={{ 
+                    fontSize: '1rem', 
+                    ml: 1, 
+                    opacity: 0.8,
+                    fontWeight: 'normal'
+                  }}>
+                    x{tierMultiplier}
+                  </Box>
+                )}
               </Box>
             </Box>
             
@@ -753,7 +786,7 @@ const TaskActions = ({ conversation_id, task_id, userEmail, showRatingButtons = 
               transition={{ delay: 0.2, duration: 0.4 }}
               sx={{ mb: 1, fontWeight: 'bold', fontSize: '1.2rem' }}
             >
-              Thanks for sharing!
+              {rewardMessage || 'Thanks for sharing!'}
             </Box>
             
             <Box
@@ -780,6 +813,16 @@ const TaskActions = ({ conversation_id, task_id, userEmail, showRatingButtons = 
                 sx={{ fontSize: '1.5rem' }}
               >
                 +2 Credits
+                {tierMultiplier > 1 && (
+                  <Box component="span" sx={{ 
+                    fontSize: '1rem', 
+                    ml: 1, 
+                    opacity: 0.8,
+                    fontWeight: 'normal'
+                  }}>
+                    x{tierMultiplier}
+                  </Box>
+                )}
               </Box>
             </Box>
             
@@ -830,7 +873,7 @@ const TaskActions = ({ conversation_id, task_id, userEmail, showRatingButtons = 
               transition={{ delay: 0.2, duration: 0.4 }}
               sx={{ mb: 1, fontWeight: 'bold', fontSize: '1.2rem' }}
             >
-              Thank You!
+              {rewardMessage || 'Thank You!'}
             </Box>
             
             <Box
@@ -844,7 +887,7 @@ const TaskActions = ({ conversation_id, task_id, userEmail, showRatingButtons = 
                 color: '#555'
               }}
             >
-              Points already awarded for this action.
+              {rewardMessage || 'Points already awarded for this action.'}
             </Box>
           </Box>
         )}
@@ -856,6 +899,27 @@ const TaskActions = ({ conversation_id, task_id, userEmail, showRatingButtons = 
         gap: '12px',
         width: '100%'
       }}>
+        {/* Tier restriction message */}
+        {isInteractionDisabled && (
+          <Box sx={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            padding: '12px 16px',
+            backgroundColor: 'rgba(255, 193, 7, 0.1)',
+            border: '1px solid rgba(255, 193, 7, 0.3)',
+            borderRadius: '8px',
+            marginBottom: '8px'
+          }}>
+            <Typography variant="body2" sx={{ 
+              color: '#f57c00',
+              fontWeight: 500,
+              textAlign: 'center'
+            }}>
+              Buy FACY to interact with fact-checks
+            </Typography>
+          </Box>
+        )}
         {/* Action buttons group */}
         <Box sx={{
           display: 'flex',
@@ -894,7 +958,7 @@ const TaskActions = ({ conversation_id, task_id, userEmail, showRatingButtons = 
                   transition: 'all 0.2s ease',
                   cursor: 'not-allowed'
                 }}
-                disabled={true}
+                disabled={true || isInteractionDisabled}
                 size="small"
               >
                 <PostAddIcon fontSize="small" />
@@ -942,7 +1006,7 @@ const TaskActions = ({ conversation_id, task_id, userEmail, showRatingButtons = 
           </Tooltip>
 
           {/* Share Button */}
-          <Tooltip title={isLoggedIn ? "Share and earn 8 credits (2 per social share)" : "Login to share"}>
+          <Tooltip title={isInteractionDisabled ? "Upgrade your tier to share" : (isLoggedIn ? (enableSharePoints ? "Share and earn 8 credits (2 per social share)" : "Share this fact-check") : "Login to share")}>
             <Box sx={{ 
               display: 'flex', 
               flexDirection: 'column', 
@@ -968,7 +1032,7 @@ const TaskActions = ({ conversation_id, task_id, userEmail, showRatingButtons = 
                   transition: 'all 0.2s ease',
                   cursor: isLoggedIn ? 'pointer' : 'not-allowed'
                 }}
-                disabled={loading || !isLoggedIn}
+                disabled={loading || !isLoggedIn || isInteractionDisabled}
                 size="small"
               >
                 <SendIcon fontSize="small" />
@@ -990,14 +1054,14 @@ const TaskActions = ({ conversation_id, task_id, userEmail, showRatingButtons = 
                   }
                 }}
               >
-                Share (+8)
+                {enableSharePoints ? 'Share (+8)' : 'Share'}
               </Typography>
             </Box>
           </Tooltip>
 
           {/* Rate Button */}
           {showRatingButtons && (
-            <Tooltip title={isLoggedIn ? "Rate this fact-check" : "Login to rate"}>
+            <Tooltip title={isInteractionDisabled ? "Upgrade your tier to rate" : (isLoggedIn ? "Rate this fact-check" : "Login to rate")}>
               <Box sx={{ 
                 display: 'flex', 
                 flexDirection: 'column', 
@@ -1022,7 +1086,7 @@ const TaskActions = ({ conversation_id, task_id, userEmail, showRatingButtons = 
                     transition: 'all 0.2s ease',
                     cursor: isLoggedIn ? 'pointer' : 'not-allowed'
                   }}
-                  disabled={loading || !isLoggedIn}
+                  disabled={loading || !isLoggedIn || isInteractionDisabled}
                   size="small"
                 >
                   {liked ? <ThumbUpOffAltIcon fontSize="small" /> : 
@@ -1054,7 +1118,7 @@ const TaskActions = ({ conversation_id, task_id, userEmail, showRatingButtons = 
         </Box>
 
         {/* Credits badge */}
-        {showRatingButtons && (
+        {showRatingButtons && !isInteractionDisabled && (
           <Box component="span" sx={{ 
             fontSize: '0.85rem', 
             color: TASK_ACTIONS_FEEDBACK_COLOR, 
@@ -1068,7 +1132,7 @@ const TaskActions = ({ conversation_id, task_id, userEmail, showRatingButtons = 
             marginLeft: '8px',
             marginTop: '18px',
           }}>
-            Get more credits!
+            Engage and earn FACY!
           </Box>
         )}
       </Box>
@@ -1151,7 +1215,10 @@ const TaskActions = ({ conversation_id, task_id, userEmail, showRatingButtons = 
         <Divider />
         <DialogContent sx={{ padding: '24px' }}>
           <Typography variant="body2" sx={{ mb: 3, color: '#666' }}>
-            Share this fact-check with your network: +2 credits per social share.
+          {enableSharePoints 
+              ? 'Share this fact-check with your network: +2 credits per social share.'
+              : 'Share this fact-check with your network.'
+            }
           </Typography>
           
           <Stack spacing={2}>
@@ -1399,6 +1466,23 @@ const TaskActions = ({ conversation_id, task_id, userEmail, showRatingButtons = 
              `Submit & Get ${feedbackText.trim().length > 0 ? '6' : '3'} Credits`}
           </Button>
         </DialogActions>
+
+        {/* Tier multiplier display - positioned at bottom of dialog */}
+        {tierMultiplier > 1 && (
+          <Box sx={{
+            fontSize: '0.75rem',
+            color: 'text.secondary',
+            textAlign: 'center',
+            padding: '8px 24px 16px 24px',
+            opacity: 0.8
+          }}>
+            {profile?.tier?.toLowerCase() !== 'none' && (
+              <>
+                {profile?.tier} Tier: {tierMultiplier}x multiplier
+              </>
+            )}
+          </Box>
+        )}
       </Dialog>
 
       {/* Popover for Notifications */}

@@ -1,3 +1,4 @@
+"use client";
 import React, { useState, useContext, useEffect } from 'react';
 import {
   Grid,
@@ -10,7 +11,8 @@ import {
   Backdrop,
   Fade,
   IconButton,
-  useMediaQuery
+  useMediaQuery,
+  Avatar
 } from '@mui/material';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import CloseIcon from '@mui/icons-material/Close';
@@ -21,7 +23,7 @@ import { AppContext } from './components/AppContext';
 import useAuth from '../auth/useAuthHook';
 import { useAppContext } from '../AppProvider';
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
-import { useNavigate } from 'react-router-dom';
+import { useRouter } from 'next/navigation';
 import Credits from '../components/Credits';
 // Create a custom theme (optional)
 const theme = createTheme({
@@ -43,11 +45,16 @@ function Writer() {
   const [fontName, setFontName] = useState('Arial');
   const [fontColor, setFontColor] = useState('#000000');
   const [isTaskpaneVisible, setTaskpaneVisible] = useState(true);
-  const [isLandscape, setIsLandscape] = useState(window.innerWidth > window.innerHeight);
+  const [isLandscape, setIsLandscape] = useState(() => {
+    if (typeof window !== 'undefined') {
+      return window.innerWidth > window.innerHeight;
+    }
+    return true; // Default to landscape for SSR
+  });
 
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, user } = useAuth();
   const { userCredits, creditsLoading, componentsLoaded } = useAppContext();
-  const navigate = useNavigate();
+  const router = useRouter();
   const isMdUp = useMediaQuery(theme.breakpoints.up('md'));
 
   const [isModalOpen, setModalOpen] = useState(false);
@@ -226,7 +233,7 @@ function Writer() {
             backgroundColor: '#F1F3FE',
             boxShadow: 'none',
             borderBottom: '2px solid #0066FF',
-            padding: '8px 16px',
+            padding: '4px 16px',
             zIndex: 1201,
           }}
         >
@@ -236,7 +243,7 @@ function Writer() {
                 src="/facticityailogo-02.png"
                 alt="Facticity.AI"
                 style={{
-                  height: '32px',
+                  height: '28px',
                   width: 'auto',
                 }}
               />
@@ -266,10 +273,21 @@ function Writer() {
                 transition: 'opacity 0.6s ease-in-out 0.4s',
               }}
             >
-              <IconButton onClick={() => navigate('/rewards')} size="small" sx={{ ml: 1 }}>
+              <IconButton onClick={() => router.push('/rewards')} size="small" sx={{ ml: 1 }}>
               <InfoOutlinedIcon fontSize="small" />
             </IconButton>
               <Credits credits={userCredits} isLoading={creditsLoading} />
+              <IconButton 
+                onClick={() => navigate('/settings')} 
+                size="small" 
+                sx={{ ml: 1 }}
+              >
+                <Avatar
+                  src={user?.picture}
+                  alt={user?.name}
+                  sx={{ width: 32, height: 32 }}
+                />
+              </IconButton>
             </Box>
           )}
 
@@ -309,7 +327,11 @@ function Writer() {
               <Button
                 variant="contained"
                 color="primary"
-                onClick={() => (window.location.href = '/')} // Navigate to the root
+                onClick={() => {
+                  if (typeof window !== 'undefined') {
+                    window.location.href = '/';
+                  }
+                }} // Navigate to the root
                 sx={{ marginTop: '16px' }}
               >
                 Return to Facticity Web

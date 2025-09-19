@@ -128,7 +128,7 @@ export const getTokenWithFallback = async (getAccessTokenSilently, logout = null
       if (logout) {
         console.log('Attempting to logout user to resolve refresh token issue...');
         try {
-          await logout({ logoutParams: { returnTo: window.location.origin } });
+          await logout({ returnTo: window.location.origin });
           return { token: null, needsReauth: true };
         } catch (logoutError) {
           console.error('Error during logout:', logoutError);

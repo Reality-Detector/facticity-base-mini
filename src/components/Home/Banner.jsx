@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import './Banner.css'; // Import the CSS for styling
+import '@/styles/Banner.css'; // Import the CSS for styling
 import CloseIcon from '@mui/icons-material/Close';
 
 const Banner = ({ isVisible, setIsVisible }) => {

@@ -1,5 +1,8 @@
+'use client';
+
 // SearchComponent.jsx
 import React, { useState, useEffect, useRef } from 'react';
+import { getTierInfo, getAllTiers } from '../../config/tierConfig';
 import {
   Typography,
   Box,
@@ -13,6 +16,7 @@ import {
   CardContent,
   Stack,
   //useTheme,
+  Button,
   Chip,
   IconButton,
   CircularProgress,
@@ -27,29 +31,34 @@ import {
   ListItemText,
   Collapse,
 } from "@mui/material";
-import FactCheckDisplay from '../FactCheckDisplay/FactCheckDisplay';
-import '../animation.css'; // Ensure .search-container styles are removed/commented out
-import '../scrollbar.css';
+import FactCheckDisplay from '../FactCheckDisplay';
+import './animation.css'; // Ensure .search-container styles are removed/commented out
+import './scrollbar.css';
 import { useAppContext } from '../../AppProvider';
 import { v4 as uuidv4 } from 'uuid';
 import SearchBar from './searchBar';
 import ErrorComponent from './ErrorComponent';
 import VideoParagraphComponent from '../Video/videoExpand';
 import useAuth from '../../auth/useAuthHook';
-import { Button as NESButton, setDarkModeActivation } from "nes-ui-react";
-import MUIButton from "@mui/material/Button";
+// import { Button, setDarkModeActivation } from "nes-ui-react";
 
 
 import Snackbar from '@mui/material/Snackbar';
 import Alert from '@mui/material/Alert';
 import axios from "axios";
 import HeadlineDisplay from './HeadlineDisplay';
+
+import ArrowBackIosNewIcon from "@mui/icons-material/ArrowBackIosNew";
+import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
 import ExampleCards from "./Examples";
+import DexScreener from "./dexscreener.jsx";
 
-import {  } from '@mui/icons-material';
+import { KeyboardArrowLeft, KeyboardArrowRight, KeyboardArrowDown, KeyboardArrowUp } from '@mui/icons-material';
 import EmojiEventsIcon from '@mui/icons-material/EmojiEvents';
+import TokenIcon from '@mui/icons-material/Token';
 
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useRouter, usePathname } from 'next/navigation';
+import Link from 'next/link';
 
 import {
   Dialog,
@@ -59,47 +68,26 @@ import {
 } from "@mui/material";
 
 //import { Collapse } from "@mui/material";
+import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
+import ExpandLessIcon from "@mui/icons-material/ExpandLess";
 import ErrorOutlineIcon from "@mui/icons-material/ErrorOutline";
-import { Link } from 'react-router-dom';
+import Game from '../../archived/game';
 
-import { KeyboardArrowLeft, KeyboardArrowRight, KeyboardArrowDown, KeyboardArrowUp, Image as ImageIcon, Description as FileTextIcon, YouTube as YoutubeIcon, TextFields as TextIcon, UnfoldLess as UnfoldLessIcon, UnfoldMore as UnfoldMoreIcon, ShoppingCart as ShoppingCartIcon, ShoppingBagSharp } from "@mui/icons-material";
+import { Image as ImageIcon, Description as FileTextIcon, YouTube as YoutubeIcon, TextFields as TextIcon, UnfoldLess as UnfoldLessIcon, UnfoldMore as UnfoldMoreIcon } from "@mui/icons-material";
 
 // Buy $FACY Button Component
 const BuyFACYButton = ({ variant = "contained", size = "medium", sx = {} }) => {
   const handleBuyFACY = () => {
-    window.open('https://app.uniswap.org/swap?chain=base&inputCurrency=NATIVE&outputCurrency=0xfac77f01957ed1b3dd1cbea992199b8f85b6e886', '_blank', 'noopener,noreferrer');
+    // Open Uniswap on Base chain with ETH as input and $FACY as output
+    window.open('https://app.uniswap.org/swap?chain=base&inputCurrency=NATIVE&outputCurrency=0xfac77f01957ed1b3dd1cbea992199b8f85b6e886', '_blank');
   };
 
-  const isOutlined = variant === 'outlined';
-
   return (
-    <Chip
-      icon={<ShoppingCartIcon fontSize="small" />}
-      label="Buy $FACY"
-      clickable
-      onClick={handleBuyFACY}
-      sx={{
-        fontWeight: 700,
-        borderRadius: '16px',
-        // Filled vs outlined styles to keep a slight distinction
-        bgcolor: isOutlined ? 'transparent' : 'rgba(0, 102, 255, 0.12)',
-        color: isOutlined ? '#0066FF' : '#0052CC',
-        border: isOutlined ? '1px solid rgba(0, 102, 255, 0.35)' : '1px solid rgba(0, 102, 255, 0.22)',
-        boxShadow: 'none',
-        '&:hover': {
-          bgcolor: isOutlined ? 'rgba(0, 102, 255, 0.08)' : 'rgba(0, 102, 255, 0.18)',
-        },
-        '& .MuiChip-icon': {
-          color: 'inherit',
-          marginLeft: '8px',
-        },
-        '& .MuiChip-label': {
-          paddingLeft: '4px',
-        },
-        // Inherit caller-provided sizing so it sits well next to other chips
-        ...sx,
-      }}
-    />
+    <Button
+    color="warning" borderInverted onClick={handleBuyFACY}
+    >
+      Buy $FACY
+    </Button>
   );
 };
 
@@ -112,7 +100,7 @@ const CompactLeaderboardDisplay = () => {
   const [userHandle, setUserHandle] = useState('');
   const { backendUrl, accessToken } = useAppContext();
   const { isAuthenticated, user } = useAuth();
-  const navigate = useNavigate();
+  const router = useRouter();
 
   // Fetch user handle when authenticated
   useEffect(() => {
@@ -133,7 +121,7 @@ const CompactLeaderboardDisplay = () => {
         headers['Validator'] = 'privy';
       }
       
-      const response = await fetch(`${backendUrl}/api/get_userhandle?email=${encodeURIComponent(user.email)}`, {
+      const response = await fetch(`${backendUrl}/api/get_userhandle?email=${encodeURIComponent(user.id)}`, {
         headers: headers,
       });
       if (!response.ok) throw new Error('Failed to fetch user handle');
@@ -434,7 +422,316 @@ const CompactLeaderboardDisplay = () => {
   );
 };
 
+// Enhanced Carousel component for discover posts
+// const DiscoverPostCarousel = ({ posts = [] }) => {
+//   const [activeIndex, setActiveIndex] = useState(0);
+//   const [imgError, setImgError] = useState({});
+//   const theme = useTheme();
+//   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
+//   const carouselRef = useRef(null);
+//   const navigate = useNavigate();
 
+//   useEffect(() => {
+//     if (posts.length > 1) {
+//       const interval = setInterval(() => {
+//         setActiveIndex((prevIndex) => (prevIndex + 1) % posts.length);
+//       }, 5000); // Change post every 5 seconds
+//       return () => clearInterval(interval);
+//     }
+//   }, [posts.length]);
+
+//   if (posts.length === 0) {
+//     return (
+//       <Box sx={{ textAlign: 'center' }}>
+//         <Skeleton variant="rectangular" height={200} sx={{ borderRadius: 1 }} />
+//       </Box>
+//     );
+//   }
+
+//   const handlePrev = (e) => {
+//     e.stopPropagation();
+//     setActiveIndex((prevIndex) => (prevIndex - 1 + posts.length) % posts.length);
+//   };
+
+//   const handleNext = (e) => {
+//     e.stopPropagation();
+//     setActiveIndex((prevIndex) => (prevIndex + 1) % posts.length);
+//   };
+
+//   const handlePostClick = (postId) => {
+//     navigate(`/discover/feed?scrollTo=${postId}`);
+//   };
+
+//   const handleImageError = (postId) => {
+//     setImgError(prev => ({ ...prev, [postId]: true }));
+//   };
+
+//   const currentPost = posts[activeIndex];
+
+//   return (
+//     <Box sx={{ position: 'relative', width: '100%', maxWidth: '100%', overflow: 'hidden' }}>
+//       {/* Single post card */}
+//       <Card 
+//         sx={{ 
+//           borderRadius: 2, 
+//           boxShadow: '0 2px 8px rgba(0, 0, 0, 0.08)',
+//           transition: 'all 0.3s ease',
+//           width: '100%',
+//           maxWidth: '100%', // Prevent expansion beyond container
+//           height: 200,
+//           display: 'flex',
+//           overflow: 'hidden', // Prevent content overflow
+//           '&:hover': {
+//             boxShadow: '0 4px 12px rgba(0, 102, 255, 0.15)',
+//             transform: 'translateY(-2px)'
+//           }
+//         }}
+//       >
+//         <CardActionArea 
+//           onClick={() => handlePostClick(currentPost.id)}
+//           sx={{ 
+//             width: '100%', 
+//             maxWidth: '100%', // Prevent expansion beyond container
+//             height: '100%', 
+//             display: 'flex', 
+//             alignItems: 'stretch',
+//             overflow: 'hidden' // Prevent content overflow
+//           }}
+//         >
+//           {/* Thumbnail Image */}
+//           <Box
+//             sx={{
+//               width: 120,
+//               minWidth: 120,
+//               maxWidth: 120, // Ensure thumbnail doesn't expand
+//               height: '100%',
+//               overflow: 'hidden',
+//               background: '#e3edfc',
+//               display: 'flex',
+//               alignItems: 'center',
+//               justifyContent: 'center',
+//               borderRadius: '8px 0 0 8px',
+//               flexShrink: 0 // Prevent shrinking
+//             }}
+//           >
+//             {currentPost.thumbnail && !imgError[currentPost.id] ? (
+//               <Box
+//                 component="img"
+//                 src={currentPost.thumbnail}
+//                 alt="Post thumbnail"
+//                 onError={() => handleImageError(currentPost.id)}
+//                 sx={{
+//                   width: '100%',
+//                   height: '100%',
+//                   objectFit: 'cover',
+//                   display: 'block',
+//                 }}
+//               />
+//             ) : (
+//               <Box
+//                 component="img"
+//                 src="/facticityailogo-03.png"
+//                 alt="Facticity.AI logo"
+//                 sx={{
+//                   width: '80%',
+//                   height: 'auto',
+//                   maxHeight: '60%',
+//                   objectFit: 'contain',
+//                 }}
+//               />
+//             )}
+//           </Box>
+
+//           {/* Content */}
+//           <CardContent sx={{ 
+//             flex: 1, 
+//             minWidth: 0, // Allow flex child to shrink
+//             p: 1.5, 
+//             display: 'flex', 
+//             flexDirection: 'column', 
+//             justifyContent: 'space-between',
+//             height: '100%',
+//             overflow: 'hidden' // Prevent content overflow
+//           }}>
+//             {/* Main content area */}
+//             <Box sx={{ flex: 1 }}>
+//               {/* Fact Check Query - Primary content */}
+//               <Typography 
+//                 variant="caption" 
+//                 sx={{ 
+//                   color: 'rgba(0, 102, 255, 0.7)', 
+//                   fontWeight: 500, 
+//                   fontSize: '0.7rem',
+//                   display: 'block',
+//                   mb: 0.5,
+//                   textAlign: 'left'
+//                 }}
+//               >
+//                 Fact Check:
+//               </Typography>
+//               <Typography 
+//                 variant="subtitle2" 
+//                 sx={{ 
+//                   fontWeight: 'bold', 
+//                   fontSize: '0.85rem',
+//                   lineHeight: 1.3,
+//                   mb: 1.5,
+//                   color: '#0066FF',
+//                   overflow: 'hidden',
+//                   textOverflow: 'ellipsis',
+//                   display: '-webkit-box',
+//                   WebkitLineClamp: 2,
+//                   WebkitBoxOrient: 'vertical',
+//                   textAlign: 'left'
+//                 }}
+//               >
+//                 {currentPost.query || "Fact check query not available"}
+//               </Typography>
+              
+//               {/* Username with @ prefix */}
+//               <Typography 
+//                 variant="caption" 
+//                 sx={{ 
+//                   fontSize: '0.75rem',
+//                   color: '#0066FF',
+//                   fontWeight: 600,
+//                   mb: 1,
+//                   display: 'block',
+//                   textAlign: 'left'
+//                 }}
+//               >
+//                 @{currentPost.publish_name || "anonymous"}
+//               </Typography>
+
+//               {/* User Title */}
+//               <Typography 
+//                 variant="body2" 
+//                 sx={{ 
+//                   fontWeight: 'bold',
+//                   fontSize: '0.8rem',
+//                   lineHeight: 1.2,
+//                   mb: 0.5,
+//                   color: 'text.primary',
+//                   overflow: 'hidden',
+//                   textOverflow: 'ellipsis',
+//                   display: '-webkit-box',
+//                   WebkitLineClamp: 1,
+//                   WebkitBoxOrient: 'vertical',
+//                   textAlign: 'left'
+//                 }}
+//               >
+//                 {currentPost.publish_title || "Untitled Post"}
+//               </Typography>
+
+//               {/* Description */}
+//               <Typography 
+//                 variant="body2" 
+//                 sx={{ 
+//                   fontSize: '0.75rem',
+//                   color: 'text.secondary',
+//                   lineHeight: 1.3,
+//                   overflow: 'hidden',
+//                   textOverflow: 'ellipsis',
+//                   display: '-webkit-box',
+//                   WebkitLineClamp: 2,
+//                   WebkitBoxOrient: 'vertical',
+//                   textAlign: 'left'
+//                 }}
+//               >
+//                 {(currentPost.description || currentPost.publish_description || currentPost.result_text)?.substring(0, 120) || "No description available"}
+//                 {(currentPost.description || currentPost.publish_description || currentPost.result_text)?.length > 120 ? '...' : ''}
+//               </Typography>
+//             </Box>
+
+//             {/* Bottom action button */}
+//             <Box sx={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center', mt: 1 }}>
+//               <Chip 
+//                 label="View" 
+//                 size="small" 
+//                 sx={{ 
+//                   fontSize: '0.65rem', 
+//                   bgcolor: '#0066FF', 
+//                   color: 'white',
+//                   height: '20px',
+//                   '&:hover': {
+//                     bgcolor: '#004FCC'
+//                   }
+//                 }}
+//               />
+//             </Box>
+//           </CardContent>
+//         </CardActionArea>
+//       </Card>
+
+//       {/* Navigation arrows (only show if more than 1 post) */}
+//       {posts.length > 1 && (
+//         <>
+//           <IconButton 
+//             size="small" 
+//             sx={{ 
+//               position: 'absolute', 
+//               left: 4, 
+//               top: '50%', 
+//               transform: 'translateY(-50%)', 
+//               bgcolor: 'rgba(255,255,255,0.9)',
+//               boxShadow: '0 2px 5px rgba(0,0,0,0.2)',
+//               width: 28,
+//               height: 28,
+//               zIndex: 2,
+//               '&:hover': {
+//                 bgcolor: 'rgba(255,255,255,1)'
+//               }
+//             }}
+//             onClick={handlePrev}
+//           >
+//             <ArrowBackIosNewIcon fontSize="small" />
+//           </IconButton>
+//           <IconButton 
+//             size="small" 
+//             sx={{ 
+//               position: 'absolute', 
+//               right: 4, 
+//               top: '50%', 
+//               transform: 'translateY(-50%)', 
+//               bgcolor: 'rgba(255,255,255,0.9)',
+//               boxShadow: '0 2px 5px rgba(0,0,0,0.2)',
+//               width: 28,
+//               height: 28,
+//               zIndex: 2,
+//               '&:hover': {
+//                 bgcolor: 'rgba(255,255,255,1)'
+//               }
+//             }}
+//             onClick={handleNext}
+//           >
+//             <ArrowForwardIosIcon fontSize="small" />
+//           </IconButton>
+//         </>
+//       )}
+
+//       {/* Navigation dots */}
+//       {posts.length > 1 && (
+//         <Box sx={{ display: 'flex', justifyContent: 'center', mt: 1.5 }}>
+//           {posts.map((_, index) => (
+//             <Box
+//               key={index}
+//               sx={{
+//                 width: 6,
+//                 height: 6,
+//                 mx: 0.5,
+//                 borderRadius: '50%',
+//                 backgroundColor: index === activeIndex ? '#0066FF' : '#C4C4C4',
+//                 cursor: 'pointer',
+//                 transition: 'all 0.2s ease'
+//               }}
+//               onClick={() => setActiveIndex(index)}
+//             />
+//           ))}
+//         </Box>
+//       )}
+//     </Box>
+//   );
+// };
 
 const InitialStatePanel = ({
   scrollableDivRef,
@@ -455,6 +752,8 @@ const InitialStatePanel = ({
       p={0} 
       sx={{
         fontFamily: 'IBM Plex Sans',
+        maxHeight: { xs: '80vh', md: '85vh' }, // Add a maxHeight for scrollability
+        overflowY: 'auto', // Enable vertical scrolling
         backgroundColor: 'transparent', // Make the card transparent
         border: 'none', // Remove border
         p: 2, // Add padding around the card
@@ -486,9 +785,9 @@ const InitialStatePanel = ({
               }}
             >
               <Chip
-                label="Refer and earn!"
+                label="Points Breakdown"
                 clickable
-                component="a"
+                component={Link}
                 href="/rewards"
                 sx={{
                   bgcolor: "#0066FF",
@@ -516,6 +815,21 @@ const InitialStatePanel = ({
                 }}
               />
               <Chip
+                label="Tagged Tweets"
+                clickable
+                component={Link}
+                href="/tagged-tweets"
+                sx={{
+                  bgcolor: "#0066FF",
+                  color: "white",
+                  fontSize: { xs: "12px", sm: "14px" },
+                  px: { xs: 0.75, sm: 1 },
+                  py: { xs: 0.2, sm: 0.25 },
+                  "&:hover": { bgcolor: "#004FCC" },
+                }}
+              />
+              {/* Writer chip disabled */}
+              {/* <Chip
                 label="Writer"
                 clickable
                 component="a"
@@ -528,7 +842,7 @@ const InitialStatePanel = ({
                   py: { xs: 0.2, sm: 0.25 },
                   "&:hover": { bgcolor: "#004FCC" },
                 }}
-              />
+              /> */}
               <BuyFACYButton 
                 variant="contained"
                 size="small"
@@ -610,9 +924,10 @@ const InitialStatePanel = ({
                     >
                       Our multi-modal and multi-lingual fact-checker can fact-check text claims, video URLs from social media platforms - try it out using the search bar below!
                       <br /><br />
-                      Plus, meet the{' '}
+                      {/* Writer link disabled */}
+                      {/* Plus, meet the{' '}
                       <Link
-                        to="/writer"
+                        href="/writer"
                         style={{
                           color: "#0066FF",
                           textDecoration: "underline",
@@ -621,7 +936,7 @@ const InitialStatePanel = ({
                       >
                         Facticity.AI "Writer"
                       </Link>
-                      {' '}to assist you in essays, assignments, and research.
+                      {' '}to assist you in essays, assignments, and research. */}
                     </Typography>
                     
                     {/* Show More/Less Button */}
@@ -631,29 +946,24 @@ const InitialStatePanel = ({
                       mt: 'auto',
                       pt: 1
                     }}>
-                      <MUIButton
+                      <Button
                         size="small"
                         onClick={() => setAboutExpanded(!aboutExpanded)}
-                        variant="outlined"
                         sx={{
                           fontSize: '0.75rem',
                           fontWeight: 600,
                           color: '#0066FF',
                           textTransform: 'none',
                           minHeight: 'auto',
-                          px: 1.5,
-                          py: 0.5,
-                          borderRadius: '999px',
-                          borderColor: 'rgba(0, 102, 255, 0.35)',
+                          padding: '4px 12px',
                           '&:hover': {
-                            backgroundColor: 'rgba(0, 102, 255, 0.06)',
-                            borderColor: '#0066FF',
+                            backgroundColor: 'rgba(0, 102, 255, 0.08)',
                           }
                         }}
-                        endIcon={aboutExpanded ? <KeyboardArrowUp sx={{ fontSize: '1rem' }} /> : <KeyboardArrowDown sx={{ fontSize: '1rem' }} />}
+                        endIcon={aboutExpanded ? <ExpandLessIcon sx={{ fontSize: '1rem' }} /> : <ExpandMoreIcon sx={{ fontSize: '1rem' }} />}
                       >
                         {aboutExpanded ? 'Show less' : 'Show more'}
-                      </MUIButton>
+                      </Button>
                     </Box>
                   </Box>
                 </Box>
@@ -764,6 +1074,27 @@ const InitialStatePanel = ({
                   </Box>
                 )}
 
+                {/* DexScreener Chart */}
+                <Box sx={{ 
+                  border: '2px solid rgba(0, 102, 255, 0.2)',
+                  borderRadius: 2,
+                  p: 2,
+                  bgcolor: '#F1F3FE',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  flexShrink: 0,
+                  height: { xs: 'auto', md: 'auto' },
+                  minHeight: { xs: 'auto', md: '400px' },
+                  boxShadow: '0 4px 12px rgba(0, 102, 255, 0.15)',
+                }}>
+                  <Box sx={{ 
+                    flex: 1,
+                    overflow: 'hidden',
+                    borderRadius: 1,
+                  }}>
+                    <DexScreener />
+                  </Box>
+                </Box>
 
               </Box>
             </Box>
@@ -795,8 +1126,8 @@ const SearchComponent = ({ isSearchMoved, setIsSearchMoved, isMdUp, initialUrlPa
   const [isProDialogOpen, setProDialogOpen] = useState(false);
   const [showExamples, setShowExamples] = useState(true);
   const [aboutExpanded, setAboutExpanded] = useState(false); // Add state for about expansion
-  const location = useLocation();
-  const isGamePath = location.pathname === '/game';
+  const pathname = usePathname();
+  const isGamePath = pathname === '/game';
 
   const {
     version,
@@ -830,6 +1161,8 @@ const SearchComponent = ({ isSearchMoved, setIsSearchMoved, isMdUp, initialUrlPa
     searchQuery, setSearchQuery,
     setRun, setForceRun,
     accessToken,
+    dailyUserCredits,
+    profile,
     discoverPosts = [], // Get discoverPosts from AppContext with a default empty array
   } = useAppContext();
   
@@ -851,7 +1184,7 @@ const SearchComponent = ({ isSearchMoved, setIsSearchMoved, isMdUp, initialUrlPa
   const [externalTrigger, setExternalTrigger] = useState(true)
   const [conversationIdMatch, setConversationIdMatch] = useState(true)
 
-  const navigate = useNavigate(); // React Router's navigation hook
+  const router = useRouter(); // Next.js router hook
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
 
@@ -868,7 +1201,7 @@ const SearchComponent = ({ isSearchMoved, setIsSearchMoved, isMdUp, initialUrlPa
             // 'X-API-KEY': frontend_key,
           },
           body: JSON.stringify({
-            userEmail: user.email.address,
+            userEmail: user.email,
             convoId: currentConversation,
           }),
         });
@@ -981,17 +1314,28 @@ const SearchComponent = ({ isSearchMoved, setIsSearchMoved, isMdUp, initialUrlPa
   };
 
   const checkCreditBalance = async (queryType) => {
-    var message = ""
-    if(queryType == 'short'){
-          message = 'You have exhausted your daily fact-checking credits. Kindly upgrade your subscription or wait until tomorrow for the credits to refresh or refer a friend to get more credits.'
-    }
-    else{
-        message = "You've exhausted your daily fact-checking credits. We will still extract claims, but full fact-checks are paused. Kindly upgrade or refer a friend to get more credits "
-    }
-    const creditValue = userCredits
+    // Get tier from profile and use tier config for credits per day
+    const userTier = profile?.tier ? profile.tier.charAt(0).toUpperCase() + profile.tier.slice(1) : 'None';
+    const tierInfo = getTierInfo(userTier);
+    const userDailyCredits = tierInfo.creditsPerDay;
+    const resetTime = " at midnight UTC"; // You can make this dynamic if needed
+    
+    const creditDialogData = {
+      title: "Out of daily credits",
+      userTier,
+      userDailyCredits,
+      resetTime,
+      tiers: getAllTiers().map(tier => ({
+        name: tier.name,
+        minBalance: tier.minBalance,
+        credits: tier.creditsPerDay
+      }))
+    };
+
+    const creditValue = dailyUserCredits
     console.log(creditValue)
-    if(creditValue == 0 && !creditsLoading){
-      setCreditDialogMessage(message);
+    if(creditValue < 5 && !creditsLoading){
+      setCreditDialogMessage(creditDialogData);
       setCreditDialogOpen(true);
     }
   }
@@ -999,20 +1343,28 @@ const SearchComponent = ({ isSearchMoved, setIsSearchMoved, isMdUp, initialUrlPa
   const handleSearchClick = async () => {
     console.log("in handlesearch")
     await checkCreditBalance()
-
     
     setErrorDisplay("");
-    // Clear the search input and move the search UI if needed
     setSearchQuery("");
     setIsSearchMoved(true);
+
+    if(dailyUserCredits < 5){
+      return
+    }
     const trimmedQuery = searchQuery.trim();
 
     if (!trimmedQuery) return;
 
     // console.log("searchCount is: ", searchCount)
     // console.log("isURL: ", isUrl(trimmedQuery))
+    console.log('SearchComponent - Checking overlay conditions:', {
+      isAuthenticated,
+      isUrl: isUrl(trimmedQuery),
+      queryLength: trimmedQuery.length,
+      dailyUserCredits
+    });
+    
     if(!isAuthenticated || !isAuthenticated && isUrl(trimmedQuery) || !isAuthenticated && trimmedQuery.length>250){
-      // alert('Please login to continue searching');
       setOverlayLogin(true)
       return;
     }
@@ -1100,7 +1452,7 @@ const SearchComponent = ({ isSearchMoved, setIsSearchMoved, isMdUp, initialUrlPa
 
       // Send conversation data and update URL without page navigation
       await sendCurrentConversation(email, newConversationId, trimmedQuery);
-      window.history.replaceState(null, "", `/c/${newConversationId}`);
+      router.replace(`/c/${newConversationId}`);
     }
     if(!isAuthenticated){
       setSearchCount(searchCount + 1)
@@ -1108,6 +1460,13 @@ const SearchComponent = ({ isSearchMoved, setIsSearchMoved, isMdUp, initialUrlPa
   };
 
 
+  // useEffect(() => {
+  //   console.log({ queries });
+  // }, [queries]);
+
+  // **Remove the previous useEffect for scrolling based on queries**
+
+  // **Add a new useEffect to scroll to the sentinel element after each render**
   useEffect(() => {
     if (bottomRef.current) {
       bottomRef.current.scrollIntoView({ behavior: 'smooth' });
@@ -1248,6 +1607,14 @@ const SearchComponent = ({ isSearchMoved, setIsSearchMoved, isMdUp, initialUrlPa
     setInternalTrigger((prevState) => !prevState);
   };
   
+  // const handleCardClick = (sample) => {
+  //   setSearchQuery(sample.content);
+  //   setInternalTrigger((prevState) => !prevState);
+  //   // We can set a short timeout to ensure the query updates
+  //   // setTimeout(() => {
+  //   //   initiateSearch();
+  //   // }, 0);
+  // };
 
   useEffect(() => {
     // Trigger an external toggle when `searchQuery` chnges
@@ -1273,29 +1640,44 @@ const SearchComponent = ({ isSearchMoved, setIsSearchMoved, isMdUp, initialUrlPa
       sx={{
         display: 'flex',
         flexDirection: 'column',
-        height: 'auto', // Allow page to control scroll
-        minHeight: '100vh',
+        height: '100%', // Fill parent height
+        minHeight: 0,
         width: '100%',
         position: 'relative',
-        backgroundColor: '#F1F3FE',
+        backgroundColor: 'transparent',
         boxSizing: 'border-box',
-        // Allow content to extend; scrolling handled by page/viewport
+        // Allow content to extend; scrolling handled by page container
         flex: '1 1 auto',
       }}
     >
       {/* Content Area - Single Scrollable Container */}
       <Box
         sx={{
-          flex: 1,
+          flex: 1,                // Fill remaining vertical space
           display: 'flex',
           flexDirection: 'column',
-          overflowY: 'auto', // Let the window handle vertical scroll
+          overflowY: 'auto',      // Primary scroll container
           overflowX: 'hidden',
-          minHeight: 0,
+          minHeight: 0,           // Required for flex children with overflow auto
           boxSizing: 'border-box',
-          pt: { xs: 0.5, sm: 1 },
-          pb: 2,
-          position: 'relative',
+          px: { xs: 2, sm: 3 },   // Horizontal padding
+          pt: { xs: 0.5, sm: 1 }, // Top padding on mobile/desktop
+          pb: 2,                 // Space above SearchBar
+          WebkitOverflowScrolling: 'touch',
+          scrollBehavior: 'smooth',
+          // Custom scrollbar styling (desktop)
+          '&::-webkit-scrollbar': {
+            width: { xs: '4px', sm: '8px' },
+          },
+          '&::-webkit-scrollbar-track': {
+            background: '#f1f1f1',
+            borderRadius: '2px',
+          },
+          '&::-webkit-scrollbar-thumb': {
+            background: '#c1c1c1',
+            borderRadius: '2px',
+            '&:hover': { background: '#a8a8a8' },
+          },
         }}
       >
         {/* Loading State */}
@@ -1318,7 +1700,7 @@ const SearchComponent = ({ isSearchMoved, setIsSearchMoved, isMdUp, initialUrlPa
             />
           </Box>
         ) : (
-              <Box
+                      <Box
               sx={{
                 display: 'flex',
                 flexDirection: 'column',
@@ -1334,6 +1716,8 @@ const SearchComponent = ({ isSearchMoved, setIsSearchMoved, isMdUp, initialUrlPa
                 // No flex or overflow properties - let parent handle scrolling
               }}
             >
+
+
 
             {/* Initial State */}
             {!queries.length && (
@@ -1359,9 +1743,9 @@ const SearchComponent = ({ isSearchMoved, setIsSearchMoved, isMdUp, initialUrlPa
                 className="scrollable-container"
                 sx={{
                   width: '100%',
+                  // Remove flexGrow and let content flow naturally
                   boxSizing: 'border-box',
-                  display: 'flex',
-                  justifyContent: 'center',
+                  // Remove scrollBehavior as parent handles scrolling
                 }}
               >
                 <Paper
@@ -1372,11 +1756,8 @@ const SearchComponent = ({ isSearchMoved, setIsSearchMoved, isMdUp, initialUrlPa
                     backgroundColor: 'transparent',
                     boxShadow: 'none',
                     borderRadius: '10px',
-                    margin: '0 auto', // Explicitly center the container
+                    margin: 'auto',
                     boxSizing: 'border-box',
-                    display: 'flex',
-                    flexDirection: 'column',
-                    alignItems: 'center', // Center align the content inside
                   }}
                 >
                   {mode === 'verify' ? (
@@ -1424,6 +1805,7 @@ const SearchComponent = ({ isSearchMoved, setIsSearchMoved, isMdUp, initialUrlPa
         sx={{
           flexShrink: 0, // Prevent shrinking
           width: '100%',
+          backgroundColor: 'transparent',
           p: { xs: 1, sm: 2 },
           pb: { xs: 'calc(env(safe-area-inset-bottom) + 16px)', sm: 2 }, // Account for iPhone safe area
           zIndex: 1000,
@@ -1434,7 +1816,7 @@ const SearchComponent = ({ isSearchMoved, setIsSearchMoved, isMdUp, initialUrlPa
           // Add backdrop blur and background for better visibility on mobile
           backdropFilter: 'blur(10px)',
           backgroundColor: 'rgba(241, 243, 254, 0.95)',
-          borderTop: '1px solid rgba(28, 108, 228, 0.1)',
+          borderTop: '1px solid rgba(0, 102, 255, 0.1)',
         }}
       >
         <Box 
@@ -1449,6 +1831,21 @@ const SearchComponent = ({ isSearchMoved, setIsSearchMoved, isMdUp, initialUrlPa
             margin: '0 auto',
           }}
         >
+          {/* Game Component
+          <Box
+            sx={{
+              position: 'absolute',
+              top: '-60px',
+              right: 0,
+              zIndex: 1001,
+            }}
+          >
+            <Game 
+              tooltip="Play games to earn credits!"
+              autoOpen={isGamePath}
+            />
+          </Box>
+         */}
 
           {/* Search Bar */}
           <SearchBar
@@ -1512,15 +1909,96 @@ const SearchComponent = ({ isSearchMoved, setIsSearchMoved, isMdUp, initialUrlPa
           Daily Limit Reached
         </DialogTitle>
         <DialogContent sx={{ bgcolor: '#F1F3FE', mt: 1, borderRadius: 2 }}>
-          <Typography
-            id="credit-dialog-description"
-            sx={{ fontSize: '0.9rem', fontWeight: 500, color: '#121212', textAlign: 'left' }}
-          >
-            {creditDialogMessage}
-          </Typography>
+          {typeof creditDialogMessage === 'object' && creditDialogMessage ? (
+            <Box sx={{ textAlign: 'left' }}>
+              <Typography
+                variant="h6"
+                sx={{ 
+                  fontSize: '1.1rem', 
+                  fontWeight: 600, 
+                  color: '#121212', 
+                  mb: 2,
+                  textAlign: 'center'
+                }}
+              >
+                {creditDialogMessage.title}
+              </Typography>
+              
+              <Typography
+                sx={{ 
+                  fontSize: '0.9rem', 
+                  fontWeight: 500, 
+                  color: '#121212', 
+                  mb: 2,
+                  lineHeight: 1.5
+                }}
+              >
+                Your free daily credits are determined by your staked $FACY amount. 
+                You've hit today's limit for your current tier <strong>{creditDialogMessage.userTier}</strong> ({creditDialogMessage.userDailyCredits}/day).
+              </Typography>
+
+              <Typography
+                sx={{ 
+                  fontSize: '0.9rem', 
+                  fontWeight: 500, 
+                  color: '#121212', 
+                  mb: 1,
+                  lineHeight: 1.5
+                }}
+              >
+                Want higher daily usage? That requires a paid subscription (in $FACY).
+              </Typography>
+
+              <Typography
+                sx={{ 
+                  fontSize: '0.9rem', 
+                  fontWeight: 500, 
+                  color: '#121212', 
+                  mb: 2,
+                  lineHeight: 1.5
+                }}
+              >
+                Status: Subscriptions aren't live yet. Until then, credits refresh tomorrow{creditDialogMessage.resetTime}.
+              </Typography>
+
+              <Typography
+                sx={{ 
+                  fontSize: '0.9rem', 
+                  fontWeight: 600, 
+                  color: '#121212', 
+                  mb: 1
+                }}
+              >
+                Tiers (by $FACY holdings) → free credits/day
+              </Typography>
+
+              <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.5 }}>
+                {creditDialogMessage.tiers.map((tier, index) => (
+                  <Typography
+                    key={index}
+                    sx={{ 
+                      fontSize: '0.85rem', 
+                      fontWeight: 500, 
+                      color: '#121212',
+                      fontFamily: 'monospace'
+                    }}
+                  >
+                    {tier.name} ({tier.minBalance === 0 ? '0' : `≥ ${tier.minBalance.toLocaleString()}`}) → {tier.credits}/day
+                  </Typography>
+                ))}
+              </Box>
+            </Box>
+          ) : (
+            <Typography
+              id="credit-dialog-description"
+              sx={{ fontSize: '0.9rem', fontWeight: 500, color: '#121212', textAlign: 'left' }}
+            >
+              {creditDialogMessage}
+            </Typography>
+          )}
         </DialogContent>
         <DialogActions sx={{ pt: 2, pb: 1, px: 3 }}>
-          <MUIButton
+          <Button
             onClick={handleCreditDialogClose}
             variant="outlined"
             sx={{
@@ -1532,8 +2010,8 @@ const SearchComponent = ({ isSearchMoved, setIsSearchMoved, isMdUp, initialUrlPa
             }}
           >
             Not Now
-          </MUIButton>
-          <MUIButton
+          </Button>
+          {/*           <Button
             variant="contained"
             sx={{
               bgcolor: '#0066FF',
@@ -1543,11 +2021,11 @@ const SearchComponent = ({ isSearchMoved, setIsSearchMoved, isMdUp, initialUrlPa
             }}
             onClick={() => {
               handleCreditDialogClose();
-              navigate('/subscription');
+              router.push('/subscription');
             }}
           >
             Upgrade
-          </MUIButton>
+          </Button> */}
         </DialogActions>
       </Dialog>
       
@@ -1565,19 +2043,19 @@ const SearchComponent = ({ isSearchMoved, setIsSearchMoved, isMdUp, initialUrlPa
           </Typography>
         </DialogContent>
         <DialogActions>
-          <MUIButton onClick={handleProDialogClose} color="secondary">
+          <Button onClick={handleProDialogClose} color="secondary">
             Not Now, Continue With Free
-          </MUIButton>
-          <MUIButton
+          </Button>
+          <Button
             variant="contained"
             color="primary"
             onClick={() => {
               handleProDialogClose();
-              navigate("/subscription")
+              router.push("/subscription")
             }}
           >
             Go Pro
-          </MUIButton>
+          </Button>
         </DialogActions>
       </Dialog>
     </Box>

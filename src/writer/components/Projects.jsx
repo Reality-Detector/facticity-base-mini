@@ -42,16 +42,14 @@ const ProjectsSection = () => {
       username: email,
       project: newProjectName,
     }
-    console.log(payload);
     try {
-      const response = await fetch(backendUrl+'/create-project', {
+      const response = await fetch('/api/create-project', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify(payload),
       });
-      console.log(response);
       if (response.ok) {
         const data = await response.json();
         setProjects(data['project_list']);
@@ -69,7 +67,7 @@ const ProjectsSection = () => {
     const fetchProjects = async () => {
       console.log("fetching projects" + email);
       try {
-        const response = await fetch(backendUrl+'/get-projects', {
+        const response = await fetch('/api/get-projects', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -82,8 +80,6 @@ const ProjectsSection = () => {
         }
 
         const data = await response.json();
-        console.log({ email });
-        console.log(data);
         const projectArray = data.projects.map(project => project.project);
         setFilesObj(data.projects);
         setProjects(projectArray);

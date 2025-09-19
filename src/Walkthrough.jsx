@@ -4,15 +4,15 @@ import useAuth from './auth/useAuthHook';
 import HelpOutlineIcon from "@mui/icons-material/HelpOutline";
 import IconButton from "@mui/material/IconButton";
 import { useAppContext } from './AppProvider';
-import { useLocation } from "react-router-dom";
+import { usePathname } from "next/navigation";
 
 
 
 
 const Walkthrough = () => {
   
-  const location = useLocation();
-  const isHomePage = location.pathname === "/";
+  const pathname = usePathname();
+  const isHomePage = pathname === "/";
   const { user, isAuthenticated } = useAuth();
   const {setSearchQuery, setHighlightSearch, backendUrl, hasSeenTut, run, setRun, forceRun, setForceRun, isProUser} = useAppContext()
 
@@ -30,7 +30,7 @@ const Walkthrough = () => {
     { target: ".facti-tut-step-5", content: "Configure your fact-checking settings using the options here." },
     { target: ".facti-tut-step-4", content: "Enter a text claim or URL of a Youtube, TikTok, Instagram video or an Apple Podcast as input. We have filled in a news headline for you to fact-check", placement: 'top' },
     { target: ".facti-tut-step-6", content: "Hit the search icon to initiate the fact-check." },
-    { target: ".facti-tut-step-sidebar", content: "Explore other features such as the Facticity Writer, API, Subscription Page, Fact-check History and more using the navigation menu," },
+    { target: ".facti-tut-step-sidebar", content: "Explore other features such as the API, Subscription Page, Fact-check History and more using the navigation menu," },
     ];
 
   useEffect(() => {
@@ -43,9 +43,15 @@ const Walkthrough = () => {
   }, [isAuthenticated, user]);
 
   const markTutorialAsCompleted = async () => {
-    const res = await fetch(backendUrl + "/mark-tutorial-complete", {
+    const headers = {
+      "Content-Type": "application/json",
+      "Validator": "privy",
+      "Frontend": "web3"
+    };
+    
+    const res = await fetch("/api/mark-tutorial-complete", {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: headers,
       body: JSON.stringify({ userEmail: user.email }) // e.g. "auth0|abc123"
     });
   

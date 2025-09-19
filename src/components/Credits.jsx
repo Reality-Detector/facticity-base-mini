@@ -53,7 +53,7 @@ const Credits = ({ credits, isLoading }) => {
           },
         }}
       > 
-        <StarsIcon sx={{ color: '#0066FF', fontSize: 16 }} />
+        {/* <StarsIcon sx={{ color: '#0066FF', fontSize: 16 }} /> */}
 
           {creditsLoading ? (
             <CircularProgress size={14} sx={{ color: '#0066FF' }} />
@@ -184,7 +184,7 @@ const Credits = ({ credits, isLoading }) => {
             </Box>
 
             {/* Exchange Rate Info */}
-            <Box sx={{ 
+            {/* <Box sx={{  
               bgcolor: 'rgba(0, 102, 255, 0.1)', 
               p: 1.5, 
               borderRadius: 1,
@@ -193,7 +193,7 @@ const Credits = ({ credits, isLoading }) => {
               <Typography variant="caption" color="text.secondary">
                 Exchange Rate: 1 FACY = 5 Credits
               </Typography>
-            </Box>
+            </Box> */}
           </Box>
         </Paper>
       </Popover>

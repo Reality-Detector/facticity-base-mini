@@ -1,3 +1,4 @@
+"use client";
 import React, { useState, useEffect } from 'react';
 import {
   Container,
@@ -63,12 +64,18 @@ const XIcon = (props) => (
   </svg>
 );
 import useAuth from '../../auth/useAuthHook';
-import { useNavigate } from 'react-router-dom';
+import { useRouter } from 'next/navigation';
 import { useAppContext } from '../../AppProvider';
 import Loader from './Loader';
 import Credits from '../Credits';
 import { useUser, useWallets, useLinkAccount, usePrivy } from '@privy-io/react-auth';
-import { getAllTiers } from '../../config/tierConfig';
+import { getAllTiers, TIER_MULTIPLIERS, getTierByBalance } from '@/config/tierConfig';
+import { useStaking } from '@/hooks/useStaking';
+import StakingSection from './StakingSection';
+import ClaimVaultSection from './ClaimVaultSection';
+import VirtualsStakingSection from './VirtualsStakingSection';
+import WalletBalanceSection from './WalletBalanceSection';
+
 
 const Settings = ({ onClose }) => {
   const { user, isAuthenticated, logout } = useAuth();
@@ -91,8 +98,17 @@ const Settings = ({ onClose }) => {
     setHandleLoading,
     fetchUserHandle,
     userCredits,
-    creditsLoading
+    creditsLoading,
+    totalStakedAmount,
   } = useAppContext();
+
+  // Get staked FACY amount for tier calculation
+  const { stakedAmount } = useStaking();
+  
+  // Calculate tier based on combined staked amount (regular + Virtuals staking)
+  const stakedAmountNumber = parseFloat(totalStakedAmount || '0');
+  const currentTierInfo = getTierByBalance(stakedAmountNumber);
+  const currentTier = currentTierInfo.name.toLowerCase();
 
   // Privy hooks for progressive onboarding
   const { refreshUser } = useUser();
@@ -195,7 +211,7 @@ const Settings = ({ onClose }) => {
         headers['Frontend'] = 'web3'
 
         
-        const response = await fetch(`${backendUrl}/api/connection-completed`, {
+        const response = await fetch('/api/api/connection-completed', {
           method: 'POST',
           headers: headers,
           body: JSON.stringify({
@@ -210,7 +226,12 @@ const Settings = ({ onClose }) => {
           const data = await response.json();
           console.log('All connections synced to backend successfully:', data);
         } else {
-          console.error('Failed to sync connections to backend:', response.statusText);
+          const errorText = await response.text();
+          console.error('Failed to sync connections to backend:', {
+            status: response.status,
+            statusText: response.statusText,
+            error: errorText
+          });
         }
       } else {
         console.log('No existing connections found to sync');
@@ -282,7 +303,7 @@ const Settings = ({ onClose }) => {
     }
   };
   
-  const navigate = useNavigate();
+  const router = useRouter();
   const theme = useTheme();
   const isMdUp = useMediaQuery(theme.breakpoints.up('md'));
   
@@ -386,7 +407,7 @@ const Settings = ({ onClose }) => {
         headers['Validator'] = 'privy';
       }
       
-      const response = await fetch(`${backendUrl}/api/generate_userhandle`, {
+      const response = await fetch('/api/api/generate_userhandle', {
         method: 'POST',
         headers: headers,
         body: JSON.stringify({ 
@@ -497,7 +518,7 @@ const Settings = ({ onClose }) => {
   // Track active section based on scroll position
   useEffect(() => {
     const handleScroll = () => {
-      const scrollPosition = window.scrollY + 100;
+      const scrollPosition = typeof window !== 'undefined' ? window.scrollY + 100 : 0;
 
       for (const section of sections) {
         const element = document.getElementById(section.id);
@@ -511,8 +532,10 @@ const Settings = ({ onClose }) => {
       }
     };
 
-    window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
+    if (typeof window !== 'undefined') {
+      window.addEventListener("scroll", handleScroll);
+      return () => window.removeEventListener("scroll", handleScroll);
+    }
   }, []);
 
 
@@ -608,7 +631,26 @@ const Settings = ({ onClose }) => {
   ];
 
   return (
-    <Box sx={{ minHeight: '100vh', bgcolor: '#F8FAFF' }}>
+    <Box sx={{ 
+      minHeight: '100vh', 
+      bgcolor: '#F8FAFF',
+      '& @keyframes shimmer': {
+        '0%': {
+          transform: 'translateX(-100%)',
+        },
+        '100%': {
+          transform: 'translateX(100%)',
+        },
+      },
+      '& @keyframes float': {
+        '0%, 100%': {
+          transform: 'translateY(0px) rotate(0deg)',
+        },
+        '50%': {
+          transform: 'translateY(-20px) rotate(180deg)',
+        },
+      }
+    }}>
       <AppBar
         position="sticky"
         sx={{
@@ -618,10 +660,10 @@ const Settings = ({ onClose }) => {
           borderBottom: '1px solid rgba(0, 102, 255, 0.1)',
         }}
       >
-        <Toolbar sx={{ minHeight: '70px !important', justifyContent: 'space-between', paddingX: { xs: 2, sm: 4 } }}>
+        <Toolbar sx={{ minHeight: '50px !important', justifyContent: 'space-between', paddingX: { xs: 2, sm: 4 } }}>
           <Box sx={{ width: { xs: 40, md: 60 }, display: 'flex', alignItems: 'center' }}>
             <IconButton
-              onClick={() => navigate('/')}
+              onClick={() => router.push('/')}
               sx={{
                 color: '#0066FF',
                 background: 'rgba(0, 102, 255, 0.08)',
@@ -640,18 +682,29 @@ const Settings = ({ onClose }) => {
             </IconButton>
           </Box>
           <Box sx={{ flexGrow: 1, display: 'flex', justifyContent: 'center' }}>
-            <a href="/" style={{ textDecoration: 'none', display: 'flex', alignItems: 'center' }}>
+          <Box 
+              onClick={() => navigate('/')} 
+              sx={{ 
+                textDecoration: 'none', 
+                display: 'flex', 
+                alignItems: 'center', 
+                cursor: 'pointer',
+                '&:hover': {
+                  opacity: 0.8
+                }
+              }}
+            >
               <img
-                src="/facticityailogo-02.png"
-                alt="Facticity.AI"
+                src="https://see.fontimg.com/api/rf5/KVdLp/YzgwNzgzNWY1N2M2NDc1MzgzNTExOWYzMWFkY2ViMmQudHRm/QVJBSVNUT1RMRQ/spartacus.png?r=fs&h=98&w=1500&fg=0066FF&bg=FFFFFF&tb=1&s=65"
+                alt="ARAISTOTLE"
                 style={{
                   paddingTop: '2px',
                   width: 'auto',
-                  height: isMdUp ? '36px' : '30px',
+                  height: isMdUp ? '28px' : '24px',
                   transition: 'all 0.3s ease-in-out',
                 }}
               />
-            </a>
+            </Box>
           </Box>
           {isAuthenticated && (
             <Box
@@ -663,7 +716,7 @@ const Settings = ({ onClose }) => {
               }}
             >
               <IconButton 
-                onClick={() => navigate('/rewards')} 
+                onClick={() => router.push('/rewards')} 
                 size="small" 
                 sx={{ 
                   color: '#0066FF',
@@ -727,7 +780,7 @@ const Settings = ({ onClose }) => {
                {/* Log Out Button */}
                <Box sx={{ pt: 2, borderTop: 1, borderColor: 'divider', mt: 2 }}>
                  <Button
-                   onClick={() => logout({ returnTo: window.location.origin })}
+                   onClick={() => logout({ returnTo: typeof window !== 'undefined' ? window.location.origin : 'http://localhost:3000' })}
                    sx={{
                      justifyContent: 'flex-start',
                      gap: 1.5,
@@ -1337,7 +1390,7 @@ const Settings = ({ onClose }) => {
                         borderColor: 'divider', 
                         borderRadius: 2 
                       }}>
-                                               <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
+                          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
                            <Link sx={{ fontSize: 20, color: '#1976d2' }} />
                            <Box>
                             <Typography variant="body1" sx={{ fontWeight: 500 }}>
@@ -1360,6 +1413,11 @@ const Settings = ({ onClose }) => {
                           }}
                         />
                       </Box>
+                      
+                      {/* Wallet Balance & Transfer Section */}
+                      {/* {user?.wallet?.address && (
+                        <WalletBalanceSection walletAddress={user.wallet.address} />
+                      )} */}
 
                       {/* Tokens Available */}
                       <Box sx={{ 
@@ -1367,156 +1425,422 @@ const Settings = ({ onClose }) => {
                         background: 'linear-gradient(135deg, #f3e5f5 0%, #e1f5fe 100%)', 
                         borderRadius: 2 
                       }}>
-                        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                                                   <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
-                             <Coins sx={{ fontSize: 20, color: '#9c27b0' }} />
-                             <Box>
+                        <Box sx={{ 
+                          display: 'flex', 
+                          flexDirection: { xs: 'column', sm: 'row' },
+                          justifyContent: { xs: 'flex-start', sm: 'space-between' }, 
+                          alignItems: { xs: 'flex-start', sm: 'center' },
+                          gap: { xs: 2, sm: 0 }
+                        }}>
+                          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
+                            <Coins sx={{ fontSize: 20, color: '#9c27b0' }} />
+                            <Box>
                               <Typography variant="body1" sx={{ fontWeight: 500 }}>
-                                Tokens Available
-                              </Typography>
-                              <Typography variant="body2" color="text.secondary">
-                                Your earned FACY coins
+                                Wallet Balance
                               </Typography>
                             </Box>
                           </Box>
-                          <Box sx={{ textAlign: 'right' }}>
-                            <Typography variant="h4" sx={{ fontWeight: 'bold', color: '#9c27b0' }}>
+                          <Box sx={{ 
+                            textAlign: { xs: 'left', sm: 'right' },
+                            width: { xs: '100%', sm: 'auto' }
+                          }}>
+                            <Typography variant="h4" sx={{ 
+                              fontWeight: 'bold', 
+                              color: '#9c27b0',
+                              wordBreak: 'break-all',
+                              overflow: 'hidden',
+                              textOverflow: 'ellipsis'
+                            }}>
                               {profile.token_balance || '0'}
                             </Typography>
                             <Typography variant="caption" color="text.secondary">
                               FACY
                             </Typography>
+                            {/* {profile.average_balance_30d && (
+                              <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mt: 0.5 }}>
+                                30d avg: {profile.average_balance_30d}
+                              </Typography>
+                            )} */}
                           </Box>
                         </Box>
                       </Box>
+                      
+                      {/* Staking Section */}
+                      {/* <StakingSection /> */}
 
-                      {/* Tier Display */}
-                      {profile.tier && (
+                      {/* Virtuals Staking Section */}
+                      <VirtualsStakingSection />
+
+                      {/* Claim Vault Section */}
+                      {/* <ClaimVaultSection /> */}
+
+                      {/* Premium Tier Display */}
+                      {currentTier && stakedAmountNumber > 0 && (
                         <Box sx={{ 
-                          p: 2, 
-                          border: 1, 
-                          borderColor: 'divider', 
-                          borderRadius: 2 
+                          background: 'linear-gradient(135deg, #F8FAFF 0%, #ffffff 50%, #F8FAFF 100%)',
+                          border: '2px solid #0066FF',
+                          borderRadius: 3,
+                          p: 3,
+                          position: 'relative',
+                          overflow: 'hidden',
+                          boxShadow: '0 8px 32px rgba(0, 102, 255, 0.15), 0 0 0 1px rgba(0, 102, 255, 0.1)',
+                          transition: 'all 0.3s ease-in-out',
+                          '&:hover': {
+                            transform: 'translateY(-2px)',
+                            boxShadow: '0 12px 40px rgba(0, 102, 255, 0.2), 0 0 0 1px rgba(0, 102, 255, 0.15)',
+                          },
+                          '&::before': {
+                            content: '""',
+                            position: 'absolute',
+                            top: 0,
+                            left: 0,
+                            right: 0,
+                            height: '2px',
+                            background: 'linear-gradient(90deg, #0066FF 0%, #0052CC 50%, #0066FF 100%)',
+                          },
+                          '&::after': {
+                            content: '""',
+                            position: 'absolute',
+                            top: -50,
+                            left: -50,
+                            width: '100px',
+                            height: '100px',
+                            background: 'radial-gradient(circle, rgba(0, 102, 255, 0.08) 0%, transparent 70%)',
+                            borderRadius: '50%',
+                            animation: 'float 6s ease-in-out infinite',
+                          }
                         }}>
-                          <Typography variant="body1" sx={{ fontWeight: 500, mb: 2 }}>
-                            Current Tier
-                          </Typography>
-                          <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 2 }}>
-                            <Typography 
-                              variant="h6" 
-                              sx={{ 
-                                color: getTierColor(profile.tier),
+                          
+                          {/* Current Tier Status */}
+                          <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 3 }}>
+                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                              <Box sx={{
+                                width: { xs: 50, sm: 60 },
+                                height: { xs: 50, sm: 60 },
+                                minWidth: { xs: 50, sm: 60 },
+                                minHeight: { xs: 50, sm: 60 },
+                                borderRadius: '50%',
+                                background: `linear-gradient(135deg, ${getTierColor(currentTier)} 0%, ${getTierColor(currentTier)}CC 100%)`,
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                boxShadow: `0 0 20px ${getTierColor(currentTier)}40`,
+                                border: `3px solid ${getTierColor(currentTier)}`,
+                                position: 'relative',
+                                '&::before': {
+                                  content: '""',
+                                  position: 'absolute',
+                                  top: -2,
+                                  left: -2,
+                                  right: -2,
+                                  bottom: -2,
+                                  borderRadius: '50%',
+                                  background: `linear-gradient(45deg, ${getTierColor(currentTier)}20, transparent, ${getTierColor(currentTier)}20)`,
+                                  zIndex: -1,
+                                }
+                              }}>
+                                <Typography sx={{ 
+                                  fontSize: { xs: '20px', sm: '24px' },
+                                  fontWeight: 'bold',
+                                  color: 'white',
+                                  textShadow: '0 2px 4px rgba(0,0,0,0.5)'
+                                }}>
+                                  {currentTier === 'platinum' ? '💎' : 
+                                   currentTier === 'gold' ? '🥇' : 
+                                   currentTier === 'silver' ? '🥈' : '🥉'}
+                                </Typography>
+                              </Box>
+                              <Box>
+                              <Typography variant="h5" sx={{ 
+                                color: '#0066FF',
                                 fontWeight: 'bold',
-                                textTransform: 'capitalize'
-                              }}
-                            >
-                              {capitalize(profile.tier)}
+                                textTransform: 'capitalize',
+                                  mb: 0.5
+                                }}>
+                                  {capitalize(currentTier)} Member
+                                </Typography>
+                                <Typography variant="body2" sx={{ 
+                                  color: 'text.secondary',
+                                  fontSize: '0.9rem'
+                                }}>
+                                  {stakedAmountNumber.toLocaleString() || '0'} Total Staked$FACY Tokens
                             </Typography>
+                            </Box>
+                            </Box>
+                            <Box sx={{ textAlign: 'right' }}>
+                              <Typography variant="h6" sx={{ 
+                                color: '#0066FF',
+                                fontWeight: 'bold',
+                                fontSize: '1.1rem'
+                              }}>
+                                Member Status
+                              </Typography>
+                              <Typography variant="caption" sx={{ 
+                                color: 'text.secondary',
+                                fontSize: '0.8rem'
+                              }}>
+                                Active
+                              </Typography>
+                            </Box>
                           </Box>
                           
-                          {/* Tier Ladder */}
-                          <Typography variant="body2" sx={{ mb: 1, fontWeight: 500 }}>
-                            Tier Ladder
+                          {/* Progress to Next Tier */}
+                          {(() => {
+                            const currentTierIndex = tiers.findIndex(t => t.name.toLowerCase() === currentTier);
+                            const nextTier = tiers[currentTierIndex + 1];
+                            const currentTierData = tiers[currentTierIndex];
+                            
+                            if (nextTier && currentTierData) {
+                              const progress = Math.min(
+                                ((stakedAmountNumber - currentTierData.minBalance) / (nextTier.minBalance - currentTierData.minBalance)) * 100,
+                                100
+                              );
+                              
+                              return (
+                                <Box sx={{ mb: 3 }}>
+                                  <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
+                                    <Typography variant="body2" sx={{ 
+                                      color: '#0066FF',
+                                      fontWeight: 'bold',
+                                      fontSize: '0.9rem'
+                                    }}>
+                                      Progress to {nextTier.name}
                           </Typography>
-                          <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
-                            {tiers.map((tier) => (
+                          <Typography variant="body2" sx={{ 
+                                      color: 'text.secondary',
+                                      fontSize: '0.8rem'
+                                    }}>
+                                      {Math.round(progress)}%
+                                    </Typography>
+                                  </Box>
+                                  <Box sx={{ 
+                                    width: '100%',
+                                    height: 8,
+                                    background: 'rgba(100, 100, 100, 0.3)',
+                                    borderRadius: 4,
+                                    overflow: 'hidden',
+                                    position: 'relative'
+                                  }}>
+                                    <Box sx={{
+                                      width: `${progress}%`,
+                                      height: '100%',
+                                      background: `linear-gradient(90deg, ${getTierColor(currentTier)} 0%, ${getTierColor(nextTier.name.toLowerCase())} 100%)`,
+                                      borderRadius: 4,
+                                      transition: 'width 0.3s ease-in-out',
+                                      position: 'relative',
+                                      '&::after': {
+                                        content: '""',
+                                        position: 'absolute',
+                                        top: 0,
+                                        left: 0,
+                                        right: 0,
+                                        bottom: 0,
+                                        background: 'linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.3) 50%, transparent 100%)',
+                                        animation: 'shimmer 2s infinite'
+                                      }
+                                    }} />
+                                  </Box>
+                                  <Typography variant="caption" sx={{ 
+                                    color: 'text.secondary',
+                                    fontSize: '0.75rem',
+                                    mt: 0.5,
+                                    display: 'block'
+                                  }}>
+                                    {nextTier.minBalance - stakedAmountNumber > 0 
+                                      ? `${(nextTier.minBalance - stakedAmountNumber).toLocaleString()} more staked $FACY needed`
+                                      : 'Next tier unlocked!'
+                                    }
+                                  </Typography>
+                                </Box>
+                              );
+                            }
+                            return null;
+                          })()}
+
+                          {/* Tier Benefits */}
+                          <Box sx={{ mb: 3 }}>
+                            <Typography variant="h6" sx={{ 
+                              color: '#0066FF',
+                              fontWeight: 'bold',
+                              mb: 2,
+                              fontSize: '1.1rem'
+                            }}>
+                              Member Benefits
+                            </Typography>
+                            <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: 2 }}>
+                              <Box sx={{ 
+                                p: 2, 
+                                background: 'rgba(0, 102, 255, 0.08)',
+                                borderRadius: 2,
+                                border: '1px solid rgba(0, 102, 255, 0.2)'
+                              }}>
+                                <Typography variant="body2" sx={{ color: '#0066FF', fontWeight: 'bold', mb: 0.5 }}>
+                                  Daily Credits
+                                </Typography>
+                                <Typography variant="h6" sx={{ color: 'text.primary', fontWeight: 'bold' }}>
+                                  {tiers.find(t => t.name.toLowerCase() === currentTier)?.creditsPerDay || 0}
+                                  </Typography>
+                                  <Typography variant="caption" sx={{ color: 'text.secondary', fontSize: '0.75rem' }}>
+                                    1 fact check = 5 credits                                </Typography>
+                              </Box>
+                              <Box sx={{ 
+                                p: 2, 
+                                background: 'rgba(0, 102, 255, 0.08)',
+                                borderRadius: 2,
+                                border: '1px solid rgba(0, 102, 255, 0.2)'
+                              }}>
+                                <Typography variant="body2" sx={{ color: '#0066FF', fontWeight: 'bold', mb: 0.5 }}>
+                                  Multiplier
+                                </Typography>
+                                <Typography variant="h6" sx={{ color: 'text.primary', fontWeight: 'bold' }}>
+                                  {TIER_MULTIPLIERS[currentTier] || 1}x
+                                </Typography>
+                              </Box>
+                            </Box>
+                          </Box>
+
+                          {/* Tier Progression */}
+                          <Box>
+                            <Typography variant="h6" sx={{ 
+                              color: '#0066FF',
+                              fontWeight: 'bold',
+                              mb: 2,
+                              fontSize: '1.1rem'
+                            }}>
+                              Tier Progression
+                            </Typography>
+                            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1.5 }}>
+                              {tiers.map((tier, index) => {
+                              const isCurrentTier = currentTier === tier.name.toLowerCase();
+                              const isUnlocked = stakedAmountNumber >= tier.minBalance;
+                              const isNextTier = index > 0 && !isUnlocked && stakedAmountNumber >= tiers[index - 1].minBalance;
+                              // For styling purposes, current tier should always appear active regardless of unlock status
+                              const shouldAppearActive = isCurrentTier || isUnlocked;
+                                
+                                return (
                               <Box 
                                 key={tier.name} 
                                 sx={{ 
-                                  p: 1, 
-                                  borderRadius: 1, 
-                                  border: 1, 
-                                  borderColor: profile.tier === tier.name.toLowerCase() ? 'primary.main' : 'divider',
-                                  bgcolor: profile.tier === tier.name.toLowerCase() ? 'primary.light' : 'background.paper',
-                                  minWidth: 80, 
-                                  textAlign: 'center',
-                                  flex: '1 1 auto'
-                                }}
-                              >
-                                <Typography variant="caption" sx={{ fontWeight: 'bold', textTransform: 'capitalize' }}>
-                                  {tier.name}
-                                </Typography>
-                                <Typography variant="caption" sx={{ display: 'block' }}>
-                                  Min: {tier.minBalance}
-                                </Typography>
+                                  display: 'flex',
+                                      alignItems: 'center',
+                                      p: 2,
+                                      borderRadius: 2,
+                                      background: isCurrentTier 
+                                        ? 'linear-gradient(135deg, rgba(76, 175, 80, 0.15), rgba(76, 175, 80, 0.08))'
+                                        : shouldAppearActive 
+                                          ? 'rgba(0, 102, 255, 0.08)'
+                                          : 'rgba(0, 0, 0, 0.05)',
+                                      border: isCurrentTier 
+                                      ? '2px solid #4CAF50'
+                                      : shouldAppearActive
+                                          ? '1px solid rgba(0, 102, 255, 0.2)'
+                                          : '1px solid rgba(0, 0, 0, 0.1)',
+                                      position: 'relative',
+                                      opacity: shouldAppearActive ? 1 : 0.6,
+                                      transition: 'all 0.3s ease-in-out',
+                                      cursor: 'pointer',
+                                      '&:hover': {
+                                        transform: 'translateX(4px)',
+                                        boxShadow: isCurrentTier 
+                                        ? '0 4px 20px rgba(76, 175, 80, 0.3)'
+                                        : shouldAppearActive 
+                                            ? '0 4px 20px rgba(0, 102, 255, 0.15)'
+                                            : '0 4px 20px rgba(0, 0, 0, 0.1)',
+                                      },
+                                      '&::before': isCurrentTier ? {
+                                        content: '""',
+                                        position: 'absolute',
+                                        left: -2,
+                                        top: -2,
+                                        bottom: -2,
+                                        width: '4px',
+                                        background: 'linear-gradient(180deg, #4CAF50 0%, #45a049 100%)',
+                                        borderRadius: '2px 0 0 2px',
+                                      } : {}
+                                    }}
+                                  >
+                                    <Box sx={{ 
+                                      width: { xs: 36, sm: 40 },
+                                      height: { xs: 36, sm: 40 },
+                                      minWidth: { xs: 36, sm: 40 },
+                                      minHeight: { xs: 36, sm: 40 },
+                                      borderRadius: '50%',
+                                      background: isCurrentTier 
+                                        ? 'linear-gradient(135deg, #4CAF50, #45a049)'
+                                        : shouldAppearActive 
+                                          ? 'linear-gradient(135deg, #FFD700, #FFA500)'
+                                          : 'linear-gradient(135deg, #666, #444)',
+                                      display: 'flex',
+                                      alignItems: 'center',
+                                      justifyContent: 'center',
+                                      mr: 2,
+                                      flexShrink: 0,
+                                      boxShadow: isCurrentTier ? '0 0 15px rgba(76, 175, 80, 0.4)' : 'none'
+                                    }}>
+                                      <Typography sx={{ 
+                                        fontSize: { xs: '16px', sm: '18px' },
+                                        color: 'white',
+                                        fontWeight: 'bold'
+                                      }}>
+                                        {tier.name === 'Platinum' ? '💎' : 
+                                         tier.name === 'Gold' ? '🥇' : 
+                                         tier.name === 'Silver' ? '🥈' : 
+                                         tier.name === 'Bronze' ? '🥉' : '●'}
+                                      </Typography>
+                                    </Box>
+                                    <Box sx={{ flex: 1 }}>
+                                      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 0.5 }}>
+                                        <Typography variant="body1" sx={{ 
+                                          fontWeight: 'bold',
+                                          color: isCurrentTier ? '#4CAF50' : shouldAppearActive ? '#0066FF' : 'text.secondary',
+                                          textTransform: 'capitalize'
+                                        }}>
+                                          {tier.name}
+                                          {isCurrentTier && (
+                                            <Typography component="span" sx={{ 
+                                              ml: 1, 
+                                              fontSize: '0.8rem',
+                                              color: '#4CAF50'
+                                            }}>
+                                              (Current)
+                                            </Typography>
+                                          )}
+                                        </Typography>
+                                        <Typography variant="body2" sx={{ 
+                                          color: shouldAppearActive ? 'text.secondary' : 'text.disabled',
+                                          fontWeight: 'bold'
+                                        }}>
+                                          {tier.minBalance.toLocaleString()}+ $FACY
+                                        </Typography>
                               </Box>
-                            ))}
+                              <Typography variant="caption" sx={{ 
+                                        color: shouldAppearActive ? 'text.secondary' : 'text.disabled',
+                                        fontSize: '0.8rem'
+                                      }}>
+                                        {tier.creditsPerDay} credits/day • {TIER_MULTIPLIERS[tier.name.toLowerCase()]}x multiplier
+                                      </Typography>
+                                    </Box>
+                                    {shouldAppearActive && (
+                                      <Box sx={{ 
+                                        width: 24,
+                                        height: 24,
+                                        borderRadius: '50%',
+                                        background: 'linear-gradient(135deg, #4CAF50, #45a049)',
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        justifyContent: 'center',
+                                        ml: 1
+                                      }}>
+                                        <CheckCircleIcon2 sx={{ fontSize: 16, color: 'white' }} />
+                                      </Box>
+                                    )}
+                                  </Box>
+                                );
+                              })}
+                            </Box>
                           </Box>
                         </Box>
                       )}
-
-                      {/* Convert to Platform Credits */}
-                      <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-                        <Box sx={{ 
-                          display: 'flex', 
-                          justifyContent: 'space-between', 
-                          alignItems: 'center',
-                          p: 2, 
-                          border: 1, 
-                          borderColor: 'divider', 
-                          borderRadius: 2,
-                          opacity: 0.5,
-                          bgcolor: 'action.hover'
-                        }}>
-                                                   <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
-                             <RefreshCw sx={{ fontSize: 20, color: 'text.disabled' }} />
-                             <Box>
-                              <Typography variant="body1" sx={{ fontWeight: 500, color: 'text.disabled' }}>
-                                Convert to Platform Credits
-                              </Typography>
-      
-                            </Box>
-                          </Box>
-                                                   {!editModes.conversion && (
-                             <Button 
-                               onClick={() => toggleEditMode("conversion")} 
-                               startIcon={<Edit sx={{ fontSize: 16 }} />}
-                               variant="outlined"
-                               size="small"
-                               disabled
-                               sx={{ 
-                                 color: 'text.disabled',
-                                 borderColor: 'text.disabled',
-                                 '&:hover': {
-                                   color: 'text.disabled',
-                                   borderColor: 'text.disabled',
-                                   bgcolor: 'transparent'
-                                 }
-                               }}
-                             >
-                               Convert
-                             </Button>
-                           )}
-                        </Box>
-
-                        {editModes.conversion && (
-                          <>
-                            <Box sx={{ display: 'flex', gap: 1 }}>
-                              <TextField
-                                placeholder="Enter TRUTH amount"
-                                defaultValue="10"
-                                size="small"
-                                sx={{ flex: 1 }}
-                              />
-                              <Button onClick={() => toggleEditMode("conversion")} variant="contained">
-                                Convert
-                              </Button>
-                            </Box>
-                            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                              <Typography variant="caption" color="text.secondary">
-                                You will receive ~100 Platform Credits
-                              </Typography>
-                                                           <Button 
-                                 onClick={() => cancelEdit("conversion")} 
-                                 size="small"
-                                 startIcon={<X sx={{ fontSize: 12 }} />}
-                               >
-                                 Cancel
-                               </Button>
-                            </Box>
-                          </>
-                        )}
-                      </Box>
                     </Box>
                   )}
                 </CardContent>

@@ -1,3 +1,5 @@
+"use client";
+import { usePathname, useParams, useSearchParams, useRouter } from 'next/navigation';
 import React, { useState, useEffect } from 'react';
 import Sidebar from './Sidebar';
 import { IconButton, Grid, Box, Typography, useTheme, useMediaQuery, AppBar, Toolbar } from '@mui/material';
@@ -7,16 +9,16 @@ import Credits from '../Credits';
 import ThirdColumn from './ThirdColumn';
 import useAuth from '../../auth/useAuthHook';
 import { useAppContext } from '../../AppProvider';
-import { useParams, useLocation } from 'react-router-dom';
-import { useNavigate } from 'react-router-dom';
+
+
 // import EditNoteIcon from '@mui/icons-material/EditNote';
 import LoginModal from './loginModal';
 import AddBoxOutlinedIcon from '@mui/icons-material/AddBoxOutlined';
 import Banner from './Banner';
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
-import '../animation.css';
+import '@/styles/globals.css'; // Animation styles are now in globals.css
 
-const Home = () => {
+const Home = ({conversationId}) => {
   const [isSidebarOpen, setSidebarOpen] = useState(false);
   const [componentsLoaded, setComponentsLoaded] = useState(false);
   
@@ -39,23 +41,29 @@ const Home = () => {
     temporaryExpiries
   } = useAppContext();
   
-  const { id } = useParams(); // Retrieve the ID from the URL
-  const location = useLocation();
+
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+  const router = useRouter();
+
+  // Temporary solution to use pathname for conversationId if undefined
+  const id = conversationId ?? (
+    pathname.startsWith("/c/") ? pathname.split("/")[2] : undefined
+  );
+  
   const theme = useTheme();
   const isSmUp = useMediaQuery(theme.breakpoints.up('sm'));
   const isMdUp = useMediaQuery(theme.breakpoints.up('md'));
 
   const [isBannerVisible, setIsBannerVisible] = useState(true);
   const [initialUrlParam, setInitialUrlParam] = useState(null);
-  const navigate = useNavigate();
   
   // Check if we're on the game path
-  const isGamePath = location.pathname === '/game';
+  const isGamePath = pathname === '/game';
   
   useEffect(() => {
     // Handle URL parameter
-    const queryParams = new URLSearchParams(location.search);
-    const encodedUrl = queryParams.get('url');
+    const encodedUrl = searchParams.get('url');
     if (encodedUrl) {
       const decodedUrl = decodeURIComponent(encodedUrl);
       console.log('Encoded URL:', encodedUrl);
@@ -63,13 +71,13 @@ const Home = () => {
       setInitialUrlParam(decodedUrl);
     }
 
-    // console.log({ id });
-    setCurrentConversation(id);
+    console.log("🔍 Home useEffect - id from useParams:", { id, type: typeof id, isUndefined: id === undefined });
+    setCurrentConversation(id || ''); // Fix: use empty string if id is undefined
     setNewSearch(false);
     if (!id) {
       setNewSearch(true);
     }
-  }, [id, location.search, setCurrentConversation, setNewSearch]);
+  }, [id, searchParams, setCurrentConversation, setNewSearch]);
 
   useEffect(() => {
     if (isSearchMoved) {
@@ -122,7 +130,12 @@ const Home = () => {
       sx={{
         // Ensure at least full-viewport height, but allow page to extend and scroll
         minHeight: { xs: '100svh', sm: '100vh' },
-        background: '#F8FAFF',
+        bbackground: 'transparent',
+        backgroundImage: 'url(/icons/background/background.png)',
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        backgroundRepeat: 'no-repeat',
+        backgroundAttachment: 'fixed',
         display: 'flex',
         flexDirection: 'column',
         overflowX: 'hidden',      // Hide horizontal overflow
@@ -130,6 +143,20 @@ const Home = () => {
         position: 'relative',
         // Mobile momentum scrolling
         WebkitOverflowScrolling: 'touch',
+        '&::before': {
+          content: '""',
+          position: 'absolute',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          background: 'rgba(248, 250, 255, 0.85)',
+          zIndex: 0,
+        },
+        '& > *': {
+          position: 'relative',
+          zIndex: 1,
+        }
       }}
     >
       <LoginModal />
@@ -143,7 +170,7 @@ const Home = () => {
           borderBottom: '1px solid rgba(0, 102, 255, 0.1)',
         }}
       >
-        <Toolbar sx={{ minHeight: '70px !important', justifyContent: 'space-between', paddingX: { xs: 2, sm: 4 } }}>
+        <Toolbar sx={{ minHeight: '50px !important', justifyContent: 'space-between', paddingX: { xs: 2, sm: 4 } }}>
           <Box sx={{ width: { xs: 40, md: 60 }, display: 'flex', alignItems: 'center' }}>
             {isAuthenticated && (
               <IconButton 
@@ -167,15 +194,15 @@ const Home = () => {
               </IconButton>
             )}
           </Box>
-          <Box sx={{ flexGrow: 1, display: 'flex', justifyContent: 'center' }}>
-            <a href="https://app.facticity.ai" style={{ textDecoration: 'none', display: 'flex', alignItems: 'center' }}>
+          <Box sx={{ flexGrow: 1, display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+            <a href="/" style={{ textDecoration: 'none', display: 'flex', alignItems: 'center' }}>
               <img
-                src="/facticityailogo-02.png"
-                alt="Facticity.AI"
+                src="https://see.fontimg.com/api/rf5/KVdLp/YzgwNzgzNWY1N2M2NDc1MzgzNTExOWYzMWFkY2ViMmQudHRm/QVJBSVNUT1RMRQ/spartacus.png?r=fs&h=98&w=1500&fg=0066FF&bg=FFFFFF&tb=1&s=65"
+                alt="ARAISTOTLE"
                 style={{
                   paddingTop: '2px',
                   width: 'auto',
-                  height: isMdUp ? '36px' : '30px',
+                  height: isMdUp ? '28px' : '24px',
                 }}
               />
             </a>
@@ -191,7 +218,7 @@ const Home = () => {
             {isAuthenticated && (
               <>
                 <IconButton 
-                  onClick={() => navigate('/rewards')} 
+                  onClick={() => router.push('/rewards')} 
                   size="small" 
                   sx={{ 
                     color: '#0066FF',
@@ -275,7 +302,7 @@ const Home = () => {
           flex: '1 1 0', // Take remaining space after AppBar and Banner, allow shrinking to 0
           display: 'flex',
           position: 'relative',
-          background: '#F1F3FE',
+          background: 'transparent',
           opacity: componentsLoaded ? 1 : 0,
           transform: componentsLoaded ? 'translateY(0)' : 'translateY(30px)',
           transition: 'all 0.5s ease-in-out 0.3s',

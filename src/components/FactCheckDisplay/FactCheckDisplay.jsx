@@ -32,7 +32,8 @@ import ExpandMoreIcon from '@mui/icons-material/ExpandMore'; // Import ExpandMor
 import ExpandLessIcon from '@mui/icons-material/ExpandLess'; // Import ExpandLessIcon
 import useAuth from '../../auth/useAuthHook';
 import PropTypes from 'prop-types';
-import TaskActions from '../Interactions/InteractionBar';
+// import TaskActions from '../Interactions/InteractionBar';
+import TaskActions from '@/components/Interactions';
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 import ArrowDropUpIcon from '@mui/icons-material/ArrowDropUp';
 import ScatterPlot from './plot';
@@ -51,6 +52,9 @@ const DUCKDUCKGO_API = 'https://api.allorigins.win/raw?url=';
 
 // Utility Functions
 const getDomain = (url) => {
+    if (!url || url === undefined || url === null) {
+        return '';
+    }
     try {
         const { hostname } = new URL(url);
         return hostname;
@@ -85,24 +89,6 @@ const fetchDuckDuckGo = async (query) => {
 };
 
 
-
-
-// async function updateProSearches(userEmail) {
-//     try {
-//       const response = await axios.post(`${backendUrl}/update_pro_searches`, {
-//         userEmail: userEmail, // Pass the logged-in user's email
-//       });
-
-//       if (response.data.success) {
-//         console.log("Pro search count updated successfully:", response.data.message);
-//       } else {
-//         console.error("Failed to update pro search count:", response.data.error);
-//       }
-//     } catch (error) {
-//       console.error("Error while updating pro search count:", error.message);
-//     }
-//   }
-// Subcomponents
 
 const ClarificationSection = ({
     clarification,
@@ -178,7 +164,7 @@ const SourceCard = ({ step, index, tags, userEmail, blurred = false }) => {
         }
     };
 
-    const domain = getDomain(step.link);
+    const domain = getDomain(step?.link);
     const faviconUrl = domain
         ? `https://www.google.com/s2/favicons?domain=${domain}`
         : '';
@@ -238,7 +224,7 @@ const SourceCard = ({ step, index, tags, userEmail, blurred = false }) => {
                                         style={{ width: '16px', height: '16px', marginRight: '6px' }}
                                     />
                                 )}
-                                {step.link ? (
+                                {step?.link ? (
                                     <Typography variant="body2" color="textSecondary">
                                         <a
                                             href={step.link}
@@ -313,7 +299,7 @@ const SourceCard = ({ step, index, tags, userEmail, blurred = false }) => {
                             <>
                                 <Button
                                     variant="contained"
-                                    onClick={() => (window.location.href = '/subscription')}
+                                    onClick={() => (window.location.href = '/subscriptions')}
                                     sx={{
                                         backgroundColor: "#0066FF",
                                         borderRadius: "30px",
@@ -391,31 +377,17 @@ const PaginationControls = ({ currentPage, totalPages, onPrevious, onNext }) => 
 );
 
 function getRenderingOptions(creditsLeft, isPro, userEmail) {
-    const outOfCredits = creditsLeft <= 0;
-    const notLoggedIn = false;
-  
-    let message = null;
-    let button = null;
-  
-    if (notLoggedIn) {
-      message = "Please log in for free daily fact checks.";
-      button = "login";
-    } else if (outOfCredits) {
-      message = isPro
-        ? "Your daily credits will refresh tomorrow, so come back tomorrow for more."
-        : "Your daily credits will refresh tomorrow. Subscribe to Pro for more daily credits.";
-      button = "subscription";
-    }
-  
+    // Disabled visualization mode - always return default options
+
     return {
-      limitSource: outOfCredits,
-      blur: outOfCredits,
-      hideDisambiguation: outOfCredits,
-      truncateExplanation: outOfCredits,
-      hideBias: outOfCredits,
-      message: message,
-      button: button,
-      isPro: isPro
+      limitSource: false,
+      blur: false,
+      hideDisambiguation: false,
+      truncateExplanation: false,
+      hideBias: false,
+      message: null,
+      button: null,
+      isPro: false
     };
   }
   
@@ -427,7 +399,7 @@ function getRenderingOptions(creditsLeft, isPro, userEmail) {
 }
   
 // New component for reward popup
-const RewardPopup = ({ open, onClose, taskId, userEmail, backendUrl, interactionBarRef, onPermanentDisable, scrollToInteractionBar }) => {
+const RewardPopup = ({ open, onClose, taskId, userEmail, backendUrl, interactionBarRef, onPermanentDisable, scrollToInteractionBar, enableSharePoints }) => {
     const [loading, setLoading] = useState(false);
 
     const handleEarnCredits = () => {
@@ -470,7 +442,10 @@ const RewardPopup = ({ open, onClose, taskId, userEmail, backendUrl, interaction
             </DialogTitle>
             <DialogContent>
                 <Typography variant="body1" sx={{ mb: 2 }}>
-                    Share your fact check or give feedback to earn additional credits. This helps us improve and expand our services.
+                    {enableSharePoints 
+                        ? 'Share your fact check or give feedback to earn additional credits. This helps us improve and expand our services.'
+                        : 'Share your fact check or give feedback. This helps us improve and expand our services.'
+                    }
                 </Typography>
             </DialogContent>
             <DialogActions sx={{ justifyContent: 'space-between', pb: 2, px: 3 }}>
@@ -564,11 +539,12 @@ const FactCheckDisplay = ({ query, id, process, setDone, skipDisambiguation, max
         setCommunityCredits,
         showRewardPopup,
         setShowRewardPopup,
-        distributedUrl
+        distributedUrl,
+        enableSharePoints
     } = useAppContext();
 
-    const DISAMBIGUATE_URL = backendUrl +'/disambiguate';
-    const MODIFYQUERY_URL = backendUrl +'/modifyquery';
+    const DISAMBIGUATE_URL = '/api/disambiguate';
+    const MODIFYQUERY_URL = '/api/modifyquery';
     
     const toggleDisambSection = () => {
         setDisambIsOpen((prev) => !prev);
@@ -593,7 +569,7 @@ const FactCheckDisplay = ({ query, id, process, setDone, skipDisambiguation, max
 
     async function updateProSearches(userEmail) {
         try {
-        const response = await axios.post(backendUrl+"/update_pro_searches", {
+        const response = await axios.post("/api/update_pro_searches", {
             userEmail: userEmail, // Pass the logged-in user's email
         });
     
@@ -610,7 +586,8 @@ const FactCheckDisplay = ({ query, id, process, setDone, skipDisambiguation, max
 
 
     useEffect(() => {
-        var tag = getRenderingOptions(visualisationMode.userCredits, visualisationMode.isPro, email)
+        // Keep credit tracking but disable UI restrictions
+        var tag = getRenderingOptions(visualisationMode.dailyCredits, visualisationMode.isPro, email)
         setTags(tag);
       }, [visualisationMode, setTags]); 
 
@@ -679,12 +656,12 @@ const FactCheckDisplay = ({ query, id, process, setDone, skipDisambiguation, max
     
 
     async function addTaskId(id, taskId) {
-        const url = backendUrl+"/add_task_id";
+        const url = "/api/add_task_id";
         const data = {
             "_id": id,
             "task_id": taskId,
-            "mode":mode,
-            "link":link
+            "mode": mode,
+            "link": link
         };
 
         try {
@@ -711,7 +688,7 @@ const FactCheckDisplay = ({ query, id, process, setDone, skipDisambiguation, max
 
     async function addCachedTasktodB(id, input, result) {
         
-        const url = backendUrl+"/add_cache_db";
+        const url = "/api/add_cache_db";
         result['userEmail'] = email
         const data = {
             "_id": id,
@@ -803,9 +780,7 @@ const FactCheckDisplay = ({ query, id, process, setDone, skipDisambiguation, max
 
     // Function to perform the final search
     const performSearch = async (finalQuery) => {
-        // console.log("perform search initiated")
         if (output){
-            // console.log({output})
             setResult(output);
             setTaskId(output['task_id'])
             setSteps(output['intermediate_steps'])
@@ -870,7 +845,6 @@ const FactCheckDisplay = ({ query, id, process, setDone, skipDisambiguation, max
                 setCommunityCredits(output.visualisationMode.communityCredits || 0)
             }
 
-            console.log({output})
             if (output?.sourceCount === 0 && output?.new_search === true) {
                 handleRedo();
                 setDisableRetry(true);
@@ -926,7 +900,6 @@ const FactCheckDisplay = ({ query, id, process, setDone, skipDisambiguation, max
                 setError(null);
                 // Show reward popup after a short delay if enabled
                 console.log("show reward popup")
-                // Show reward popup after a short delay if enabled
                 scrollToOverallAssessment();
                 setTimeout(() => {
                     handleShowRewardPopup();
@@ -1054,9 +1027,6 @@ const FactCheckDisplay = ({ query, id, process, setDone, skipDisambiguation, max
         }
     }, [query, skipDisambiguation, process]);
 
-    // useEffect(() => {
-    //     console.log(sortedSteps)
-    // }, [sortedSteps])
 
     const parseAndSortSteps = (steps) => {
         if (!Array.isArray(steps)) return [];
@@ -1076,15 +1046,12 @@ const FactCheckDisplay = ({ query, id, process, setDone, skipDisambiguation, max
     };
 
     useEffect(() => {
-        console.log("hit")
         const sorted = parseAndSortSteps(steps);
         if (sorted.length > 0) {
             setSortedSteps(sorted);
         } else {
             setSortedSteps([]);
         }
-
-        // Optionally handle result.Classification here
 
     }, [steps, result]);
 
@@ -1127,12 +1094,12 @@ const FactCheckDisplay = ({ query, id, process, setDone, skipDisambiguation, max
                 maxWidth: maxWidth,
                 margin: '0px auto',
                 overflowY: 'auto',
-                backgroundColor: 'transparent',
+                backgroundColor: '#ffffff',
                 color: '#333',
                 textAlign: 'left',
-            }}
-        >
-                  {/* <WalkthroughFactCheck /> */}
+            }}>
+            
+            {/* <WalkthroughFactCheck /> */}
 
             <div>
                 {/* Display Query and Classification with Expand/Collapse Button if expandable */}
@@ -1144,7 +1111,7 @@ const FactCheckDisplay = ({ query, id, process, setDone, skipDisambiguation, max
                         justifyContent: 'space-between',
                     }}
                     >
-                    <Typography style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center' }}>
+                    <Typography component="div" style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center' }}>
                         {/* {factDisplay} */}
                         {timestamp && <div
                                     style={{
@@ -1170,7 +1137,6 @@ const FactCheckDisplay = ({ query, id, process, setDone, skipDisambiguation, max
                             </Button>
                         ) : result ? (
                             <>
-                            {console.log({result})}
                             <Chip
                                 className = 'facti-tut-step-7'
                                 label={result.Classification}
@@ -1258,7 +1224,6 @@ const FactCheckDisplay = ({ query, id, process, setDone, skipDisambiguation, max
                             </div>
                         ) : result ? (
                             <>
-                            {console.log({result})}
                             <Grow in={Boolean(result)} >
                                 <div style={{ fontFamily: 'Arial' }} >
                                         <div style={{ marginTop: '10px', textAlign: 'left' }}>
@@ -1297,7 +1262,7 @@ const FactCheckDisplay = ({ query, id, process, setDone, skipDisambiguation, max
                                                 </span>
                                             ) : tags.button === 'subscription' ? (
                                                 <a
-                                                    href="/subscription"
+                                                    href="/subscriptions"
                                                     style={{
                                                         marginTop: '10px',
                                                         display: 'inline-block',
@@ -1391,7 +1356,6 @@ const FactCheckDisplay = ({ query, id, process, setDone, skipDisambiguation, max
                                         <div>
                                             {result.bias && Array.isArray(result.bias) && result.bias.length > 1 && (
                                                 <div>
-                                                    {/* {console.log("plotting")} */}
                                                     <Grid container spacing={2}>
                                                     <Grid item xs={12} md={5}>
                                                         <div>
@@ -1511,7 +1475,6 @@ const FactCheckDisplay = ({ query, id, process, setDone, skipDisambiguation, max
                             </div>
                         ) : result ? (
                             <>
-                            {console.log({result})}
                             <Grow in={Boolean(result)}>
                                 <div style={{ fontFamily: 'Arial' }} className='facti-tut-step-8'>
                                         <div style={{ marginTop: '10px', textAlign: 'left' }}>
@@ -1550,7 +1513,7 @@ const FactCheckDisplay = ({ query, id, process, setDone, skipDisambiguation, max
                                                     </span>
                                                 ) : tags.button === 'subscription' ? (
                                                     <a
-                                                        href="/subscription"
+                                                        href="/subscriptions"
                                                         style={{
                                                             marginTop: '10px',
                                                             display: 'inline-block',
@@ -1648,7 +1611,6 @@ const FactCheckDisplay = ({ query, id, process, setDone, skipDisambiguation, max
                                         <div>
                                             {result.bias && Array.isArray(result.bias) && result.bias.length > 1 && (
                                                 <div>
-                                                    {/* {console.log("plotting")} */}
                                                     <Grid container spacing={2}>
                                                     <Grid item xs={12} md={5}>
                                                         <div>
@@ -1753,6 +1715,7 @@ const FactCheckDisplay = ({ query, id, process, setDone, skipDisambiguation, max
                 interactionBarRef={interactionBarRef}
                 onPermanentDisable={handlePermanentDisable}
                 scrollToInteractionBar={scrollToInteractionBar}
+                enableSharePoints={enableSharePoints}
             />
             
             {/* Add a data attribute for TaskActions to find */}

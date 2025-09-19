@@ -9,7 +9,7 @@ export const queryAPI = async (searchQuery, files, AccessToken) => {
     };
     console.log({payload})
     try {
-      const response = await fetch('https://backend.facticity.ai/query', {
+      const response = await fetch('/api/query', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
