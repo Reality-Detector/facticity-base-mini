@@ -1,3 +1,5 @@
+'use client';
+
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import {
   Box,
@@ -29,8 +31,8 @@ import {
   TextField
 } from '@mui/material';
 import Tooltip, { tooltipClasses } from '@mui/material/Tooltip';
-import { useAppContext } from './AppProvider';
-import useAuth from './useAuthHook';
+import { useAppContext } from '@/AppProvider';
+import useAuth from '../auth/useAuthHook';
 import confetti from 'canvas-confetti';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import CancelIcon from '@mui/icons-material/Cancel';

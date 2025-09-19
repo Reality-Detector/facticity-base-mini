@@ -18,7 +18,7 @@ import Banner from './Banner';
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 import '@/styles/globals.css'; // Animation styles are now in globals.css
 
-const Home = ({conversationId}) => {
+const Home = () => {
   const [isSidebarOpen, setSidebarOpen] = useState(false);
   const [componentsLoaded, setComponentsLoaded] = useState(false);
   
@@ -46,10 +46,8 @@ const Home = ({conversationId}) => {
   const searchParams = useSearchParams();
   const router = useRouter();
 
-  // Temporary solution to use pathname for conversationId if undefined
-  const id = conversationId ?? (
-    pathname.startsWith("/c/") ? pathname.split("/")[2] : undefined
-  );
+  // Extract conversation ID from pathname
+  const id = pathname.startsWith("/c/") ? pathname.split("/")[2] : undefined;
   
   const theme = useTheme();
   const isSmUp = useMediaQuery(theme.breakpoints.up('sm'));

@@ -32,9 +32,9 @@ import {
   Collapse,
 } from "@mui/material";
 import FactCheckDisplay from '../FactCheckDisplay';
-import './animation.css'; // Ensure .search-container styles are removed/commented out
-import './scrollbar.css';
-import { useAppContext } from '../../AppProvider';
+
+import '@/styles/globals.css';
+import { useAppContext } from '@/AppProvider';
 import { v4 as uuidv4 } from 'uuid';
 import SearchBar from './searchBar';
 import ErrorComponent from './ErrorComponent';
@@ -71,7 +71,6 @@ import {
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import ExpandLessIcon from "@mui/icons-material/ExpandLess";
 import ErrorOutlineIcon from "@mui/icons-material/ErrorOutline";
-import Game from '../../archived/game';
 
 import { Image as ImageIcon, Description as FileTextIcon, YouTube as YoutubeIcon, TextFields as TextIcon, UnfoldLess as UnfoldLessIcon, UnfoldMore as UnfoldMoreIcon } from "@mui/icons-material";
 
@@ -79,7 +78,10 @@ import { Image as ImageIcon, Description as FileTextIcon, YouTube as YoutubeIcon
 const BuyFACYButton = ({ variant = "contained", size = "medium", sx = {} }) => {
   const handleBuyFACY = () => {
     // Open Uniswap on Base chain with ETH as input and $FACY as output
-    window.open('https://app.uniswap.org/swap?chain=base&inputCurrency=NATIVE&outputCurrency=0xfac77f01957ed1b3dd1cbea992199b8f85b6e886', '_blank');
+    if (typeof window !== 'undefined') {
+      window.open('https://app.uniswap.org/swap?chain=base&inputCurrency=NATIVE&outputCurrency=0xfac77f01957ed1b3dd1cbea992199b8f85b6e886', '_blank', 'noopener,noreferrer');
+    }
+    // window.open('https://app.uniswap.org/swap?chain=base&inputCurrency=NATIVE&outputCurrency=0xfac77f01957ed1b3dd1cbea992199b8f85b6e886', '_blank');
   };
 
   return (
@@ -121,7 +123,7 @@ const CompactLeaderboardDisplay = () => {
         headers['Validator'] = 'privy';
       }
       
-      const response = await fetch(`${backendUrl}/api/get_userhandle?email=${encodeURIComponent(user.id)}`, {
+      const response = await fetch('/api/api/get_userhandle?email=${encodeURIComponent(user.id)}', {
         headers: headers,
       });
       if (!response.ok) throw new Error('Failed to fetch user handle');
@@ -140,7 +142,7 @@ const CompactLeaderboardDisplay = () => {
   const fetchGamefiles = async () => {
     setLoading(true);
     try {
-      const response = await fetch(`${backendUrl}/get-all-gamefiles`);
+      const response = await fetch('/api/get-all-gamefiles');
       
       if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
       const data = await response.json();
@@ -181,7 +183,7 @@ const CompactLeaderboardDisplay = () => {
     setLeaderboardLoading(prev => ({ ...prev, [gameId]: true }));
     
     try {
-      const response = await fetch(`${backendUrl}/api/leaderboard/game/${gameId}`);
+      const response = await fetch(`/api/api/leaderboard/game/${gameId}`);
       
       if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
       const data = await response.json();
@@ -1193,7 +1195,7 @@ const SearchComponent = ({ isSearchMoved, setIsSearchMoved, isMdUp, initialUrlPa
       if (!currentConversation || !user?.email) return;
       
       try {
-        const response = await fetch(backendUrl+`/check-convo-user-mapping`, {
+        const response = await fetch('/api/check-convo-user-mapping', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -1284,7 +1286,7 @@ const SearchComponent = ({ isSearchMoved, setIsSearchMoved, isMdUp, initialUrlPa
 
   const sendCurrentConversation = async (email, currentConversation, query) => {
     try {
-      await fetch(backendUrl+'/update_ids', {
+      await fetch('/api/update_ids', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -1507,7 +1509,7 @@ const SearchComponent = ({ isSearchMoved, setIsSearchMoved, isMdUp, initialUrlPa
     const checkProSearches = async () => {
       try {
         if(isProUser == false){
-          const response = await axios.post(`${backendUrl}/check_pro_searches`, {
+          const response = await axios.post('/api/check_pro_searches', {
             userEmail: user.email,
           });
           //truth table logic
