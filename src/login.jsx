@@ -1,3 +1,5 @@
+'use client';
+
 import useAuth from './auth/useAuthHook';
 import { useEffect } from "react";
 
