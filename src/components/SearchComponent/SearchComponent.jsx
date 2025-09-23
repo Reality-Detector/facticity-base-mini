@@ -16,7 +16,6 @@ import {
   CardContent,
   Stack,
   //useTheme,
-  Button,
   Chip,
   IconButton,
   CircularProgress,
@@ -31,6 +30,7 @@ import {
   ListItemText,
   Collapse,
 } from "@mui/material";
+import { FacticityButton } from '@/components/wrappers';
 import FactCheckDisplay from '../FactCheckDisplay';
 
 import '@/styles/globals.css';
@@ -85,11 +85,11 @@ const BuyFACYButton = ({ variant = "contained", size = "medium", sx = {} }) => {
   };
 
   return (
-    <Button
+    <FacticityButton
     color="warning" borderInverted onClick={handleBuyFACY}
     >
       Buy $FACY
-    </Button>
+    </FacticityButton>
   );
 };
 
@@ -786,50 +786,56 @@ const InitialStatePanel = ({
                 width: "100%",
               }}
             >
-              <Chip
-                label="Points Breakdown"
-                clickable
-                component={Link}
-                href="/rewards"
-                sx={{
-                  bgcolor: "#0066FF",
-                  color: "white",
-                  fontSize: { xs: "12px", sm: "14px" },
-                  px: { xs: 0.75, sm: 1 },
-                  py: { xs: 0.2, sm: 0.25 },
-                  "&:hover": { bgcolor: "#004FCC" },
-                }}
-              />
-              <Chip
-                label="Tutorial"
-                clickable
+              <Link href="/rewards" passHref>
+                <FacticityButton
+                  size="sm"
+                  variant="contained"
+                  color="primary"
+                  sx={{
+                    fontSize: { xs: "12px", sm: "14px" },
+                    px: { xs: 0.75, sm: 1 },
+                    py: { xs: 0.2, sm: 0.25 },
+                    minHeight: 'auto',
+                    textTransform: 'none'
+                  }}
+                >
+                  Points Breakdown
+                </FacticityButton>
+              </Link>
+              <FacticityButton
+                size="sm"
+                variant="contained"
+                color="primary"
                 onClick={() => {
                   setForceRun(true);
                   setRun(true);
                 }}
                 sx={{
-                  bgcolor: "#0066FF",
-                  color: "white",
                   fontSize: { xs: "12px", sm: "14px" },
                   px: { xs: 0.75, sm: 1 },
                   py: { xs: 0.2, sm: 0.25 },
-                  "&:hover": { bgcolor: "#004FCC" },
+                  minHeight: 'auto',
+                  textTransform: 'none'
                 }}
-              />
-              <Chip
-                label="Tagged Tweets"
-                clickable
-                component={Link}
-                href="/tagged-tweets"
-                sx={{
-                  bgcolor: "#0066FF",
-                  color: "white",
-                  fontSize: { xs: "12px", sm: "14px" },
-                  px: { xs: 0.75, sm: 1 },
-                  py: { xs: 0.2, sm: 0.25 },
-                  "&:hover": { bgcolor: "#004FCC" },
-                }}
-              />
+              >
+                Tutorial
+              </FacticityButton>
+              <Link href="/tagged-tweets" passHref>
+                <FacticityButton
+                  size="small"
+                  variant="contained"
+                  color="primary"
+                  sx={{
+                    fontSize: { xs: "12px", sm: "14px" },
+                    px: { xs: 0.75, sm: 1 },
+                    py: { xs: 0.2, sm: 0.25 },
+                    minHeight: 'auto',
+                    textTransform: 'none'
+                  }}
+                >
+                  Tagged Tweets
+                </FacticityButton>
+              </Link>
               {/* Writer chip disabled */}
               {/* <Chip
                 label="Writer"
@@ -948,7 +954,7 @@ const InitialStatePanel = ({
                       mt: 'auto',
                       pt: 1
                     }}>
-                      <Button
+                      <FacticityButton
                         size="small"
                         onClick={() => setAboutExpanded(!aboutExpanded)}
                         sx={{
@@ -965,7 +971,7 @@ const InitialStatePanel = ({
                         endIcon={aboutExpanded ? <ExpandLessIcon sx={{ fontSize: '1rem' }} /> : <ExpandMoreIcon sx={{ fontSize: '1rem' }} />}
                       >
                         {aboutExpanded ? 'Show less' : 'Show more'}
-                      </Button>
+                      </FacticityButton>
                     </Box>
                   </Box>
                 </Box>
@@ -2000,7 +2006,7 @@ const SearchComponent = ({ isSearchMoved, setIsSearchMoved, isMdUp, initialUrlPa
           )}
         </DialogContent>
         <DialogActions sx={{ pt: 2, pb: 1, px: 3 }}>
-          <Button
+          <FacticityButton
             onClick={handleCreditDialogClose}
             variant="outlined"
             sx={{
@@ -2012,7 +2018,7 @@ const SearchComponent = ({ isSearchMoved, setIsSearchMoved, isMdUp, initialUrlPa
             }}
           >
             Not Now
-          </Button>
+          </FacticityButton>
           {/*           <Button
             variant="contained"
             sx={{
@@ -2045,10 +2051,10 @@ const SearchComponent = ({ isSearchMoved, setIsSearchMoved, isMdUp, initialUrlPa
           </Typography>
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleProDialogClose} color="secondary">
+          <FacticityButton onClick={handleProDialogClose} color="secondary">
             Not Now, Continue With Free
-          </Button>
-          <Button
+          </FacticityButton>
+          <FacticityButton
             variant="contained"
             color="primary"
             onClick={() => {
@@ -2057,7 +2063,7 @@ const SearchComponent = ({ isSearchMoved, setIsSearchMoved, isMdUp, initialUrlPa
             }}
           >
             Go Pro
-          </Button>
+          </FacticityButton>
         </DialogActions>
       </Dialog>
     </Box>
