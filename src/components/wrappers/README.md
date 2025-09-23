@@ -1,12 +1,12 @@
 # Facticity Component Wrappers
 
-This directory contains wrapper components that maintain existing Material-UI APIs while using shadcn/ui components underneath.
+This folder contains wrapper components that maintain existing Material-UI APIs while using shadcn/ui components underneath.
 
 ## Purpose
 
 During the migration from Material-UI to shadcn/ui, these wrappers allow us to:
 
-1. **Maintain existing APIs** - No need to change props across 80+ files
+1. **Maintain existing APIs** - No need to change props for simple components like Button, Card and Badge (I hope)
 2. **Gradual migration** - Can be deployed with feature flags
 3. **Mobile optimization** - Add mobile-first enhancements without breaking existing code
 4. **Consistent branding** - Apply Facticity-specific styling consistently
@@ -31,7 +31,7 @@ import { FacticityButton } from '@/components/wrappers';
 </FacticityButton>
 ```
 
-The wrapper translates MUI props to shadcn/ui equivalents while maintaining the same API.
+The wrapper translates MUI props to shadcn/ui equivalents while maintaining the (mostly) same API. Transitioning is smooth but complex components will require individual attention for refactoring..
 
 ## File Naming Convention
 
