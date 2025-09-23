@@ -9,4 +9,5 @@ export {
   useFeatureFlags 
 } from './FeatureFlagWrapper';
 
-// Wrapper components will be added here as they are created
+// Wrapper Components
+export { default as FacticityButton } from './FacticityButton';
