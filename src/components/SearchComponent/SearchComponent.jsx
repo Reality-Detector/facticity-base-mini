@@ -86,6 +86,7 @@ const BuyFACYButton = ({ variant = "contained", size = "medium", sx = {} }) => {
 
   return (
     <FacticityButton
+    size="small"
     color="warning" borderInverted onClick={handleBuyFACY}
     >
       Buy $FACY
@@ -788,7 +789,7 @@ const InitialStatePanel = ({
             >
               <Link href="/rewards" passHref>
                 <FacticityButton
-                  size="sm"
+                  size="small"
                   variant="contained"
                   color="primary"
                   sx={{
@@ -803,7 +804,7 @@ const InitialStatePanel = ({
                 </FacticityButton>
               </Link>
               <FacticityButton
-                size="sm"
+                size="small"
                 variant="contained"
                 color="primary"
                 onClick={() => {
