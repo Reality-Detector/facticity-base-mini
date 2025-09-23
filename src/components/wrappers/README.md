@@ -40,10 +40,82 @@ The wrapper translates MUI props to shadcn/ui equivalents while maintaining the 
 - `FacticityCard.jsx` - Card/Container wrapper
 - etc.
 
+## Feature Flag Usage
+
+Enable gradual rollout with environment variables in `.env.local`:
+
+### Main idea/flow for switching between new and old components:
+
+Global flag OFF → Everything uses MUI (safe default)
+
+Global flag ON → Check individual component flags
+  
+  └─ Component flag ON → Use shadcn
+  
+  └─ Component flag OFF → Use MUI  
+  
+  └─ No component flag → Use shadcn (default to new)
+
+This scheme is to quickly sitch between mui and shadcn copmonents ro that rollback is possible with one global flag
+```bash
+# Global flag - enables/disables all shadcn components
+NEXT_PUBLIC_USE_NEW_UI=true
+
+# Component-specific flags (only work if global flag is true)
+NEXT_PUBLIC_USE_NEW_UI_BUTTON=true
+NEXT_PUBLIC_USE_NEW_UI_INPUT=true
+NEXT_PUBLIC_USE_NEW_UI_CARD=true
+```
+
+### Using Feature Flag Wrappers
+
+```jsx
+import { FeatureFlagWrapper } from '@/components/wrappers';
+import { Button } from '@mui/material';
+import { Button as ShadcnButton } from '@/components/ui';
+
+<FeatureFlagWrapper
+  oldComponent={Button}
+  newComponent={ShadcnButton}
+  variant="contained"
+  color="primary"
+>
+  Fact Check
+</FeatureFlagWrapper>
+```
+
+### Using Component-Specific Flags
+
+```jsx
+import { ComponentFeatureFlagWrapper } from '@/components/wrappers';
+
+<ComponentFeatureFlagWrapper
+  componentName="Button"
+  oldComponent={MuiButton}
+  newComponent={ShadcnButton}
+  variant="contained"
+>
+  Click me
+</ComponentFeatureFlagWrapper>
+```
+
+### Using Feature Flag Hooks
+
+```jsx
+import { useFeatureFlags } from '@/components/wrappers';
+
+const MyComponent = () => {
+  const { useNewUIForComponent, getComponent } = useFeatureFlags('Button');
+  
+  const ButtonComponent = getComponent(ShadcnButton, MuiButton);
+  
+  return <ButtonComponent>Click me</ButtonComponent>;
+};
+```
+
 ## Mobile-First Guidelines
 
 All wrappers should:
 - Use minimum 44px touch targets
 - Implement proper focus states for accessibility
 - Support responsive sizing out of the box
-- Include haptic feedback where appropriate (for Base Mini App)
