@@ -1,78 +1,58 @@
+# Facticity
 
-# Dev Practices for Facticity
+An AI-powered fact-checking platform built with **Next.js** (migrated from React + Vite).  
+The app provides real-time verification of claims across text, audio, video, and documents, and is being actively extended into a **Base Mini App** and a new UI with **shadcn/ui**.
 
-Create 'temp' branches while working on new features/bugs and merge into the primary branch
+## Tech Stack
 
-Wherever possible, create new components in order to prevent App.js from becoming bloated.
-
-Add short comment lines to explain code flow and code blocks, so that it's easier for other devs who might work on the same code block in the future.
-
-For using backend or API URLs, displaying long hardcoded texts -> create an entry in the config file, and import the key of the entry in code and use. This would facilitate easier reusability.
-
-Eg: if a text that we are displaying, say 'Enter a Fact about someone or something and I will fact check it' needs to be updated, it can be easily changed just in the config file, instead of having to go through the code and find the div and make changes.
-
-Usage of Feature Flags: It is recommended to have modular features, certain app behaviors (both frontend and backend) that can be toggled, under a Feature Flag. If the feature flag for a particular feature is set to True in the config file, then this feature would be displayed/used in the UI.  
-
-Eg: Let's say that one feature/behavior of the application is referring to Knowledge Base. If the 'USE_KNOWLEDGE_BASE' flag is set to true in the config file, then in the code flow, knowledge base will be used. If set to false, then those code blocks should be skipped (which will be enforced by the boolean variable USE_KNOWLEDGE_BASE). 
-
-If we want to turn off knowledge base, then instead of having to comment out all of the code blocks related to knowledge base, just changing the flag from true to false in the config file would be enough. This will automatically reflect in the entire code flow.
+- **Framework:** Next.js 15 (App Router)  
+- **UI:** Material-UI (in active use), [shadcn/ui](https://ui.shadcn.com/) (under migration)  
+- **Styling:** CSS modules & global styles  
+- **Authentication:** Auth0 + Privy (hybrid setup)  
+- **Build Tooling:** Next.js native build & optimizations  
+- **Deployment:** Vercel / containerized (nginx, Docker)  
+- **Onchain Integration:** Coinbase OnchainKit + MiniKit (in progress under `base-mini-app-conversion` branch)
 
 
-# Getting Started with Create React App
+## Dev Practices
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
-
-## Available Scripts
-
-In the project directory, you can run:
-
-### `npm start`
-
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
-
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
-
-### `npm test`
-
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
-
-### `npm run build`
-
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
-
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
-
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
-
-### `npm run eject`
-
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
-
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
-
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
-
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+- Always create **temporary feature branches** when working on new features/bugs, and merge them into your working branch via PRs.  
+- Create **new components** whenever possible to prevent bloating in src/components in a logical sub-folder.
+- Add **short comment lines** to explain code flow and blocks, making it easier for other devs to maintain.  
+- For **backend/API URLs or long hardcoded texts**, use environment variables instead of hardcoding.  
+  - Define them in `.env.local` for development and `.env.production` for production.  
+  - Access them in code with `process.env.NEXT_PUBLIC_*`.  
+  - Example:  
+    ```env
+    # .env.local
+    NEXT_PUBLIC_BACKEND_URL=http://127.0.0.1:5000
+    ```  
+    ```ts
+    const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL;
+    ```
 
 
 
+## Branching & Workflow
+
+We maintain **two active feature branches** and one integration branch:
+
+- `base-mini-app-conversion` → Work related to converting the app into a Base Mini App (MiniKit, OnchainKit, wallet context, manifest, etc.)  
+- `shadcn-ui` → Work related to revamping the frontend layout with shadcn/ui components  
+- `dev` → The **common integration branch**. All changes from the feature branches must be merged here via **Pull Requests**.  
+- `master` → Stable release branch. Only merge from `dev` via **Pull Requests** once features are tested and stable.  
+
+### Workflow Rules
+
+1. Developers commit directly to their assigned feature branch (`base-mini-app-conversion` or `shadcn-ui`).  
+2. Changes are merged into `dev` **only via PRs**.  
+3. From `dev`, when stable, changes are promoted to `master` via PRs.  
+4. **Important:** Always pull the latest `dev` branch before committing new work on your feature branch. This keeps collisions minimal.  
+5. Use meaningful commit messages and small, reviewable PRs.  
 
 
+###  Getting Started (Next.js)
 
-# React + Vite
-
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
-
-Currently, two official plugins are available:
-
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
-
-## Expanding the ESLint configuration
-
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+In the project directory, run:
+```bash
+npm run dev
